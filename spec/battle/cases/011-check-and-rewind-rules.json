@@ -1,0 +1,172 @@
+{
+  "name": "チェックとリターンの制限",
+  "description": "同じターンは 2 回チェックできない。チェックポイントが今のターンだけならリターンできない。チェックは最大 2 回。チェックポイント以外のターンにはリターンできない。リターンするとチェックポイントとチェックの回数はリセットされる。リターンは最大 1 回。",
+  "seed": 1,
+  "player": {
+    "hp": 1000,
+    "attack": 300,
+    "defence": 50,
+    "attribute": "note",
+    "attackBuffRate": 0.5,
+    "defenceBuffAmount": 50,
+    "checkMax": 2,
+    "rewindMax": 1,
+    "specialMax": 1,
+    "numbnessResistant": false
+  },
+  "enemies": [
+    {
+      "hp": 99999,
+      "attack": 200,
+      "defence": 100,
+      "attribute": "note",
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 50,
+      "fixedAttackPower": 300,
+      "strongAttackPower": 500,
+      "recoveryRate": 0.3,
+      "changeAttribute": null,
+      "attackDebuff": 0,
+      "defenceDebuff": 0,
+      "turns": [
+        "concentration",
+        "concentration",
+        "concentration",
+        "concentration",
+        "concentration",
+        "concentration",
+        "concentration",
+        "concentration",
+        "concentration",
+        "deathblow"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 2
+      }
+    },
+    {
+      "command": {
+        "type": "check"
+      },
+      "expect": {
+        "turn": 2,
+        "checkpoints": [
+          2
+        ]
+      }
+    },
+    {
+      "command": {
+        "type": "check"
+      },
+      "expect": {
+        "rejected": "ALREADY_CHECKED"
+      }
+    },
+    {
+      "command": {
+        "type": "rewind",
+        "to": 2
+      },
+      "expect": {
+        "rejected": "CANNOT_REWIND_HERE"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 3
+      }
+    },
+    {
+      "command": {
+        "type": "check"
+      },
+      "expect": {
+        "checkpoints": [
+          2,
+          3
+        ]
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 4
+      }
+    },
+    {
+      "command": {
+        "type": "check"
+      },
+      "expect": {
+        "rejected": "CHECK_LIMIT"
+      }
+    },
+    {
+      "command": {
+        "type": "rewind",
+        "to": 4
+      },
+      "expect": {
+        "rejected": "INVALID_REWIND_TARGET"
+      }
+    },
+    {
+      "command": {
+        "type": "rewind",
+        "to": 2
+      },
+      "expect": {
+        "turn": 2,
+        "checkpoints": []
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 3
+      }
+    },
+    {
+      "command": {
+        "type": "check"
+      },
+      "expect": {
+        "checkpoints": [
+          3
+        ]
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 4
+      }
+    },
+    {
+      "command": {
+        "type": "rewind",
+        "to": 3
+      },
+      "expect": {
+        "rejected": "REWIND_LIMIT"
+      }
+    }
+  ]
+}

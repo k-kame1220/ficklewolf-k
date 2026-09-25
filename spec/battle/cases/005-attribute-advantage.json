@@ -1,0 +1,73 @@
+{
+  "name": "有利な属性だと与えるダメージが増え、受けるダメージが減る",
+  "description": "月（プレイヤー）は陽（敵）に有利。自分の攻撃力 ×1.25、敵の攻撃力 ×0.75。",
+  "seed": 1,
+  "player": {
+    "hp": 1000,
+    "attack": 400,
+    "defence": 50,
+    "attribute": "moon",
+    "attackBuffRate": 0.5,
+    "defenceBuffAmount": 50,
+    "checkMax": 2,
+    "rewindMax": 1,
+    "specialMax": 1,
+    "numbnessResistant": false
+  },
+  "enemies": [
+    {
+      "hp": 2000,
+      "attack": 400,
+      "defence": 100,
+      "attribute": "yang",
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 50,
+      "fixedAttackPower": 300,
+      "strongAttackPower": 500,
+      "recoveryRate": 0.3,
+      "changeAttribute": null,
+      "attackDebuff": 0,
+      "defenceDebuff": 0,
+      "turns": [
+        "attack",
+        "attack",
+        "deathblow"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 2,
+        "playerHp": 750,
+        "enemyHp": 1600,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 3,
+        "playerHp": 500,
+        "enemyHp": 1200,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 3,
+        "playerHp": 0,
+        "enemyHp": 1200,
+        "outcome": "lose"
+      }
+    }
+  ]
+}

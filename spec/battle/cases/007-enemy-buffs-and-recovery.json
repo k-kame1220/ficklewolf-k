@@ -1,6 +1,6 @@
 {
-  "name": "リターンしても HP とバフは戻らず、敵の行動だけが戻る",
-  "description": "3 ターン目でチェックし、攻撃したあと 3 ターン目にリターンする。受けたダメージ・与えたダメージ・攻撃バフはそのままで、敵は 3 ターン目の攻撃をもう一度行う。",
+  "name": "敵のバフと回復",
+  "description": "攻撃バフは攻撃倍率に加算、防御バフは防御力に加算（ずっと続く）。超回復は最大 HP の 3 割を回復し、最大 HP を超えたら最大 HP も上がる。全回復は（上がった）最大 HP まで戻る。",
   "seed": 1,
   "player": {
     "hp": 1000,
@@ -21,17 +21,19 @@
       "defence": 100,
       "attribute": "note",
       "attackBuffRate": 0.5,
-      "defenceBuffAmount": 0,
-      "fixedAttackPower": 0,
-      "strongAttackPower": 0,
-      "recoveryRate": 0,
+      "defenceBuffAmount": 50,
+      "fixedAttackPower": 300,
+      "strongAttackPower": 500,
+      "recoveryRate": 0.3,
       "changeAttribute": null,
       "attackDebuff": 0,
       "defenceDebuff": 0,
       "turns": [
-        "defend",
-        "concentration",
+        "attackBuff",
         "attack",
+        "defenceBuff",
+        "rateRecovery",
+        "fullRecovery",
         "concentration",
         "deathblow"
       ]
@@ -45,79 +47,7 @@
       "expect": {
         "turn": 2,
         "playerHp": 1000,
-        "enemyHp": 1940
-      }
-    },
-    {
-      "command": {
-        "type": "attackBuff"
-      },
-      "expect": {
-        "turn": 3,
-        "playerHp": 1000,
-        "enemyHp": 1940
-      }
-    },
-    {
-      "command": {
-        "type": "check"
-      },
-      "expect": {
-        "turn": 3,
-        "checkpoints": [
-          3
-        ]
-      }
-    },
-    {
-      "command": {
-        "type": "attack"
-      },
-      "expect": {
-        "turn": 4,
-        "playerHp": 850,
-        "enemyHp": 1590
-      }
-    },
-    {
-      "command": {
-        "type": "rewind",
-        "to": 3
-      },
-      "expect": {
-        "turn": 3,
-        "playerHp": 850,
-        "enemyHp": 1590,
-        "checkpoints": []
-      }
-    },
-    {
-      "command": {
-        "type": "attack"
-      },
-      "expect": {
-        "turn": 4,
-        "playerHp": 700,
-        "enemyHp": 1240
-      }
-    },
-    {
-      "command": {
-        "type": "rewind",
-        "to": 3
-      },
-      "expect": {
-        "rejected": "NO_CHECKPOINT"
-      }
-    },
-    {
-      "command": {
-        "type": "attack"
-      },
-      "expect": {
-        "turn": 5,
-        "playerHp": 700,
-        "enemyHp": 890,
+        "enemyHp": 1800,
         "outcome": "ongoing"
       }
     },
@@ -126,8 +56,66 @@
         "type": "attack"
       },
       "expect": {
+        "turn": 3,
+        "playerHp": 750,
+        "enemyHp": 1600,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 4,
+        "playerHp": 750,
+        "enemyHp": 1450,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 5,
+        "playerHp": 750,
+        "enemyHp": 1900,
+        "outcome": "ongoing",
+        "enemyMaxHp": 2050
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 6,
+        "playerHp": 750,
+        "enemyHp": 1900,
+        "outcome": "ongoing",
+        "enemyMaxHp": 2050
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 7,
+        "playerHp": 750,
+        "enemyHp": 1750,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 7,
         "playerHp": 0,
-        "enemyHp": 890,
+        "enemyHp": 1750,
         "outcome": "lose"
       }
     }

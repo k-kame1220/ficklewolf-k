@@ -1,0 +1,123 @@
+{
+  "name": "連戦: 1 体目を倒すと 2 体目に入れ替わり、HP とバフは引き継ぐ",
+  "description": "旧作メインクエスト I → I2 と同じ扱い。敵・ターン・チェックポイントはリセットされる。",
+  "seed": 1,
+  "player": {
+    "hp": 1000,
+    "attack": 300,
+    "defence": 50,
+    "attribute": "note",
+    "attackBuffRate": 0.5,
+    "defenceBuffAmount": 50,
+    "checkMax": 2,
+    "rewindMax": 1,
+    "specialMax": 1,
+    "numbnessResistant": false
+  },
+  "enemies": [
+    {
+      "hp": 300,
+      "attack": 100,
+      "defence": 0,
+      "attribute": "note",
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 50,
+      "fixedAttackPower": 300,
+      "strongAttackPower": 500,
+      "recoveryRate": 0.3,
+      "changeAttribute": null,
+      "attackDebuff": 0,
+      "defenceDebuff": 0,
+      "turns": [
+        "attack",
+        "attack",
+        "deathblow"
+      ]
+    },
+    {
+      "hp": 500,
+      "attack": 100,
+      "defence": 0,
+      "attribute": "note",
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 50,
+      "fixedAttackPower": 300,
+      "strongAttackPower": 500,
+      "recoveryRate": 0.3,
+      "changeAttribute": null,
+      "attackDebuff": 0,
+      "defenceDebuff": 0,
+      "turns": [
+        "attack",
+        "attackBuff",
+        "deathblow"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "command": {
+        "type": "attackBuff"
+      },
+      "expect": {
+        "stage": 1,
+        "turn": 2,
+        "playerHp": 950,
+        "enemyHp": 300
+      }
+    },
+    {
+      "command": {
+        "type": "check"
+      },
+      "expect": {
+        "checkpoints": [
+          2
+        ]
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "stage": 2,
+        "turn": 1,
+        "playerHp": 900,
+        "enemyHp": 500,
+        "checkpoints": [],
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "stage": 2,
+        "turn": 2,
+        "playerHp": 850,
+        "enemyHp": 50
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "stage": 2,
+        "playerHp": 850,
+        "enemyHp": 0,
+        "outcome": "win"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "rejected": "BATTLE_FINISHED"
+      }
+    }
+  ]
+}
