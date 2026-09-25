@@ -1,6 +1,6 @@
 {
-  "name": "ビリビリで 3 ターンの間、行動が 50% で失敗する",
-  "description": "1 ターン目に敵がビリビリ。攻撃は敵の後に行うので、そのターンの攻撃から判定する（行動の直前に乱数を 1 回引き、値 / 2^32 < 0.5 なら行動できない）。シード 1 の乱数は 0.627 / 0.0027 / 0.527 なので、2 ターン目だけ失敗する。",
+  "name": "ビリビリは先制コマンドには同じターンは効かない",
+  "description": "防御は敵より先に行うので、敵がビリビリしたターンの防御はしびれない（判定も残り回数も消費しない）。以降は行動の直前に判定する。しびれた防御は効かないので、敵の攻撃をそのまま受ける。",
   "seed": 1,
   "player": {
     "hp": 1000,
@@ -31,8 +31,7 @@
       "turns": [
         "numbness",
         "concentration",
-        "concentration",
-        "concentration",
+        "attack",
         "concentration",
         "deathblow"
       ]
@@ -41,14 +40,14 @@
   "steps": [
     {
       "command": {
-        "type": "attack"
+        "type": "defend"
       },
       "expect": {
         "turn": 2,
         "playerHp": 1000,
-        "enemyHp": 1800,
+        "enemyHp": 2000,
         "outcome": "ongoing",
-        "numbnessTurns": 2,
+        "numbnessTurns": 3,
         "paralyzed": false
       }
     },
@@ -61,6 +60,19 @@
         "playerHp": 1000,
         "enemyHp": 1800,
         "outcome": "ongoing",
+        "numbnessTurns": 2,
+        "paralyzed": false
+      }
+    },
+    {
+      "command": {
+        "type": "defend"
+      },
+      "expect": {
+        "turn": 4,
+        "playerHp": 850,
+        "enemyHp": 1800,
+        "outcome": "ongoing",
         "numbnessTurns": 1,
         "paralyzed": true
       }
@@ -70,8 +82,8 @@
         "type": "attack"
       },
       "expect": {
-        "turn": 4,
-        "playerHp": 1000,
+        "turn": 5,
+        "playerHp": 850,
         "enemyHp": 1600,
         "outcome": "ongoing",
         "numbnessTurns": 0,
@@ -84,24 +96,9 @@
       },
       "expect": {
         "turn": 5,
-        "playerHp": 1000,
-        "enemyHp": 1400,
-        "outcome": "ongoing",
-        "numbnessTurns": 0,
-        "paralyzed": false
-      }
-    },
-    {
-      "command": {
-        "type": "attack"
-      },
-      "expect": {
-        "turn": 6,
-        "playerHp": 1000,
-        "enemyHp": 1200,
-        "outcome": "ongoing",
-        "numbnessTurns": 0,
-        "paralyzed": false
+        "playerHp": 0,
+        "enemyHp": 1600,
+        "outcome": "lose"
       }
     }
   ]
