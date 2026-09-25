@@ -1,6 +1,6 @@
 # Git 運用ルール
 
-> 版: v0.1（2026-09-25）
+> 版: v0.2（2026-09-26）
 
 ## ブランチ
 
@@ -83,3 +83,16 @@ Conventional Commits の形で書く。
 - type: `feat` / `fix` / `chore` / `refactor` / `docs` / `test`
 - scope: `web` / `api` / `docs` / `legacy` など（任意）
 - 例: `feat(web): リターンの演出を追加`、`fix(api): ヘルスチェックのパスを修正`
+
+## GitHub
+- リポジトリ: https://github.com/k-kame1220/ficklewolf-k （公開。無料プランの非公開リポジトリではブランチ保護が使えないため）
+- 既定のブランチは `develop`。マージはマージコミットのみ。マージしたブランチは自動で削除される。
+- **ブランチ保護**（ruleset `protected-branches`）: `develop` / `staging` / `main` は PR 経由でのみ変更でき、CI の `result` が通っていないとマージできない。削除と force push も禁止。
+- **CI**（`.github/workflows/ci.yml`）: PR と保護ブランチへの push で実行する。変更があったものだけ確認する。
+
+| ジョブ | 実行する条件 | 内容 |
+|---|---|---|
+| `web` | `web/`・`spec/`・`.github/` の変更 | `pnpm check` |
+| `api` | `api/`・`spec/`・`.github/` の変更 | `./gradlew build` |
+| `spec` | `spec/`・`.github/` の変更 | `python3 spec/tools/validate.py` |
+| `result` | 常に | 上のどれかが失敗していたら失敗（ブランチ保護の必須チェック） |

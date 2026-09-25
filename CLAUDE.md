@@ -1,6 +1,7 @@
 # K（リメイク）
 
-旧作（2021 年・Unity）の 1 対 1 ターン制コマンドバトル RPG「K」を、Web / iOS / Android 向けに作り直すモノリポ。作者は FickleWolf。
+旧作（2021 年・Unity）の 1 対 1 ターン制コマンドバトル RPG「K」を、Web / iOS / Android 向けに作り直すモノリポ。作者は FickleWolf（Shackw の子ブランド）。
+GitHub: https://github.com/k-kame1220/ficklewolf-k （公開・既定のブランチは `develop`）
 
 ## 役割分担
 | 場所 | 担当 | AI がしてよいこと |
@@ -23,21 +24,28 @@
 - コミットメッセージは Conventional Commits（`feat(web): ...`）。
 
 ## 仕様の置き場所
-- `spec/`: 機械で確かめられる仕様（OpenAPI・バトルのゴールデンテスト・マスタデータ）。これが正。
+- `spec/`: 機械で確かめられる仕様。これが正。
+  - `spec/battle/`: バトルの計算ルール（README）とゴールデンテスト
+  - `spec/master/`: マスタデータ（キャラ・クエスト・天気・アイテム・設定）
+  - `spec/tools/validate.py`: spec の検証（pre-commit・CI でも実行）
+  - OpenAPI は api の実装を始めるときに追加する
 - `docs/`: なぜそうするか・どう感じてほしいか。
 
 ## ドキュメント
 | ファイル | 内容 |
 |---|---|
 | `docs/00_project-context.md` | 目的・決定事項・構成 |
-| `docs/01_legacy-analysis.md` | 旧作のルールと数値（ソースから逆算） |
-| `docs/02_requirements.md` | 要件定義（フェーズ・画面・API） |
+| `docs/01_legacy-analysis.md` | 旧作のルールと数値（ソースから逆算した記録。リメイクの正は spec） |
+| `docs/02_requirements.md` | 要件定義（フェーズ・機能・画面・API・マスタと素材の配信・決定事項） |
 | `docs/03_frontend-architecture.md` | フロントの設計とコーディングルール |
-| `docs/04_git-workflow.md` | Git 運用ルール |
+| `docs/04_git-workflow.md` | Git 運用・AI との作業の進め方・CI |
+| `spec/battle/README.md` | バトルの計算ルール（正） |
+| `spec/master/README.md` | マスタデータのルール |
 | `web/CLAUDE.md` | フロント実装時に守ること |
 
 ## コマンド
 ```bash
 cd web && pnpm check
 cd web && pnpm dev
+python3 spec/tools/validate.py
 ```

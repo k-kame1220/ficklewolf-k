@@ -1,7 +1,8 @@
 # 旧作 K 解析レポート（Unity ソースからの逆算仕様）
 
 > 作成: 2026-09-25 / 対象: `legacy/unity/`（最終更新 2022-02、Unity + GS2）
-> 数値データは `legacy/data/*.json`（`legacy/tools/extract_unity_data.py` で抽出）を正とする。
+> 旧作の数値は `legacy/data/*.json`（`legacy/tools/extract_unity_data.py` で抽出）。
+> **これは旧作の記録**。リメイクで使う値とルールは `spec/master`・`spec/battle/README.md` が正で、旧作から変えた点は `docs/02` §4 にまとめている。
 > 「※」は旧実装のバグ・未完成・要判断ポイント。
 
 ---

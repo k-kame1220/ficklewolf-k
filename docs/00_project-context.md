@@ -1,7 +1,6 @@
 # K（ケイ）リメイク プロジェクトコンテキスト
 
-> 状態: ドラフト v0.2（2026-09-25）。旧ソースを解析済み。
-> 「確定」「推定」「未確認」を区別して書く。
+> 状態: v0.3（2026-09-26）。旧ソース解析・要件定義・設計・仕様（spec）まで完了し、実装に入る段階。
 
 ## 1. プロジェクトの目的
 
@@ -13,8 +12,9 @@
 
 ### 役割分担ルール（重要）
 - `api/` 配下（バックエンド）: オーナーが書く。AI はコードを書かない。レビュー・解説・API 仕様の相談のみ。
-- フロントエンド: AI が実装する。
-- 両者の境界は **API 仕様（OpenAPI 等）** で定義する。
+- `web/` 配下（フロントエンド）: AI が実装する。
+- 両者の境界は `spec/`（OpenAPI・ゴールデンテスト・マスタデータ）で定義する。spec は AI が下書きし、オーナーが確定する。
+- 作業の進め方（Issue・計画・コミット・完了条件など）は [04_git-workflow.md](04_git-workflow.md)。
 
 ## 2. 旧作 K の情報（出典: appget 記事 2021-12-16）
 
@@ -55,7 +55,7 @@
 
 ### 未確認（オーナーに確認 / 再設計）
 - [x] クエストクリア時の報酬テーブル → 仮の値で始めて、遊んでから調整（02 D-4）
-- [ ] ガチャの提供割合、広告報酬の抽選表
+- [ ] ガチャの提供割合、広告報酬の抽選表（フェーズ 1.5 / 3 で決める）
 - [x] メインクエストの解放順 → 旧 DB の並び（02 D-5）
 - [x] Google Drive の原画 → プロジェクト内と同じ。Drive は不要
 - [x] BGM / SE → すべて自作。そのまま使える
@@ -65,31 +65,52 @@
 
 ## 4. 技術選定
 
-| 領域 | 候補 | メモ |
+| 領域 | 決定 | メモ |
 |------|------|------|
-| バックエンド | **Kotlin + Spring Boot 4 / MySQL 8.4**（確定） | `api/` にクリーンアーキテクチャ構成の雛形あり（パッケージ `com.ficklewolf.k`、起動クラス `KApplication`） |
-| フロント（Web+iOS+Android） | **React + TypeScript（Vite）、ストア配信は Capacitor**（確定: D-2） | 構成の詳細は 02_requirements.md §9。iOS は Mac が無いのでクラウドでビルドする |
-| バトルのルール | フロントとサーバで別々に実装し、ゴールデンテストで一致を保証（確定: D-1） | テストケースは `spec/battle/`（仮） |
-| API 仕様 | OpenAPI（フロント/バックの契約） | バック=オーナー、フロント=AI の分担に必須 |
+| バックエンド | **Kotlin + Spring Boot 4 / MySQL 8.4** | `api/`。パッケージ `com.ficklewolf.k`、起動クラス `KApplication`、ヘルスチェックは Actuator |
+| フロント（Web+iOS+Android） | **React + TypeScript（Vite）、ストア配信は Capacitor**（D-2） | 設計は [03_frontend-architecture.md](03_frontend-architecture.md)。iOS は Mac が無いのでクラウドでビルドする |
+| バトルのルール | フロントとサーバで別々に実装し、ゴールデンテストで一致を保証（D-1） | `spec/battle/` |
+| マスタデータ | `spec/master/*.json` が正。api が DB に投入して配信（D-6） | [02_requirements.md](02_requirements.md) §10 |
+| API 仕様 | OpenAPI | api の実装を始めるときに作る |
 
-## 5. リポジトリ現状（2026-09-25）
+## 5. リポジトリ（2026-09-26）
+GitHub: https://github.com/k-kame1220/ficklewolf-k （公開・既定のブランチは `develop`）
+
 ```
 K/
-├── api/            Spring Boot マルチモジュール雛形（domain / application / infrastructure / presentation / bootstrap）
-│                   パッケージ com.ficklewolf.k / 作者 FickleWolf
-├── docs/           本ドキュメント・解析レポート・設計書
+├── .claude/        Claude Code の設定（AI の権限・整形フック）
+├── .githooks/      pre-commit（ブランチ名・format・lint・test・build・spec の検証）
+├── .github/        Issue / PR テンプレート・CI
 ├── .gitignore      モノリポ共通の除外設定（legacy/unity など）
-├── spec/           （予定）OpenAPI・ゴールデンテスト。web と api の約束事
+├── CLAUDE.md       AI が最初に読む案内
+├── api/            バックエンド（オーナー）。Spring Boot マルチモジュール
+├── docs/           要件・設計・運用ルール
 ├── legacy/
-│   ├── unity/         旧 Unity プロジェクト（.gitignore 済み。署名鍵・GS2 認証情報を含む）
-│   ├── data/          抽出したマスタデータ（JSON）
-│   └── tools/         移行スクリプト（Python）
-└── web/            フロントエンド（Vite + React + TS。AI が実装。pnpm の設定・lockfile もこの中）
+│   ├── unity/      旧 Unity プロジェクト（git の対象外。署名鍵・GS2 認証情報を含む）
+│   ├── data/       旧作から抽出したデータ（JSON）
+│   └── tools/      移行スクリプト（Python）
+├── spec/           web と api の約束事（ゴールデンテスト・マスタデータ・検証ツール）
+└── web/            フロントエンド（AI）。Vite + React + TS
 ```
-- **モノリポ**（2026-09-25 git init）。git は K/ に 1 つ。各プロジェクトのツール（Gradle・pnpm）はそれぞれのフォルダの中で完結させ、直下には `.gitignore` 以外を置かない。
+- **モノリポ**。各プロジェクトのツール（Gradle・pnpm）はそれぞれのフォルダの中で完結させ、直下に設定ファイルを増やさない。
+- オーナーは `K/`、AI は worktree `K-ai/` で作業する（[04_git-workflow.md](04_git-workflow.md)）。
 
-## 6. 次のステップ
-1. ~~旧ソースの回収と解析~~（完了: 01_legacy-analysis.md）
-2. ~~要件定義書のドラフト~~（02_requirements.md）→ D-1・D-2 決定。D-3〜D-5 を決める
-3. ~~技術選定~~（フロント: React + TS + Capacitor）
-4. API 仕様（OpenAPI）策定 → バック（オーナー）/ フロント（AI）並行開発
+## 6. ドキュメント一覧
+| ファイル | 内容 |
+|---|---|
+| [01_legacy-analysis.md](01_legacy-analysis.md) | 旧作の仕様（ソースからの逆算）。リメイクで変えた点は 02 と spec が正 |
+| [02_requirements.md](02_requirements.md) | 要件定義（フェーズ・機能・画面・API・マスタと素材の配信・決定事項） |
+| [03_frontend-architecture.md](03_frontend-architecture.md) | フロントの設計とコーディングルール |
+| [04_git-workflow.md](04_git-workflow.md) | Git 運用・AI との作業の進め方・CI |
+| `spec/README.md` | spec の位置づけと変更のルール |
+| `spec/battle/README.md` | バトルの計算ルール（正） |
+| `spec/master/README.md` | マスタデータのルール |
+
+## 7. 進捗と次のステップ
+1. ~~旧ソースの回収と解析~~
+2. ~~要件定義・技術選定・決定事項（D-1〜D-7）~~
+3. ~~開発環境・ルール（lint・フック・worktree・GitHub・CI・ブランチ保護）~~
+4. ~~spec: バトルのゴールデンテスト 14 ケース・マスタデータの初版~~
+5. **web のバトルエンジン（TDD）** ← 次
+6. 素材の変換（`legacy/tools`）と画面の見た目の方向性
+7. 画面の実装（MSW で API をモック）／ api の実装（オーナー）と OpenAPI

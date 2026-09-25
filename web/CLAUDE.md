@@ -1,6 +1,7 @@
 # web/ — K フロントエンド（AI が実装する）
 
-設計の全体は `../docs/03_frontend-architecture.md`、要件は `../docs/02_requirements.md`、旧作の仕様は `../docs/01_legacy-analysis.md`。
+設計の全体は `../docs/03_frontend-architecture.md`、要件は `../docs/02_requirements.md`。
+バトルのルールの正は `../spec/battle/README.md`、マスタデータの正は `../spec/master/`（旧作の記録は `../docs/01_legacy-analysis.md`）。
 **`../api/` はオーナー専用。AI はコードを書かない。**
 
 ## 必ず守ること（オーナーの方針・最優先）
@@ -62,5 +63,5 @@ src/app → src/pages → src/features/* → src/api → src/domain
 - 作業の最後に `pnpm check` を実行し、すべて通してから完了とする。
 - ライブラリは使う時点で追加する（MSW・openapi-fetch は API ができたとき、Howler・Motion はバトルの演出を作るとき）。
 - lint のルールを無効化するときは `// eslint-disable-next-line <rule> -- 理由` と理由を必ず書く。
-- バトルのルールを変えたら `../spec/battle/` のゴールデンテストを全件通す。
+- バトルのエンジンは `../spec/battle/cases/` のゴールデンテストを全件通す。ケースが間違っていると思ったら、実装を変える前にオーナーに相談する。
 - 1 つの作業 = 1 つの PR。PR には「何を・なぜ・どう確かめたか」と画面のスクリーンショットを付ける。
