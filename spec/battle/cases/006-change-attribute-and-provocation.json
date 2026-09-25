@@ -1,6 +1,6 @@
 {
-  "name": "属性変化で相性が入れ替わり、挑発の上乗せは消える。敵の HP を 0 にすると勝ち",
-  "description": "敵は陽 ⇔ 音を行き来する。音になると月のプレイヤーが不利になる。挑発で上がった敵の攻撃力（+10）は属性変化で計算し直すと消える（旧作どおり）。",
+  "name": "属性変化で相性が入れ替わっても、挑発の上乗せは残る。敵の HP を 0 にすると勝ち",
+  "description": "敵は陽 ⇔ 音を行き来する。音になると月のプレイヤーが不利になる。挑発で上がった敵の攻撃力（+10）は属性の倍率とは別に足すので、属性が変わっても残る（旧作では消えていたが、直観に合わせて変更）。",
   "seed": 1,
   "player": {
     "hp": 1000,
@@ -81,7 +81,7 @@
       },
       "expect": {
         "turn": 5,
-        "playerHp": 290,
+        "playerHp": 280,
         "enemyHp": 800,
         "outcome": "ongoing"
       }
@@ -92,7 +92,7 @@
       },
       "expect": {
         "turn": 6,
-        "playerHp": 290,
+        "playerHp": 280,
         "enemyHp": 400,
         "outcome": "ongoing",
         "enemyAttribute": "yang"
@@ -104,7 +104,7 @@
       },
       "expect": {
         "turn": 6,
-        "playerHp": 40,
+        "playerHp": 20,
         "enemyHp": 0,
         "outcome": "win"
       }
