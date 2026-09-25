@@ -208,7 +208,7 @@
     "name": "G",
     "category": "main",
     "attribute": "note",
-    "description": "不安を背負った神。 「Ｌ」にまで不安を悟られる。 誰よりも全知全能なのに。",
+    "description": "不安を背負った神。 「L」にまで不安を悟られる。 誰よりも全知全能なのに。",
     "base": {
       "hp": 3000,
       "attack": 600,
@@ -875,7 +875,7 @@
     "name": "Ganesha",
     "category": "gacha",
     "attribute": "note",
-    "description": "筋肉を増量させるのが好き。 でも握力はたったの「２４」 「L」に腕相撲で負けた過去あり。",
+    "description": "筋肉を増量させるのが好き。 でも握力はたったの「24」 「L」に腕相撲で負けた過去あり。",
     "base": {
       "hp": 2400,
       "attack": 900,
