@@ -1,0 +1,43 @@
+{
+  "name": "リターンしても HP とバフは戻らず、敵の行動だけが戻る",
+  "description": "3 ターン目でチェックし、攻撃したあと 3 ターン目にリターンする。受けたダメージ・与えたダメージ・攻撃バフはそのままで、敵は 3 ターン目の攻撃をもう一度行う。",
+  "seed": 1,
+  "player": {
+    "hp": 1000,
+    "attack": 300,
+    "defence": 50,
+    "attribute": "NOTE",
+    "attackBuffRate": 0.5,
+    "defenceBuffAmount": 50,
+    "checkMax": 2,
+    "rewindMax": 1,
+    "specialMax": 1,
+    "numbnessResistant": false
+  },
+  "enemy": {
+    "hp": 2000,
+    "attack": 200,
+    "defence": 100,
+    "attribute": "NOTE",
+    "attackBuffRate": 0.5,
+    "defenceBuffAmount": 0,
+    "fixedAttackPower": 0,
+    "strongAttackPower": 0,
+    "recoveryRate": 0,
+    "changeAttribute": null,
+    "attackDebuff": 0,
+    "defenceDebuff": 0,
+    "turns": ["defend", "concentration", "attack", "concentration", "deathblow"]
+  },
+  "steps": [
+    { "command": { "type": "attack" }, "expect": { "turn": 2, "playerHp": 1000, "enemyHp": 1940 } },
+    { "command": { "type": "attackBuff" }, "expect": { "turn": 3, "playerHp": 1000, "enemyHp": 1940 } },
+    { "command": { "type": "check" }, "expect": { "turn": 3, "checkpoints": [3] } },
+    { "command": { "type": "attack" }, "expect": { "turn": 4, "playerHp": 850, "enemyHp": 1590 } },
+    { "command": { "type": "rewind", "to": 3 }, "expect": { "turn": 3, "playerHp": 850, "enemyHp": 1590, "checkpoints": [] } },
+    { "command": { "type": "attack" }, "expect": { "turn": 4, "playerHp": 700, "enemyHp": 1240 } },
+    { "command": { "type": "rewind", "to": 3 }, "expect": { "rejected": "NO_CHECKPOINT" } },
+    { "command": { "type": "attack" }, "expect": { "turn": 5, "playerHp": 700, "enemyHp": 890, "outcome": "ongoing" } },
+    { "command": { "type": "attack" }, "expect": { "playerHp": 0, "enemyHp": 890, "outcome": "lose" } }
+  ]
+}

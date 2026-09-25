@@ -1,0 +1,40 @@
+{
+  "name": "攻撃だけを続けると、敵の攻撃で先に倒される",
+  "description": "旧作メインクエスト D の敵に、キャラ A 相当で攻撃だけを選ぶ。同じ属性なので倍率は 1。敵が防御したターンは与ダメージが 2 割になる。",
+  "seed": 1,
+  "player": {
+    "hp": 1400,
+    "attack": 400,
+    "defence": 90,
+    "attribute": "YANG",
+    "attackBuffRate": 0.6,
+    "defenceBuffAmount": 90,
+    "checkMax": 2,
+    "rewindMax": 1,
+    "specialMax": 1,
+    "numbnessResistant": false
+  },
+  "enemy": {
+    "hp": 3100,
+    "attack": 630,
+    "defence": 40,
+    "attribute": "YANG",
+    "attackBuffRate": 0.5,
+    "defenceBuffAmount": 40,
+    "fixedAttackPower": 0,
+    "strongAttackPower": 0,
+    "recoveryRate": 0,
+    "changeAttribute": null,
+    "attackDebuff": 0,
+    "defenceDebuff": 0,
+    "turns": ["attack", "defend", "attack", "defend", "attack", "defend", "deathblow"]
+  },
+  "steps": [
+    { "command": { "type": "attack" }, "expect": { "turn": 2, "playerHp": 860, "enemyHp": 2740, "outcome": "ongoing" } },
+    { "command": { "type": "attack" }, "expect": { "turn": 3, "playerHp": 860, "enemyHp": 2660, "outcome": "ongoing" } },
+    { "command": { "type": "attack" }, "expect": { "turn": 4, "playerHp": 320, "enemyHp": 2300, "outcome": "ongoing" } },
+    { "command": { "type": "attack" }, "expect": { "turn": 5, "playerHp": 320, "enemyHp": 2220, "outcome": "ongoing" } },
+    { "command": { "type": "attack" }, "expect": { "playerHp": 0, "enemyHp": 2220, "outcome": "lose" } },
+    { "command": { "type": "attack" }, "expect": { "rejected": "BATTLE_FINISHED" } }
+  ]
+}
