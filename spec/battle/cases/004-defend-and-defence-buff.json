@@ -1,0 +1,97 @@
+{
+  "name": "防御と防御バフは敵の行動より先に効く",
+  "description": "防御は受けるダメージを「敵の攻撃力の 2 割 − 自分の防御」に減らす（強攻撃にも効く）。固定攻撃は防御できない。防御バフは同じターンの敵の攻撃から効く。",
+  "seed": 1,
+  "player": {
+    "hp": 1000,
+    "attack": 300,
+    "defence": 50,
+    "attribute": "note",
+    "attackBuffRate": 0.5,
+    "defenceBuffAmount": 50,
+    "checkMax": 2,
+    "rewindMax": 1,
+    "specialMax": 1,
+    "numbnessResistant": false
+  },
+  "enemies": [
+    {
+      "hp": 2000,
+      "attack": 200,
+      "defence": 100,
+      "attribute": "note",
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 50,
+      "fixedAttackPower": 300,
+      "strongAttackPower": 500,
+      "recoveryRate": 0.3,
+      "changeAttribute": null,
+      "attackDebuff": 0,
+      "defenceDebuff": 0,
+      "turns": [
+        "attack",
+        "strongAttack",
+        "fixedAttack",
+        "attack",
+        "deathblow"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "command": {
+        "type": "defend"
+      },
+      "expect": {
+        "turn": 2,
+        "playerHp": 1000,
+        "enemyHp": 2000,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "defenceBuff"
+      },
+      "expect": {
+        "turn": 3,
+        "playerHp": 600,
+        "enemyHp": 2000,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "defend"
+      },
+      "expect": {
+        "turn": 4,
+        "playerHp": 300,
+        "enemyHp": 2000,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 5,
+        "playerHp": 200,
+        "enemyHp": 1800,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 5,
+        "playerHp": 0,
+        "enemyHp": 1800,
+        "outcome": "lose"
+      }
+    }
+  ]
+}

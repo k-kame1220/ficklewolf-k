@@ -1,0 +1,108 @@
+{
+  "name": "ビリビリで 3 ターンの間、行動が 50% で失敗する",
+  "description": "1 ターン目に敵がビリビリ。そのターンの自分の攻撃は通常どおり。2〜4 ターン目は乱数を 1 回ずつ引き、値 / 2^32 < 0.5 なら行動できない。シード 1 の乱数は 0.627 / 0.0027 / 0.527 なので、3 ターン目だけ失敗する。",
+  "seed": 1,
+  "player": {
+    "hp": 1000,
+    "attack": 300,
+    "defence": 50,
+    "attribute": "note",
+    "attackBuffRate": 0.5,
+    "defenceBuffAmount": 50,
+    "checkMax": 2,
+    "rewindMax": 1,
+    "specialMax": 1,
+    "numbnessResistant": false
+  },
+  "enemies": [
+    {
+      "hp": 2000,
+      "attack": 200,
+      "defence": 100,
+      "attribute": "note",
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 50,
+      "fixedAttackPower": 300,
+      "strongAttackPower": 500,
+      "recoveryRate": 0.3,
+      "changeAttribute": null,
+      "attackDebuff": 0,
+      "defenceDebuff": 0,
+      "turns": [
+        "numbness",
+        "concentration",
+        "concentration",
+        "concentration",
+        "concentration",
+        "deathblow"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 2,
+        "playerHp": 1000,
+        "enemyHp": 1800,
+        "outcome": "ongoing",
+        "numbnessTurns": 3,
+        "paralyzed": false
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 3,
+        "playerHp": 1000,
+        "enemyHp": 1600,
+        "outcome": "ongoing",
+        "numbnessTurns": 2,
+        "paralyzed": false
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 4,
+        "playerHp": 1000,
+        "enemyHp": 1600,
+        "outcome": "ongoing",
+        "numbnessTurns": 1,
+        "paralyzed": true
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 5,
+        "playerHp": 1000,
+        "enemyHp": 1400,
+        "outcome": "ongoing",
+        "numbnessTurns": 0,
+        "paralyzed": false
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 6,
+        "playerHp": 1000,
+        "enemyHp": 1200,
+        "outcome": "ongoing",
+        "numbnessTurns": 0,
+        "paralyzed": false
+      }
+    }
+  ]
+}

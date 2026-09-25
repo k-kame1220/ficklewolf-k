@@ -1,0 +1,186 @@
+{
+  "name": "必殺技で先の敵の攻撃を挑発に書き換えて、負けを回避する",
+  "description": "必殺技の条件（HP が半分未満・リターン済み・3 ターン目以降・最終ターンの 3 ターン以上前）を満たしたとき、前後 2 ターンの範囲で 1 ターンだけ敵の行動を書き換えられる。必殺技はターンを消費しない。",
+  "seed": 1,
+  "player": {
+    "hp": 1000,
+    "attack": 300,
+    "defence": 50,
+    "attribute": "note",
+    "attackBuffRate": 0.5,
+    "defenceBuffAmount": 50,
+    "checkMax": 2,
+    "rewindMax": 1,
+    "specialMax": 1,
+    "numbnessResistant": false
+  },
+  "enemies": [
+    {
+      "hp": 1400,
+      "attack": 600,
+      "defence": 100,
+      "attribute": "note",
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 50,
+      "fixedAttackPower": 300,
+      "strongAttackPower": 500,
+      "recoveryRate": 0.3,
+      "changeAttribute": null,
+      "attackDebuff": 0,
+      "defenceDebuff": 0,
+      "turns": [
+        "concentration",
+        "attack",
+        "concentration",
+        "concentration",
+        "attack",
+        "concentration",
+        "concentration",
+        "deathblow"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 2,
+        "playerHp": 1000,
+        "enemyHp": 1200,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 3,
+        "playerHp": 450,
+        "enemyHp": 1000,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "check"
+      },
+      "expect": {
+        "turn": 3,
+        "checkpoints": [
+          3
+        ]
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 4,
+        "playerHp": 450,
+        "enemyHp": 800,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "special",
+        "turn": 5,
+        "action": "provocation"
+      },
+      "expect": {
+        "rejected": "SPECIAL_UNAVAILABLE"
+      }
+    },
+    {
+      "command": {
+        "type": "rewind",
+        "to": 3
+      },
+      "expect": {
+        "turn": 3,
+        "playerHp": 450,
+        "enemyHp": 800
+      }
+    },
+    {
+      "command": {
+        "type": "special",
+        "turn": 6,
+        "action": "provocation"
+      },
+      "expect": {
+        "rejected": "INVALID_SPECIAL_TARGET"
+      }
+    },
+    {
+      "command": {
+        "type": "special",
+        "turn": 5,
+        "action": "provocation"
+      },
+      "expect": {
+        "turn": 3,
+        "playerHp": 450,
+        "enemyHp": 800
+      }
+    },
+    {
+      "command": {
+        "type": "special",
+        "turn": 4,
+        "action": "attack"
+      },
+      "expect": {
+        "rejected": "SPECIAL_UNAVAILABLE"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 4,
+        "playerHp": 450,
+        "enemyHp": 600,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 5,
+        "playerHp": 450,
+        "enemyHp": 400,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 6,
+        "playerHp": 450,
+        "enemyHp": 200,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 6,
+        "playerHp": 450,
+        "enemyHp": 0,
+        "outcome": "win"
+      }
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "name": "ビリビリ耐性があるとしびれない",
+  "description": "008 と同じ敵だが、プレイヤーにビリビリ耐性がある。乱数は引かない。",
+  "seed": 1,
+  "player": {
+    "hp": 1000,
+    "attack": 300,
+    "defence": 50,
+    "attribute": "note",
+    "attackBuffRate": 0.5,
+    "defenceBuffAmount": 50,
+    "checkMax": 2,
+    "rewindMax": 1,
+    "specialMax": 1,
+    "numbnessResistant": true
+  },
+  "enemies": [
+    {
+      "hp": 2000,
+      "attack": 200,
+      "defence": 100,
+      "attribute": "note",
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 50,
+      "fixedAttackPower": 300,
+      "strongAttackPower": 500,
+      "recoveryRate": 0.3,
+      "changeAttribute": null,
+      "attackDebuff": 0,
+      "defenceDebuff": 0,
+      "turns": [
+        "numbness",
+        "concentration",
+        "concentration",
+        "concentration",
+        "concentration",
+        "deathblow"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 2,
+        "playerHp": 1000,
+        "enemyHp": 1800,
+        "outcome": "ongoing",
+        "numbnessTurns": 0
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 3,
+        "playerHp": 1000,
+        "enemyHp": 1600,
+        "outcome": "ongoing",
+        "numbnessTurns": 0,
+        "paralyzed": false
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 4,
+        "playerHp": 1000,
+        "enemyHp": 1400,
+        "outcome": "ongoing",
+        "paralyzed": false
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 5,
+        "playerHp": 1000,
+        "enemyHp": 1200,
+        "outcome": "ongoing",
+        "paralyzed": false
+      }
+    }
+  ]
+}

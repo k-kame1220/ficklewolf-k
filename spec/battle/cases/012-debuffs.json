@@ -1,0 +1,109 @@
+{
+  "name": "敵のデバフ",
+  "description": "攻撃デバフは自分の攻撃倍率を下げる（0 未満にはならない）。防御デバフは防御バフの回数を下げ、防御力（基礎＋バフ）が 0 以下になるときは 0 で止まる。",
+  "seed": 1,
+  "player": {
+    "hp": 1000,
+    "attack": 300,
+    "defence": 60,
+    "attribute": "note",
+    "attackBuffRate": 0.5,
+    "defenceBuffAmount": 50,
+    "checkMax": 2,
+    "rewindMax": 1,
+    "specialMax": 1,
+    "numbnessResistant": false
+  },
+  "enemies": [
+    {
+      "hp": 2000,
+      "attack": 200,
+      "defence": 100,
+      "attribute": "note",
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 50,
+      "fixedAttackPower": 300,
+      "strongAttackPower": 500,
+      "recoveryRate": 0.3,
+      "changeAttribute": null,
+      "attackDebuff": 1,
+      "defenceDebuff": 3,
+      "turns": [
+        "concentration",
+        "concentration",
+        "attackDebuff",
+        "defenceDebuff",
+        "attack",
+        "deathblow"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "command": {
+        "type": "attackBuff"
+      },
+      "expect": {
+        "turn": 2,
+        "playerHp": 1000,
+        "enemyHp": 2000,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "defenceBuff"
+      },
+      "expect": {
+        "turn": 3,
+        "playerHp": 1000,
+        "enemyHp": 2000,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 4,
+        "playerHp": 1000,
+        "enemyHp": 1950,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 5,
+        "playerHp": 1000,
+        "enemyHp": 1900,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 6,
+        "playerHp": 800,
+        "enemyHp": 1850,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 6,
+        "playerHp": 0,
+        "enemyHp": 1850,
+        "outcome": "lose"
+      }
+    }
+  ]
+}

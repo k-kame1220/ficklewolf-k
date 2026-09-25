@@ -14,27 +14,93 @@
     "specialMax": 1,
     "numbnessResistant": false
   },
-  "enemy": {
-    "hp": 3100,
-    "attack": 630,
-    "defence": 40,
-    "attribute": "yang",
-    "attackBuffRate": 0.5,
-    "defenceBuffAmount": 40,
-    "fixedAttackPower": 0,
-    "strongAttackPower": 0,
-    "recoveryRate": 0,
-    "changeAttribute": null,
-    "attackDebuff": 0,
-    "defenceDebuff": 0,
-    "turns": ["attack", "defend", "attack", "defend", "attack", "defend", "deathblow"]
-  },
+  "enemies": [
+    {
+      "hp": 3100,
+      "attack": 630,
+      "defence": 40,
+      "attribute": "yang",
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 40,
+      "fixedAttackPower": 0,
+      "strongAttackPower": 0,
+      "recoveryRate": 0,
+      "changeAttribute": null,
+      "attackDebuff": 0,
+      "defenceDebuff": 0,
+      "turns": [
+        "attack",
+        "defend",
+        "attack",
+        "defend",
+        "attack",
+        "defend",
+        "deathblow"
+      ]
+    }
+  ],
   "steps": [
-    { "command": { "type": "attack" }, "expect": { "turn": 2, "playerHp": 860, "enemyHp": 2740, "outcome": "ongoing" } },
-    { "command": { "type": "attack" }, "expect": { "turn": 3, "playerHp": 860, "enemyHp": 2660, "outcome": "ongoing" } },
-    { "command": { "type": "attack" }, "expect": { "turn": 4, "playerHp": 320, "enemyHp": 2300, "outcome": "ongoing" } },
-    { "command": { "type": "attack" }, "expect": { "turn": 5, "playerHp": 320, "enemyHp": 2220, "outcome": "ongoing" } },
-    { "command": { "type": "attack" }, "expect": { "playerHp": 0, "enemyHp": 2220, "outcome": "lose" } },
-    { "command": { "type": "attack" }, "expect": { "rejected": "BATTLE_FINISHED" } }
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 2,
+        "playerHp": 860,
+        "enemyHp": 2740,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 3,
+        "playerHp": 860,
+        "enemyHp": 2660,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 4,
+        "playerHp": 320,
+        "enemyHp": 2300,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 5,
+        "playerHp": 320,
+        "enemyHp": 2220,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "playerHp": 0,
+        "enemyHp": 2220,
+        "outcome": "lose"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "rejected": "BATTLE_FINISHED"
+      }
+    }
   ]
 }

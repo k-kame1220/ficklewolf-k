@@ -1,0 +1,121 @@
+{
+  "name": "属性変化で相性が入れ替わり、挑発の上乗せは消える。敵の HP を 0 にすると勝ち",
+  "description": "敵は陽 ⇔ 音を行き来する。音になると月のプレイヤーが不利になる。挑発で上がった敵の攻撃力（+10）は属性変化で計算し直すと消える（旧作どおり）。",
+  "seed": 1,
+  "player": {
+    "hp": 1000,
+    "attack": 400,
+    "defence": 50,
+    "attribute": "moon",
+    "attackBuffRate": 0.5,
+    "defenceBuffAmount": 50,
+    "checkMax": 2,
+    "rewindMax": 1,
+    "specialMax": 1,
+    "numbnessResistant": false
+  },
+  "enemies": [
+    {
+      "hp": 2000,
+      "attack": 400,
+      "defence": 100,
+      "attribute": "yang",
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 50,
+      "fixedAttackPower": 300,
+      "strongAttackPower": 500,
+      "recoveryRate": 0.3,
+      "changeAttribute": "note",
+      "attackDebuff": 0,
+      "defenceDebuff": 0,
+      "turns": [
+        "provocation",
+        "attack",
+        "changeAttribute",
+        "attack",
+        "changeAttribute",
+        "attack",
+        "deathblow"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 2,
+        "playerHp": 1000,
+        "enemyHp": 1600,
+        "outcome": "ongoing",
+        "enemyAttribute": "yang"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 3,
+        "playerHp": 740,
+        "enemyHp": 1200,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 4,
+        "playerHp": 740,
+        "enemyHp": 1000,
+        "outcome": "ongoing",
+        "enemyAttribute": "note"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 5,
+        "playerHp": 290,
+        "enemyHp": 800,
+        "outcome": "ongoing"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 6,
+        "playerHp": 290,
+        "enemyHp": 400,
+        "outcome": "ongoing",
+        "enemyAttribute": "yang"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "turn": 6,
+        "playerHp": 40,
+        "enemyHp": 0,
+        "outcome": "win"
+      }
+    },
+    {
+      "command": {
+        "type": "attack"
+      },
+      "expect": {
+        "rejected": "BATTLE_FINISHED"
+      }
+    }
+  ]
+}
