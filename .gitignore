@@ -1,0 +1,6 @@
+/legacy/unity/
+*.keystore
+*.aab
+*.apk
+*:Zone.Identifier
+.DS_Store

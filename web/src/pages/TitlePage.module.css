@@ -1,0 +1,39 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  min-height: 100dvh;
+}
+
+.logo {
+  margin: 0;
+  font-size: var(--font-size-logo);
+  letter-spacing: 0.1em;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.start {
+  min-height: var(--tap-min-size);
+  margin-top: var(--space-8);
+  padding: 0 var(--space-6);
+  border: none;
+  background: none;
+  animation: blink var(--duration-slow) ease-in-out infinite alternate;
+  cursor: pointer;
+}
+
+@keyframes blink {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.3;
+  }
+}

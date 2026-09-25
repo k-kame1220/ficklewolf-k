@@ -1,0 +1,27 @@
+:root {
+  --color-bg: #1a1414;
+  --color-surface: #2a2020;
+  --color-text: #f3ece0;
+  --color-text-muted: #b8ab98;
+  --color-accent: #c8423b;
+  --color-yang: #e8a33c;
+  --color-note: #4f8fd0;
+  --color-moon: #8a6cc9;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --font-family: "Hiragino Maru Gothic ProN", "Zen Maru Gothic", system-ui, sans-serif;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 32px;
+  --font-size-logo: 96px;
+  --layout-max-width: 480px;
+  --tap-min-size: 44px;
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 600ms;
+}

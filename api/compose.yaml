@@ -1,0 +1,12 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: k-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD を .env に設定してください}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-k}
+    ports:
+      - "3306:3306"
+
+volumes:
+  mysql_data:

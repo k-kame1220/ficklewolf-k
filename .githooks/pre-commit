@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly PROTECTED_BRANCH_PATTERN='^(main|staging|develop)$'
+readonly WORK_BRANCH_PATTERN='^(feature|fix|chore|refact)/[a-z0-9][a-z0-9._-]*$'
+
+branch="$(git symbolic-ref --short -q HEAD || true)"
+
+if [[ -z "$branch" ]]; then
+  echo "pre-commit: detached HEAD ではコミットできません。作業ブランチを作ってください。" >&2
+  exit 1
+fi
+
+if [[ "$branch" =~ $PROTECTED_BRANCH_PATTERN ]]; then
+  echo "pre-commit: $branch には直接コミットできません。feature/ fix/ chore/ refact/ のブランチから PR でマージしてください。" >&2
+  exit 1
+fi
+
+if ! [[ "$branch" =~ $WORK_BRANCH_PATTERN ]]; then
+  echo "pre-commit: ブランチ名 '$branch' がルールに合いません。" >&2
+  echo "  使える形: feature/xxx fix/xxx chore/xxx refact/xxx（xxx は小文字・数字・. _ -）" >&2
+  exit 1
+fi
+
+repo_root="$(git rev-parse --show-toplevel)"
+staged="$(git diff --cached --name-only)"
+
+if grep -q '^web/' <<< "$staged"; then
+  echo "pre-commit: web の format / lint / test / build を確認します"
+  (cd "$repo_root/web" && pnpm check)
+fi
+
+if grep -q '^api/' <<< "$staged"; then
+  echo "pre-commit: api の format(ktlint) / test / build を確認します"
+  (cd "$repo_root/api" && ./gradlew build --console=plain -q)
+fi

@@ -1,0 +1,98 @@
+[
+  {
+    "_file": "MoonATK.asset",
+    "m_Name": "MoonATK",
+    "itemName": "ATKの酒",
+    "serverItemName": "MoonATK",
+    "itemImage": "素材/アイテム素材/強化素材/MoonATK.png",
+    "_category": ""
+  },
+  {
+    "_file": "MoonDEF.asset",
+    "m_Name": "MoonDEF",
+    "itemName": "DEFの酒",
+    "serverItemName": "MoonDEF",
+    "itemImage": "素材/アイテム素材/強化素材/MoonDEF.png",
+    "_category": ""
+  },
+  {
+    "_file": "MoonHP.asset",
+    "m_Name": "MoonHP",
+    "itemName": "HPの酒",
+    "serverItemName": "MoonHP",
+    "itemImage": "素材/アイテム素材/強化素材/MoonHP.png",
+    "_category": ""
+  },
+  {
+    "_file": "MoonSPD.asset",
+    "m_Name": "MoonSPD",
+    "itemName": "SPDの酒",
+    "serverItemName": "MoonSPD",
+    "itemImage": "素材/アイテム素材/強化素材/MoonSPD.png",
+    "_category": ""
+  },
+  {
+    "_file": "NoteATK.asset",
+    "m_Name": "NoteATK",
+    "itemName": "ATKの譜",
+    "serverItemName": "NoteATK",
+    "itemImage": "素材/アイテム素材/強化素材/NoteATK.png",
+    "_category": ""
+  },
+  {
+    "_file": "NoteDEF.asset",
+    "m_Name": "NoteDEF",
+    "itemName": "DEFの譜",
+    "serverItemName": "NoteDEF",
+    "itemImage": "素材/アイテム素材/強化素材/NoteDEF.png",
+    "_category": ""
+  },
+  {
+    "_file": "NoteHP.asset",
+    "m_Name": "NoteHP",
+    "itemName": "HPの譜",
+    "serverItemName": "NoteHP",
+    "itemImage": "素材/アイテム素材/強化素材/NoteHP.png",
+    "_category": ""
+  },
+  {
+    "_file": "NoteSPD.asset",
+    "m_Name": "NoteSPD",
+    "itemName": "SPDの譜",
+    "serverItemName": "NoteSPD",
+    "itemImage": "素材/アイテム素材/強化素材/NoteSPD.png",
+    "_category": ""
+  },
+  {
+    "_file": "YangATK.asset",
+    "m_Name": "YangATK",
+    "itemName": "ATKの灯",
+    "serverItemName": "YangATK",
+    "itemImage": "素材/アイテム素材/強化素材/YangATK.png",
+    "_category": ""
+  },
+  {
+    "_file": "YangDEF.asset",
+    "m_Name": "YangDEF",
+    "itemName": "DEFの灯",
+    "serverItemName": "YangDEF",
+    "itemImage": "素材/アイテム素材/強化素材/YangDEF.png",
+    "_category": ""
+  },
+  {
+    "_file": "YangHP.asset",
+    "m_Name": "YangHP",
+    "itemName": "HPの灯",
+    "serverItemName": "YangHP",
+    "itemImage": "素材/アイテム素材/強化素材/YangHP.png",
+    "_category": ""
+  },
+  {
+    "_file": "YangSPD.asset",
+    "m_Name": "YangSPD",
+    "itemName": "SPDの灯",
+    "serverItemName": "YangSPD",
+    "itemImage": "素材/アイテム素材/強化素材/YangSPD.png",
+    "_category": ""
+  }
+]
