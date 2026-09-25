@@ -1,7 +1,7 @@
 # フロントエンド設計（レイヤー構成とコーディングルール）
 
-> 版: v0.3（2026-09-25、shackw の書き方に合わせて調整・ESLint 10・設定も TS に統一）/ 前提: [02_requirements.md](02_requirements.md) §4・§9（D-1: ルールは別々に実装、D-2: React + TS + Capacitor）
-> 対象: `web/`（【仮】）。フロントは AI が実装する。このルールは AI が守るものであり、オーナーのレビューの基準にもなる。
+> 版: v0.4（2026-09-26、spec（ゴールデンテスト・マスタ）に合わせて更新）/ 前提: [02_requirements.md](02_requirements.md) §4・§9（D-1: ルールは別々に実装、D-2: React + TS + Capacitor）
+> 対象: `web/`。フロントは AI が実装する。このルールは AI が守るものであり、オーナーのレビューの基準にもなる。
 
 ---
 
@@ -56,14 +56,14 @@ shared → （外部ライブラリのみ）
 ### 3.1 domain/ — ゲームのルール
 ```
 domain/
-├── master/        マスタの型（Character, Quest, Weather, Item）と読み取り関数
+├── master/        マスタの型（`spec/master` の形に合わせる）と読み取り関数
 ├── attribute/     属性相性（陽 > 音 > 月 > 陽）
-├── stats/         ステータス計算（基礎 + アイテム + 被り + 天気）
+├── stats/         ステータス計算（HP・攻撃・防御 = 基礎 + アイテム + 被り + 天気。係数は `spec/master/settings.json`）
 ├── battle/
 │   ├── state.ts       BattleState（HP・バフ・ターン・チェックポイント・残り回数…）
-│   ├── commands.ts    Command（attack / defend / attackBuff / defenceBuff / check / return / special / reveal）
-│   ├── events.ts      BattleEvent（enemyAction, damage, buff, attributeChanged, numbness, returned, finished…）
-│   ├── engine.ts      step(state, command, ctx) → { state, events } | { error }
+│   ├── commands.ts    Command（attack / defend / attackBuff / defenceBuff / check / rewind / special）。みえーるみえーる（reveal）は画面の機能でエンジンには入れない
+│   ├── events.ts      BattleEvent（enemyAction, damage, buff, attributeChanged, numbness, paralyzed, rewound, stageChanged, finished…）
+│   ├── engine.ts      step(state, command) → { ok: true, state, events } | { ok: false, reason }（reason は spec の理由コード）
 │   ├── enemyActions.ts 敵の行動ごとの処理
 │   ├── replay.ts      コマンドログの再生（サーバ検証と同じことをフロントでも確かめる）
 │   └── rng.ts         シード付き乱数（仕様で決めたアルゴリズム）
@@ -72,7 +72,7 @@ domain/
 - **すべて純粋関数**。入力が同じなら結果も同じ。状態は `readonly` で、書き換えずに新しいオブジェクトを返す。
 - 乱数・現在時刻は引数で受け取る（`ctx.rng`）。
 - 実行できないコマンドは例外にせず、**理由付きの結果**を返す: `{ ok: false, reason: 'NO_CHECKPOINT' }`。画面はこれを見てメッセージを出す（旧作の「チェックポイントがありません。」など）。
-- ゴールデンテスト（`spec/battle/*.json`）は `domain/battle` に対して直接実行する。
+- ゴールデンテスト（`spec/battle/cases/*.json`）は `domain/battle` に対して直接実行する。ルールの正は `spec/battle/README.md`。
 
 ### 3.2 api/ — 通信
 ```
@@ -109,7 +109,7 @@ features/battle/
 shared/
 ├── ui/        Button, Modal, Tabs, Gauge, Dialog…（見た目だけ。ゲームの知識なし）
 ├── sound/     Howler のラッパー（BGM の切り替え・SE・音量・iOS の自動再生制限への対応）
-├── assets/    素材のパスと先読み（生成したマニフェスト）
+├── assets/    素材のキーから URL を組み立てる・先読み（同梱素材のマニフェストと取得素材の基点 URL。`docs/02` §10）
 ├── storage/   端末保存の抽象化（Web は localStorage、アプリは Capacitor Preferences）
 ├── styles/    デザイントークン（色・余白・文字サイズ・アニメ時間）
 └── lib/       小さな関数（型ガード・フォーマット…）
@@ -256,7 +256,7 @@ export default BattleStoreProvider;
 | 定数 | UPPER_SNAKE_CASE | `MAX_CHECK_COUNT` |
 - コンポーネント・フックは **1 ファイル 1 つを default export**（ファイル名 = 名前）。feature の `index.ts` では `export { default as CommandPanel } from "./components/CommandPanel";` の形で公開する。
 - 1 つのファイルから複数出すもの（ストア・スキーマ・定数・ドメインの関数）は named export。
-- ゲーム用語のコード上の名前は `docs/glossary.md`（作成予定）で統一する（例: リターン = `return` ではなく予約語を避けて `rewind`、みえーるみえーる = `reveal`、必殺技（プレイヤー）= `special`、敵の必殺技 = `deathblow`）。
+- ゲーム用語のコード上の名前は `spec/battle/README.md` の「用語とコード上の名前」に揃える（例: リターン = `rewind`、必殺技（プレイヤー）= `special`、敵の必殺技 = `deathblow`、陽 / 音 / 月 = `yang` / `note` / `moon`）。画面だけの用語は みえーるみえーる = `reveal`。
 
 ### 5.4 スタイル
 - **CSS Modules ＋ CSS 変数（デザイントークン）**。色・余白・アニメ時間は `shared/styles/tokens.css` からだけ取る。
