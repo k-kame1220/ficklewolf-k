@@ -1,11 +1,11 @@
-export const ATTRIBUTES = ["YANG", "NOTE", "MOON"] as const;
+export const ATTRIBUTES = ["yang", "note", "moon"] as const;
 
 export type Attribute = (typeof ATTRIBUTES)[number];
 
 const ADVANTAGE = new Map<Attribute, Attribute>([
-  ["YANG", "NOTE"],
-  ["NOTE", "MOON"],
-  ["MOON", "YANG"]
+  ["yang", "note"],
+  ["note", "moon"],
+  ["moon", "yang"]
 ]);
 
 export const ADVANTAGE_MULTIPLIER = 1.25;

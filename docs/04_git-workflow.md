@@ -63,6 +63,7 @@ git worktree remove ../K-ai
 |---|---|
 | `web/` | `pnpm check`（Prettier の確認 → ESLint → Vitest → 型チェック＋ビルド） |
 | `api/` | `./gradlew build`（ktlint → テスト → ビルド） |
+| `spec/` | `python3 spec/tools/validate.py`（スキーマ・相互参照） |
 | `docs/`・`legacy/` など | なし |
 
 ### 初回の設定（clone したら 1 回だけ）

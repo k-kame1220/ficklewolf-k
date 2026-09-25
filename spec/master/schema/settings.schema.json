@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ficklewolf.shackw.com/k/spec/master/schema/settings.schema.json",
+  "type": "object",
+  "required": ["minAppVersion", "growth", "rewards"],
+  "additionalProperties": false,
+  "properties": {
+    "minAppVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "growth": {
+      "type": "object",
+      "required": ["itemUseMax", "itemBonusPerUse", "duplicateBonusPerCount"],
+      "additionalProperties": false,
+      "properties": {
+        "itemUseMax": { "$ref": "common.schema.json#/$defs/stats" },
+        "itemBonusPerUse": { "$ref": "common.schema.json#/$defs/stats" },
+        "duplicateBonusPerCount": { "$ref": "common.schema.json#/$defs/stats" }
+      }
+    },
+    "rewards": {
+      "type": "object",
+      "required": ["firstClearRecruitRate", "repeatRecruitRate", "weatherItemDropMin", "weatherItemDropMax", "fudaPerEvenLevel"],
+      "additionalProperties": false,
+      "properties": {
+        "firstClearRecruitRate": { "$ref": "common.schema.json#/$defs/rate" },
+        "repeatRecruitRate": { "$ref": "common.schema.json#/$defs/rate" },
+        "weatherItemDropMin": { "type": "integer", "minimum": 0 },
+        "weatherItemDropMax": { "type": "integer", "minimum": 0 },
+        "fudaPerEvenLevel": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

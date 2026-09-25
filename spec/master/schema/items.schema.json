@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ficklewolf.shackw.com/k/spec/master/schema/items.schema.json",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["id", "name", "attribute", "stat", "iconKey"],
+    "additionalProperties": false,
+    "properties": {
+      "id": { "$ref": "common.schema.json#/$defs/id" },
+      "name": { "type": "string" },
+      "attribute": { "$ref": "common.schema.json#/$defs/attribute" },
+      "stat": { "$ref": "common.schema.json#/$defs/stat" },
+      "iconKey": { "$ref": "common.schema.json#/$defs/assetKey" }
+    }
+  }
+}

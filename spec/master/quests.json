@@ -1,0 +1,2064 @@
+[
+  {
+    "id": "main-a",
+    "kind": "main",
+    "name": "A",
+    "order": 1,
+    "stages": [
+      {
+        "name": "A",
+        "imageKey": "characters/a/main",
+        "battle": {
+          "hp": 2000,
+          "attack": 400,
+          "defence": 500,
+          "attribute": "yang",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 10,
+          "fixedAttackPower": 500,
+          "strongAttackPower": 1000,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "defend",
+            "attack",
+            "defend",
+            "provocation",
+            "strongAttack",
+            "defend",
+            "attack",
+            "concentration",
+            "fixedAttack",
+            "deathblow"
+          ]
+        },
+        "revealCount": 1
+      }
+    ],
+    "rewards": {
+      "recruit": "a",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "main-b",
+    "kind": "main",
+    "name": "B",
+    "order": 2,
+    "stages": [
+      {
+        "name": "B",
+        "imageKey": "characters/b/main",
+        "battle": {
+          "hp": 5000,
+          "attack": 300,
+          "defence": 300,
+          "attribute": "note",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 200,
+          "fixedAttackPower": 500,
+          "strongAttackPower": 0,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "attack",
+            "attackBuff",
+            "defend",
+            "attack",
+            "attackBuff",
+            "attack",
+            "fixedAttack",
+            "attackBuff",
+            "attackBuff",
+            "defend",
+            "attack",
+            "attack",
+            "provocation",
+            "concentration",
+            "deathblow"
+          ]
+        },
+        "revealCount": 1
+      }
+    ],
+    "rewards": {
+      "recruit": "b",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "main-c",
+    "kind": "main",
+    "name": "C",
+    "order": 3,
+    "stages": [
+      {
+        "name": "C",
+        "imageKey": "characters/c/main",
+        "battle": {
+          "hp": 2000,
+          "attack": 1000,
+          "defence": 10,
+          "attribute": "moon",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 10,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 0,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "attack",
+            "attack",
+            "attack",
+            "attack",
+            "attack",
+            "attack",
+            "attack",
+            "deathblow"
+          ]
+        },
+        "revealCount": 1
+      }
+    ],
+    "rewards": {
+      "recruit": "c",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "main-d",
+    "kind": "main",
+    "name": "D",
+    "order": 4,
+    "stages": [
+      {
+        "name": "D",
+        "imageKey": "characters/d/main",
+        "battle": {
+          "hp": 3100,
+          "attack": 630,
+          "defence": 40,
+          "attribute": "yang",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 40,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 0,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "attack",
+            "defend",
+            "attack",
+            "defend",
+            "attack",
+            "defend",
+            "deathblow"
+          ]
+        },
+        "revealCount": 1
+      }
+    ],
+    "rewards": {
+      "recruit": "d",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "main-e",
+    "kind": "main",
+    "name": "E",
+    "order": 5,
+    "stages": [
+      {
+        "name": "E",
+        "imageKey": "characters/e/main",
+        "battle": {
+          "hp": 4000,
+          "attack": 500,
+          "defence": 300,
+          "attribute": "yang",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 300,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 0,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "defend",
+            "defend",
+            "defend",
+            "attack",
+            "defend",
+            "defend",
+            "attack",
+            "defend",
+            "deathblow"
+          ]
+        },
+        "revealCount": 1
+      }
+    ],
+    "rewards": {
+      "recruit": "e",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "main-f",
+    "kind": "main",
+    "name": "F",
+    "order": 6,
+    "stages": [
+      {
+        "name": "F",
+        "imageKey": "characters/f/main",
+        "battle": {
+          "hp": 1250,
+          "attack": 2000,
+          "defence": 200,
+          "attribute": "moon",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 200,
+          "fixedAttackPower": 1000,
+          "strongAttackPower": 0,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "attack",
+            "attack",
+            "fixedAttack",
+            "attack",
+            "attack",
+            "defend",
+            "attack",
+            "attack",
+            "deathblow"
+          ]
+        },
+        "revealCount": 1
+      }
+    ],
+    "rewards": {
+      "recruit": "f",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "main-g",
+    "kind": "main",
+    "name": "G",
+    "order": 7,
+    "stages": [
+      {
+        "name": "G",
+        "imageKey": "characters/g/main",
+        "battle": {
+          "hp": 6000,
+          "attack": 400,
+          "defence": 700,
+          "attribute": "note",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 350,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 0,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "defenceBuff",
+            "attack",
+            "defenceBuff",
+            "attack",
+            "defenceBuff",
+            "defend",
+            "attack",
+            "defend",
+            "defend",
+            "attack",
+            "defend",
+            "defend",
+            "deathblow"
+          ]
+        },
+        "revealCount": 1
+      }
+    ],
+    "rewards": {
+      "recruit": "g",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "main-i",
+    "kind": "main",
+    "name": "I",
+    "order": 8,
+    "stages": [
+      {
+        "name": "B!",
+        "imageKey": "characters/i/main",
+        "battle": {
+          "hp": 5000,
+          "attack": 2000,
+          "defence": 300,
+          "attribute": "note",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 350,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 2500,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "attack",
+            "defend",
+            "defend",
+            "defend",
+            "defend",
+            "defend",
+            "strongAttack",
+            "defend",
+            "defend",
+            "defend",
+            "attack",
+            "deathblow"
+          ]
+        },
+        "revealCount": 1
+      },
+      {
+        "name": "I",
+        "imageKey": "characters/i/main",
+        "battle": {
+          "hp": 5000,
+          "attack": 1500,
+          "defence": 200,
+          "attribute": "note",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 200,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 2000,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "strongAttack",
+            "strongAttack",
+            "strongAttack",
+            "defend",
+            "defend",
+            "provocation",
+            "concentration",
+            "deathblow"
+          ]
+        },
+        "revealCount": 1
+      }
+    ],
+    "rewards": {
+      "recruit": "i",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "main-j",
+    "kind": "main",
+    "name": "J",
+    "order": 9,
+    "stages": [
+      {
+        "name": "J",
+        "imageKey": "characters/j/main",
+        "battle": {
+          "hp": 20000,
+          "attack": 800,
+          "defence": 200,
+          "attribute": "note",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 200,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 2500,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "defenceBuff",
+            "attack",
+            "attackBuff",
+            "attackBuff",
+            "defend",
+            "attack",
+            "defend",
+            "attackBuff",
+            "attack",
+            "defend",
+            "attack",
+            "defenceBuff",
+            "defenceBuff",
+            "attackBuff",
+            "attack",
+            "strongAttack",
+            "defend",
+            "defenceBuff",
+            "deathblow"
+          ]
+        },
+        "revealCount": 2
+      }
+    ],
+    "rewards": {
+      "recruit": "j",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "main-l",
+    "kind": "main",
+    "name": "L",
+    "order": 10,
+    "stages": [
+      {
+        "name": "L",
+        "imageKey": "characters/l/main",
+        "battle": {
+          "hp": 23000,
+          "attack": 800,
+          "defence": 200,
+          "attribute": "yang",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 200,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 0,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "defenceBuff",
+            "attack",
+            "attack",
+            "defenceBuff",
+            "defend",
+            "attack",
+            "attackBuff",
+            "attackBuff",
+            "attack",
+            "fullRecovery",
+            "attackBuff",
+            "defenceBuff",
+            "defenceBuff",
+            "attack",
+            "defend",
+            "attack",
+            "attack",
+            "attack",
+            "deathblow"
+          ]
+        },
+        "revealCount": 2
+      }
+    ],
+    "rewards": {
+      "recruit": "l",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "main-m",
+    "kind": "main",
+    "name": "M",
+    "order": 11,
+    "stages": [
+      {
+        "name": "M",
+        "imageKey": "characters/m/main",
+        "battle": {
+          "hp": 20000,
+          "attack": 1400,
+          "defence": 200,
+          "attribute": "moon",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 200,
+          "fixedAttackPower": 500,
+          "strongAttackPower": 2200,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "fixedAttack",
+            "attack",
+            "defenceBuff",
+            "defenceBuff",
+            "strongAttack",
+            "fullRecovery",
+            "strongAttack",
+            "defenceBuff",
+            "attackBuff",
+            "fullRecovery",
+            "attack",
+            "attackBuff",
+            "attack",
+            "fullRecovery",
+            "defenceBuff",
+            "fullRecovery",
+            "attackBuff",
+            "attack",
+            "attack",
+            "deathblow"
+          ]
+        },
+        "revealCount": 2
+      }
+    ],
+    "rewards": {
+      "recruit": "m",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "main-n",
+    "kind": "main",
+    "name": "N",
+    "order": 12,
+    "stages": [
+      {
+        "name": "N",
+        "imageKey": "characters/n/main",
+        "battle": {
+          "hp": 10000,
+          "attack": 1400,
+          "defence": 200,
+          "attribute": "moon",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 200,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 2000,
+          "recoveryRate": 0,
+          "changeAttribute": "yang",
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "attack",
+            "defenceBuff",
+            "attack",
+            "changeAttribute",
+            "fullRecovery",
+            "strongAttack",
+            "attackBuff",
+            "attack",
+            "defenceBuff",
+            "strongAttack",
+            "fullRecovery",
+            "attack",
+            "attack",
+            "fullRecovery",
+            "deathblow"
+          ]
+        },
+        "revealCount": 2
+      }
+    ],
+    "rewards": {
+      "recruit": "n",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "main-o",
+    "kind": "main",
+    "name": "O",
+    "order": 13,
+    "stages": [
+      {
+        "name": "O",
+        "imageKey": "characters/o/main",
+        "battle": {
+          "hp": 8000,
+          "attack": 900,
+          "defence": 200,
+          "attribute": "yang",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 200,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 2600,
+          "recoveryRate": 0.4,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "rateRecovery",
+            "attack",
+            "rateRecovery",
+            "attackBuff",
+            "rateRecovery",
+            "attack",
+            "fullRecovery",
+            "attackBuff",
+            "strongAttack",
+            "rateRecovery",
+            "attack",
+            "rateRecovery",
+            "attackBuff",
+            "rateRecovery",
+            "deathblow"
+          ]
+        },
+        "revealCount": 2
+      }
+    ],
+    "rewards": {
+      "recruit": "o",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "main-r",
+    "kind": "main",
+    "name": "R",
+    "order": 14,
+    "stages": [
+      {
+        "name": "R",
+        "imageKey": "characters/r/main",
+        "battle": {
+          "hp": 15000,
+          "attack": 1000,
+          "defence": 250,
+          "attribute": "yang",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 240,
+          "fixedAttackPower": 600,
+          "strongAttackPower": 4000,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "attack",
+            "attackBuff",
+            "defend",
+            "attack",
+            "attackBuff",
+            "attack",
+            "fullRecovery",
+            "attack",
+            "attackBuff",
+            "defend",
+            "strongAttack",
+            "fullRecovery",
+            "attack",
+            "attackBuff",
+            "attack",
+            "defend",
+            "fixedAttack",
+            "attack",
+            "attack",
+            "deathblow"
+          ]
+        },
+        "revealCount": 2
+      }
+    ],
+    "rewards": {
+      "recruit": "r",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "main-s",
+    "kind": "main",
+    "name": "S",
+    "order": 15,
+    "stages": [
+      {
+        "name": "S",
+        "imageKey": "characters/s/main",
+        "battle": {
+          "hp": 10000,
+          "attack": 1000,
+          "defence": 400,
+          "attribute": "note",
+          "attackBuffRate": 0.55,
+          "defenceBuffAmount": 400,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 2000,
+          "recoveryRate": 0,
+          "changeAttribute": "moon",
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "attackBuff",
+            "attack",
+            "defenceBuff",
+            "fullRecovery",
+            "attack",
+            "strongAttack",
+            "changeAttribute",
+            "attack",
+            "defend",
+            "attack",
+            "strongAttack",
+            "defenceBuff",
+            "strongAttack",
+            "attack",
+            "deathblow"
+          ]
+        },
+        "revealCount": 2
+      }
+    ],
+    "rewards": {
+      "recruit": "s",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "main-t",
+    "kind": "main",
+    "name": "T",
+    "order": 16,
+    "stages": [
+      {
+        "name": "T",
+        "imageKey": "characters/t/main",
+        "battle": {
+          "hp": 13000,
+          "attack": 800,
+          "defence": 250,
+          "attribute": "note",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 250,
+          "fixedAttackPower": 400,
+          "strongAttackPower": 1800,
+          "recoveryRate": 0.6,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "attack",
+            "attackBuff",
+            "defenceBuff",
+            "attackBuff",
+            "defend",
+            "attack",
+            "rateRecovery",
+            "attack",
+            "attackBuff",
+            "defenceBuff",
+            "defend",
+            "strongAttack",
+            "defend",
+            "rateRecovery",
+            "fixedAttack",
+            "attackBuff",
+            "attackBuff",
+            "attackBuff",
+            "attack",
+            "deathblow"
+          ]
+        },
+        "revealCount": 2
+      }
+    ],
+    "rewards": {
+      "recruit": "t",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "main-u",
+    "kind": "main",
+    "name": "U",
+    "order": 17,
+    "stages": [
+      {
+        "name": "U",
+        "imageKey": "characters/u/main",
+        "battle": {
+          "hp": 12000,
+          "attack": 2100,
+          "defence": 150,
+          "attribute": "yang",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 150,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 0,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "attack",
+            "attack",
+            "attack",
+            "attack",
+            "attack",
+            "attack",
+            "attack",
+            "attack",
+            "concentration",
+            "concentration",
+            "concentration",
+            "concentration",
+            "deathblow"
+          ]
+        },
+        "revealCount": 1
+      }
+    ],
+    "rewards": {
+      "recruit": "u",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "main-v",
+    "kind": "main",
+    "name": "V",
+    "order": 18,
+    "stages": [
+      {
+        "name": "V",
+        "imageKey": "characters/v/main",
+        "battle": {
+          "hp": 30000,
+          "attack": 800,
+          "defence": 350,
+          "attribute": "moon",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 350,
+          "fixedAttackPower": 600,
+          "strongAttackPower": 3000,
+          "recoveryRate": 0,
+          "changeAttribute": "yang",
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "attackBuff",
+            "defenceBuff",
+            "attackBuff",
+            "fullRecovery",
+            "attackBuff",
+            "attackBuff",
+            "attackBuff",
+            "fullRecovery",
+            "attack",
+            "attack",
+            "attack",
+            "fullRecovery",
+            "changeAttribute",
+            "attack",
+            "defend",
+            "strongAttack",
+            "fixedAttack",
+            "defend",
+            "concentration",
+            "attackBuff",
+            "attack",
+            "defenceBuff",
+            "defend",
+            "attack",
+            "deathblow"
+          ]
+        },
+        "revealCount": 3
+      }
+    ],
+    "rewards": {
+      "recruit": "v",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "main-x",
+    "kind": "main",
+    "name": "X",
+    "order": 19,
+    "stages": [
+      {
+        "name": "X",
+        "imageKey": "characters/x/main",
+        "battle": {
+          "hp": 25000,
+          "attack": 1400,
+          "defence": 250,
+          "attribute": "note",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 250,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 0,
+          "recoveryRate": 0,
+          "changeAttribute": "moon",
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "attack",
+            "defend",
+            "attack",
+            "attack",
+            "fullRecovery",
+            "changeAttribute",
+            "defend",
+            "defend",
+            "defend",
+            "defend",
+            "defend",
+            "defend",
+            "deathblow"
+          ]
+        },
+        "revealCount": 2
+      }
+    ],
+    "rewards": {
+      "recruit": "x",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "main-y",
+    "kind": "main",
+    "name": "Y",
+    "order": 20,
+    "stages": [
+      {
+        "name": "Y",
+        "imageKey": "characters/y/main",
+        "battle": {
+          "hp": 22000,
+          "attack": 600,
+          "defence": 300,
+          "attribute": "yang",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 300,
+          "fixedAttackPower": 800,
+          "strongAttackPower": 3000,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "attack",
+            "defend",
+            "attack",
+            "defend",
+            "fullRecovery",
+            "attackBuff",
+            "attack",
+            "attackBuff",
+            "attack",
+            "fullRecovery",
+            "defenceBuff",
+            "defend",
+            "attack",
+            "attack",
+            "fullRecovery",
+            "fixedAttack",
+            "attack",
+            "defend",
+            "attack",
+            "fullRecovery",
+            "fullRecovery",
+            "fullRecovery",
+            "deathblow"
+          ]
+        },
+        "revealCount": 3
+      }
+    ],
+    "rewards": {
+      "recruit": "y",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "main-z",
+    "kind": "main",
+    "name": "Z",
+    "order": 21,
+    "stages": [
+      {
+        "name": "Z",
+        "imageKey": "characters/z/main",
+        "battle": {
+          "hp": 20000,
+          "attack": 450,
+          "defence": 250,
+          "attribute": "moon",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 250,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 1500,
+          "recoveryRate": 0.6,
+          "changeAttribute": "yang",
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "attack",
+            "attackBuff",
+            "rateRecovery",
+            "defenceBuff",
+            "defend",
+            "attack",
+            "defenceBuff",
+            "attack",
+            "fullRecovery",
+            "rateRecovery",
+            "defend",
+            "attack",
+            "strongAttack",
+            "attackBuff",
+            "fullRecovery",
+            "attack",
+            "rateRecovery",
+            "attack",
+            "attackBuff",
+            "changeAttribute",
+            "rateRecovery",
+            "attack",
+            "attack",
+            "rateRecovery",
+            "attackBuff",
+            "defend",
+            "rateRecovery",
+            "attack",
+            "concentration",
+            "concentration",
+            "strongAttack",
+            "defend",
+            "defend",
+            "defend",
+            "defend",
+            "deathblow"
+          ]
+        },
+        "revealCount": 3
+      }
+    ],
+    "rewards": {
+      "recruit": "z",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "main-dawn",
+    "kind": "main",
+    "name": "Dawn",
+    "order": 22,
+    "stages": [
+      {
+        "name": "Dawn",
+        "imageKey": "characters/dawn/main",
+        "battle": {
+          "hp": 14000,
+          "attack": 700,
+          "defence": 200,
+          "attribute": "yang",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 200,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 3500,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 1,
+          "defenceDebuff": 0,
+          "turns": [
+            "attack",
+            "attackBuff",
+            "attackDebuff",
+            "defend",
+            "attack",
+            "attackBuff",
+            "strongAttack",
+            "attackDebuff",
+            "attack",
+            "defend",
+            "attack",
+            "concentration",
+            "attack",
+            "attackDebuff",
+            "attack",
+            "deathblow"
+          ]
+        },
+        "revealCount": 2
+      }
+    ],
+    "rewards": {
+      "recruit": "dawn",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "main-moi",
+    "kind": "main",
+    "name": "Moi",
+    "order": 23,
+    "stages": [
+      {
+        "name": "Moi",
+        "imageKey": "characters/moi/main",
+        "battle": {
+          "hp": 12000,
+          "attack": 800,
+          "defence": 200,
+          "attribute": "yang",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 200,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 8000,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 1,
+          "defenceDebuff": 1,
+          "turns": [
+            "defenceBuff",
+            "defenceBuff",
+            "attackDebuff",
+            "defenceDebuff",
+            "strongAttack",
+            "fullRecovery",
+            "attackBuff",
+            "attack",
+            "defenceBuff",
+            "attack",
+            "defenceDebuff",
+            "strongAttack",
+            "defend",
+            "concentration",
+            "strongAttack",
+            "attackBuff",
+            "concentration",
+            "defend",
+            "provocation",
+            "deathblow"
+          ]
+        },
+        "revealCount": 2
+      }
+    ],
+    "rewards": {
+      "recruit": "moi",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "main-nomb",
+    "kind": "main",
+    "name": "Nomb",
+    "order": 24,
+    "stages": [
+      {
+        "name": "Nomb",
+        "imageKey": "characters/nomb/main",
+        "battle": {
+          "hp": 15000,
+          "attack": 800,
+          "defence": 250,
+          "attribute": "note",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 250,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 0,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 1,
+          "defenceDebuff": 0,
+          "turns": [
+            "attack",
+            "attack",
+            "attack",
+            "numbness",
+            "attackDebuff",
+            "defenceBuff",
+            "defend",
+            "attack",
+            "numbness",
+            "attackBuff",
+            "defenceBuff",
+            "defend",
+            "attack",
+            "numbness",
+            "attackBuff",
+            "concentration",
+            "attack",
+            "concentration",
+            "deathblow"
+          ]
+        },
+        "revealCount": 2
+      }
+    ],
+    "rewards": {
+      "recruit": "nomb",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "event-w",
+    "kind": "event",
+    "name": "W",
+    "order": 1,
+    "stages": [
+      {
+        "name": "W",
+        "imageKey": "characters/w/main",
+        "battle": {
+          "hp": 25000,
+          "attack": 900,
+          "defence": 200,
+          "attribute": "note",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 200,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 3000,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "attack",
+            "attackBuff",
+            "defend",
+            "concentration",
+            "attack",
+            "attackBuff",
+            "defend",
+            "attack",
+            "strongAttack",
+            "attack",
+            "defend",
+            "strongAttack",
+            "defend",
+            "attack",
+            "concentration",
+            "deathblow"
+          ]
+        },
+        "revealCount": 2
+      }
+    ],
+    "bannerKey": "quests/event-w/banner",
+    "bgmKey": "bgm/quests/event-w",
+    "rewards": {
+      "recruit": "w",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "event-kappa",
+    "kind": "event",
+    "name": "Kappa",
+    "order": 2,
+    "stages": [
+      {
+        "name": "Kappa",
+        "imageKey": "characters/kappa/main",
+        "battle": {
+          "hp": 24000,
+          "attack": 600,
+          "defence": 300,
+          "attribute": "yang",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 300,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 3000,
+          "recoveryRate": 0.5,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "defenceBuff",
+            "defend",
+            "defenceBuff",
+            "defend",
+            "strongAttack",
+            "defend",
+            "concentration",
+            "defenceBuff",
+            "defend",
+            "strongAttack",
+            "rateRecovery",
+            "attackBuff",
+            "attackBuff",
+            "attack",
+            "defend",
+            "concentration",
+            "strongAttack",
+            "provocation",
+            "provocation",
+            "deathblow"
+          ]
+        },
+        "revealCount": 2
+      }
+    ],
+    "bannerKey": "quests/event-kappa/banner",
+    "bgmKey": "bgm/quests/event-kappa",
+    "rewards": {
+      "recruit": "kappa",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "event-dress",
+    "kind": "event",
+    "name": "Dress",
+    "order": 3,
+    "stages": [
+      {
+        "name": "Dress",
+        "imageKey": "characters/dress/main",
+        "battle": {
+          "hp": 16000,
+          "attack": 700,
+          "defence": 200,
+          "attribute": "note",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 200,
+          "fixedAttackPower": 400,
+          "strongAttackPower": 3000,
+          "recoveryRate": 0.5,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "rateRecovery",
+            "attack",
+            "fullRecovery",
+            "attack",
+            "rateRecovery",
+            "attack",
+            "concentration",
+            "attack",
+            "rateRecovery",
+            "strongAttack",
+            "fixedAttack",
+            "strongAttack",
+            "defend",
+            "attackBuff",
+            "concentration",
+            "strongAttack",
+            "attack",
+            "provocation",
+            "provocation",
+            "deathblow"
+          ]
+        },
+        "revealCount": 2
+      }
+    ],
+    "bannerKey": "quests/event-dress/banner",
+    "bgmKey": "bgm/quests/event-dress",
+    "rewards": {
+      "recruit": "dress",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "event-fever",
+    "kind": "event",
+    "name": "Fever",
+    "order": 4,
+    "stages": [
+      {
+        "name": "Fever",
+        "imageKey": "characters/fever/main",
+        "battle": {
+          "hp": 12000,
+          "attack": 700,
+          "defence": 200,
+          "attribute": "note",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 200,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 6500,
+          "recoveryRate": 0,
+          "changeAttribute": "moon",
+          "attackDebuff": 1,
+          "defenceDebuff": 1,
+          "turns": [
+            "attackBuff",
+            "defenceBuff",
+            "defend",
+            "strongAttack",
+            "attackBuff",
+            "defenceBuff",
+            "attackDebuff",
+            "attackBuff",
+            "attackBuff",
+            "changeAttribute",
+            "fullRecovery",
+            "attackDebuff",
+            "attackBuff",
+            "defenceDebuff",
+            "attack",
+            "strongAttack",
+            "defend",
+            "concentration",
+            "defend",
+            "deathblow"
+          ]
+        },
+        "revealCount": 2
+      }
+    ],
+    "bannerKey": "quests/event-fever/banner",
+    "bgmKey": "bgm/quests/event-fever",
+    "rewards": {
+      "recruit": "fever",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "event-per-o",
+    "kind": "event",
+    "name": "Per-o",
+    "order": 5,
+    "stages": [
+      {
+        "name": "Per-o",
+        "imageKey": "characters/per-o/main",
+        "battle": {
+          "hp": 32000,
+          "attack": 600,
+          "defence": 200,
+          "attribute": "yang",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 200,
+          "fixedAttackPower": 400,
+          "strongAttackPower": 6000,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 1,
+          "defenceDebuff": 0,
+          "turns": [
+            "defend",
+            "defend",
+            "defend",
+            "attackDebuff",
+            "attack",
+            "attack",
+            "strongAttack",
+            "attackDebuff",
+            "attack",
+            "attack",
+            "strongAttack",
+            "attackDebuff",
+            "attack",
+            "attack",
+            "strongAttack",
+            "attackDebuff",
+            "fixedAttack",
+            "concentration",
+            "deathblow"
+          ]
+        },
+        "revealCount": 2
+      }
+    ],
+    "bannerKey": "quests/event-per-o/banner",
+    "bgmKey": "bgm/quests/event-per-o",
+    "rewards": {
+      "recruit": "per-o",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "event-ronove",
+    "kind": "event",
+    "name": "Ronove",
+    "order": 6,
+    "stages": [
+      {
+        "name": "Ronove",
+        "imageKey": "characters/ronove/main",
+        "battle": {
+          "hp": 15000,
+          "attack": 900,
+          "defence": 200,
+          "attribute": "yang",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 200,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 6500,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "numbness",
+            "attackBuff",
+            "attack",
+            "strongAttack",
+            "numbness",
+            "attackBuff",
+            "attack",
+            "attack",
+            "numbness",
+            "fullRecovery",
+            "defend",
+            "fullRecovery",
+            "concentration",
+            "defend",
+            "attack",
+            "concentration",
+            "deathblow"
+          ]
+        },
+        "revealCount": 2
+      }
+    ],
+    "bannerKey": "quests/event-ronove/banner",
+    "bgmKey": "bgm/quests/event-ronove",
+    "rewards": {
+      "recruit": "ronove",
+      "weatherItems": false
+    }
+  },
+  {
+    "id": "weather-blue-sky",
+    "kind": "weather",
+    "name": "青空",
+    "order": 1,
+    "stages": [
+      {
+        "name": "E",
+        "imageKey": "characters/e/main",
+        "battle": {
+          "hp": 3000,
+          "attack": 500,
+          "defence": 100,
+          "attribute": "yang",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 100,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 0,
+          "recoveryRate": 0.3,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "rateRecovery",
+            "attack",
+            "fullRecovery",
+            "attack",
+            "rateRecovery",
+            "attack",
+            "concentration",
+            "attack",
+            "rateRecovery",
+            "deathblow"
+          ]
+        },
+        "revealCount": 1
+      }
+    ],
+    "weatherId": "blue-sky",
+    "rewards": {
+      "recruit": null,
+      "weatherItems": true
+    }
+  },
+  {
+    "id": "weather-sunny",
+    "kind": "weather",
+    "name": "晴",
+    "order": 2,
+    "stages": [
+      {
+        "name": "O",
+        "imageKey": "characters/o/main",
+        "battle": {
+          "hp": 5000,
+          "attack": 900,
+          "defence": 100,
+          "attribute": "yang",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 100,
+          "fixedAttackPower": 400,
+          "strongAttackPower": 0,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "attackBuff",
+            "attack",
+            "attackBuff",
+            "attack",
+            "fixedAttack",
+            "attack",
+            "concentration",
+            "attackBuff",
+            "attack",
+            "deathblow"
+          ]
+        },
+        "revealCount": 1
+      }
+    ],
+    "weatherId": "sunny",
+    "rewards": {
+      "recruit": null,
+      "weatherItems": true
+    }
+  },
+  {
+    "id": "weather-galleon",
+    "kind": "weather",
+    "name": "ガレオン船",
+    "order": 3,
+    "stages": [
+      {
+        "name": "R",
+        "imageKey": "characters/r/main",
+        "battle": {
+          "hp": 8000,
+          "attack": 900,
+          "defence": 300,
+          "attribute": "yang",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 300,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 3000,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "defenceBuff",
+            "defend",
+            "defenceBuff",
+            "defend",
+            "strongAttack",
+            "defend",
+            "concentration",
+            "defenceBuff",
+            "defend",
+            "deathblow"
+          ]
+        },
+        "revealCount": 1
+      }
+    ],
+    "weatherId": "galleon",
+    "rewards": {
+      "recruit": null,
+      "weatherItems": true
+    }
+  },
+  {
+    "id": "weather-mexico",
+    "kind": "weather",
+    "name": "メキシコ",
+    "order": 4,
+    "stages": [
+      {
+        "name": "D",
+        "imageKey": "characters/d/main",
+        "battle": {
+          "hp": 5000,
+          "attack": 900,
+          "defence": 200,
+          "attribute": "yang",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 200,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 3000,
+          "recoveryRate": 0.3,
+          "changeAttribute": "note",
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "rateRecovery",
+            "attack",
+            "attackBuff",
+            "defend",
+            "strongAttack",
+            "changeAttribute",
+            "concentration",
+            "fullRecovery",
+            "attack",
+            "deathblow"
+          ]
+        },
+        "revealCount": 1
+      }
+    ],
+    "weatherId": "mexico",
+    "rewards": {
+      "recruit": null,
+      "weatherItems": true
+    }
+  },
+  {
+    "id": "weather-snow",
+    "kind": "weather",
+    "name": "雪",
+    "order": 5,
+    "stages": [
+      {
+        "name": "B",
+        "imageKey": "characters/b/main",
+        "battle": {
+          "hp": 3000,
+          "attack": 500,
+          "defence": 100,
+          "attribute": "note",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 100,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 0,
+          "recoveryRate": 0.3,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "rateRecovery",
+            "attack",
+            "fullRecovery",
+            "attack",
+            "rateRecovery",
+            "attack",
+            "concentration",
+            "attack",
+            "rateRecovery",
+            "deathblow"
+          ]
+        },
+        "revealCount": 1
+      }
+    ],
+    "weatherId": "snow",
+    "rewards": {
+      "recruit": null,
+      "weatherItems": true
+    }
+  },
+  {
+    "id": "weather-rain",
+    "kind": "weather",
+    "name": "雨",
+    "order": 6,
+    "stages": [
+      {
+        "name": "T",
+        "imageKey": "characters/t/main",
+        "battle": {
+          "hp": 5000,
+          "attack": 900,
+          "defence": 100,
+          "attribute": "note",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 100,
+          "fixedAttackPower": 400,
+          "strongAttackPower": 0,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "attackBuff",
+            "attack",
+            "attackBuff",
+            "attack",
+            "fixedAttack",
+            "attack",
+            "concentration",
+            "attackBuff",
+            "attack",
+            "deathblow"
+          ]
+        },
+        "revealCount": 1
+      }
+    ],
+    "weatherId": "rain",
+    "rewards": {
+      "recruit": null,
+      "weatherItems": true
+    }
+  },
+  {
+    "id": "weather-dark",
+    "kind": "weather",
+    "name": "闇",
+    "order": 7,
+    "stages": [
+      {
+        "name": "G",
+        "imageKey": "characters/g/main",
+        "battle": {
+          "hp": 8000,
+          "attack": 900,
+          "defence": 300,
+          "attribute": "note",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 300,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 3000,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "defenceBuff",
+            "defend",
+            "defenceBuff",
+            "defend",
+            "strongAttack",
+            "defend",
+            "concentration",
+            "defenceBuff",
+            "defend",
+            "deathblow"
+          ]
+        },
+        "revealCount": 1
+      }
+    ],
+    "weatherId": "dark",
+    "rewards": {
+      "recruit": null,
+      "weatherItems": true
+    }
+  },
+  {
+    "id": "weather-shukuchi",
+    "kind": "weather",
+    "name": "縮地",
+    "order": 8,
+    "stages": [
+      {
+        "name": "S",
+        "imageKey": "characters/s/main",
+        "battle": {
+          "hp": 5000,
+          "attack": 900,
+          "defence": 200,
+          "attribute": "note",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 200,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 3000,
+          "recoveryRate": 0.3,
+          "changeAttribute": "moon",
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "rateRecovery",
+            "attack",
+            "attackBuff",
+            "defend",
+            "strongAttack",
+            "changeAttribute",
+            "concentration",
+            "fullRecovery",
+            "attack",
+            "deathblow"
+          ]
+        },
+        "revealCount": 1
+      }
+    ],
+    "weatherId": "shukuchi",
+    "rewards": {
+      "recruit": null,
+      "weatherItems": true
+    }
+  },
+  {
+    "id": "weather-fog",
+    "kind": "weather",
+    "name": "霧",
+    "order": 9,
+    "stages": [
+      {
+        "name": "N",
+        "imageKey": "characters/n/main",
+        "battle": {
+          "hp": 3000,
+          "attack": 500,
+          "defence": 100,
+          "attribute": "moon",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 100,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 0,
+          "recoveryRate": 0.3,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "rateRecovery",
+            "attack",
+            "fullRecovery",
+            "attack",
+            "rateRecovery",
+            "attack",
+            "concentration",
+            "attack",
+            "rateRecovery",
+            "deathblow"
+          ]
+        },
+        "revealCount": 1
+      }
+    ],
+    "weatherId": "fog",
+    "rewards": {
+      "recruit": null,
+      "weatherItems": true
+    }
+  },
+  {
+    "id": "weather-cloudy",
+    "kind": "weather",
+    "name": "曇",
+    "order": 10,
+    "stages": [
+      {
+        "name": "M",
+        "imageKey": "characters/m/main",
+        "battle": {
+          "hp": 5000,
+          "attack": 900,
+          "defence": 100,
+          "attribute": "moon",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 100,
+          "fixedAttackPower": 400,
+          "strongAttackPower": 0,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "attackBuff",
+            "attack",
+            "attackBuff",
+            "attack",
+            "fixedAttack",
+            "attack",
+            "concentration",
+            "attackBuff",
+            "attack",
+            "deathblow"
+          ]
+        },
+        "revealCount": 1
+      }
+    ],
+    "weatherId": "cloudy",
+    "rewards": {
+      "recruit": null,
+      "weatherItems": true
+    }
+  },
+  {
+    "id": "weather-storm",
+    "kind": "weather",
+    "name": "嵐",
+    "order": 11,
+    "stages": [
+      {
+        "name": "ZERO",
+        "imageKey": "characters/zero/home",
+        "battle": {
+          "hp": 8000,
+          "attack": 900,
+          "defence": 300,
+          "attribute": "moon",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 300,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 3000,
+          "recoveryRate": 0,
+          "changeAttribute": null,
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "defenceBuff",
+            "defend",
+            "defenceBuff",
+            "defend",
+            "strongAttack",
+            "defend",
+            "concentration",
+            "defenceBuff",
+            "defend",
+            "deathblow"
+          ]
+        },
+        "revealCount": 1
+      }
+    ],
+    "weatherId": "storm",
+    "rewards": {
+      "recruit": null,
+      "weatherItems": true
+    }
+  },
+  {
+    "id": "weather-thunder",
+    "kind": "weather",
+    "name": "雷",
+    "order": 12,
+    "stages": [
+      {
+        "name": "V",
+        "imageKey": "characters/v/main",
+        "battle": {
+          "hp": 5000,
+          "attack": 900,
+          "defence": 200,
+          "attribute": "moon",
+          "attackBuffRate": 0.5,
+          "defenceBuffAmount": 200,
+          "fixedAttackPower": 0,
+          "strongAttackPower": 3000,
+          "recoveryRate": 0.3,
+          "changeAttribute": "yang",
+          "attackDebuff": 0,
+          "defenceDebuff": 0,
+          "turns": [
+            "rateRecovery",
+            "attack",
+            "attackBuff",
+            "defend",
+            "strongAttack",
+            "changeAttribute",
+            "concentration",
+            "fullRecovery",
+            "attack",
+            "deathblow"
+          ]
+        },
+        "revealCount": 1
+      }
+    ],
+    "weatherId": "thunder",
+    "rewards": {
+      "recruit": null,
+      "weatherItems": true
+    }
+  }
+]

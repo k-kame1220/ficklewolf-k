@@ -1,0 +1,65 @@
+[
+  {
+    "id": "yang-hp",
+    "name": "HPの灯",
+    "attribute": "yang",
+    "stat": "hp",
+    "iconKey": "items/yang-hp"
+  },
+  {
+    "id": "yang-attack",
+    "name": "ATKの灯",
+    "attribute": "yang",
+    "stat": "attack",
+    "iconKey": "items/yang-attack"
+  },
+  {
+    "id": "yang-defence",
+    "name": "DEFの灯",
+    "attribute": "yang",
+    "stat": "defence",
+    "iconKey": "items/yang-defence"
+  },
+  {
+    "id": "note-hp",
+    "name": "HPの譜",
+    "attribute": "note",
+    "stat": "hp",
+    "iconKey": "items/note-hp"
+  },
+  {
+    "id": "note-attack",
+    "name": "ATKの譜",
+    "attribute": "note",
+    "stat": "attack",
+    "iconKey": "items/note-attack"
+  },
+  {
+    "id": "note-defence",
+    "name": "DEFの譜",
+    "attribute": "note",
+    "stat": "defence",
+    "iconKey": "items/note-defence"
+  },
+  {
+    "id": "moon-hp",
+    "name": "HPの酒",
+    "attribute": "moon",
+    "stat": "hp",
+    "iconKey": "items/moon-hp"
+  },
+  {
+    "id": "moon-attack",
+    "name": "ATKの酒",
+    "attribute": "moon",
+    "stat": "attack",
+    "iconKey": "items/moon-attack"
+  },
+  {
+    "id": "moon-defence",
+    "name": "DEFの酒",
+    "attribute": "moon",
+    "stat": "defence",
+    "iconKey": "items/moon-defence"
+  }
+]

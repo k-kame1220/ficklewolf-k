@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ficklewolf.shackw.com/k/spec/master/schema/common.schema.json",
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "attribute": { "enum": ["yang", "note", "moon"] },
+    "assetKey": { "type": "string", "pattern": "^[a-z0-9-]+(/[a-z0-9-]+)+$" },
+    "stat": { "enum": ["hp", "attack", "defence"] },
+    "stats": {
+      "type": "object",
+      "required": ["hp", "attack", "defence"],
+      "additionalProperties": false,
+      "properties": {
+        "hp": { "type": "integer", "minimum": 0 },
+        "attack": { "type": "integer", "minimum": 0 },
+        "defence": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "rate": { "type": "number", "minimum": 0, "maximum": 1 }
+  }
+}

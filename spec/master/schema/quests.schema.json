@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ficklewolf.shackw.com/k/spec/master/schema/quests.schema.json",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["id", "kind", "name", "order", "stages", "rewards"],
+    "additionalProperties": false,
+    "properties": {
+      "id": { "$ref": "common.schema.json#/$defs/id" },
+      "kind": { "enum": ["main", "event", "weather"] },
+      "name": { "type": "string" },
+      "order": { "type": "integer", "minimum": 1 },
+      "weatherId": { "$ref": "common.schema.json#/$defs/id" },
+      "bannerKey": { "$ref": "common.schema.json#/$defs/assetKey" },
+      "bgmKey": { "$ref": "common.schema.json#/$defs/assetKey" },
+      "stages": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "required": ["name", "imageKey", "battle", "revealCount"],
+          "additionalProperties": false,
+          "properties": {
+            "name": { "type": "string" },
+            "imageKey": { "$ref": "common.schema.json#/$defs/assetKey" },
+            "battle": { "$ref": "../../battle/case.schema.json#/$defs/enemy" },
+            "revealCount": { "type": "integer", "minimum": 0 }
+          }
+        }
+      },
+      "rewards": {
+        "type": "object",
+        "required": ["recruit", "weatherItems"],
+        "additionalProperties": false,
+        "properties": {
+          "recruit": { "oneOf": [{ "$ref": "common.schema.json#/$defs/id" }, { "type": "null" }] },
+          "weatherItems": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

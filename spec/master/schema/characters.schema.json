@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ficklewolf.shackw.com/k/spec/master/schema/characters.schema.json",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["id", "no", "name", "category", "attribute", "description", "base", "duplicateBonusMax", "assets"],
+    "additionalProperties": false,
+    "properties": {
+      "id": { "$ref": "common.schema.json#/$defs/id" },
+      "no": { "type": "integer", "minimum": 1 },
+      "name": { "type": "string" },
+      "category": { "enum": ["main", "event", "gacha", "other"] },
+      "attribute": { "$ref": "common.schema.json#/$defs/attribute" },
+      "description": { "type": "string" },
+      "base": {
+        "type": "object",
+        "required": ["hp", "attack", "defence", "attackBuffRate", "defenceBuffAmount", "checkMax", "rewindMax", "specialMax", "numbnessResistant"],
+        "additionalProperties": false,
+        "properties": {
+          "hp": { "type": "integer", "minimum": 1 },
+          "attack": { "type": "number", "minimum": 0 },
+          "defence": { "type": "number", "minimum": 0 },
+          "attackBuffRate": { "type": "number", "minimum": 0 },
+          "defenceBuffAmount": { "type": "number", "minimum": 0 },
+          "checkMax": { "type": "integer", "minimum": 0 },
+          "rewindMax": { "type": "integer", "minimum": 0 },
+          "specialMax": { "type": "integer", "minimum": 0 },
+          "numbnessResistant": { "type": "boolean" }
+        }
+      },
+      "duplicateBonusMax": { "$ref": "common.schema.json#/$defs/stats" },
+      "assets": {
+        "type": "object",
+        "required": ["main", "icon", "home"],
+        "additionalProperties": false,
+        "properties": {
+          "main": { "$ref": "common.schema.json#/$defs/assetKey" },
+          "icon": { "$ref": "common.schema.json#/$defs/assetKey" },
+          "home": { "$ref": "common.schema.json#/$defs/assetKey" }
+        }
+      }
+    }
+  }
+}

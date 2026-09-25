@@ -17,6 +17,7 @@ legacy/
 | `data/items.json` | 強化アイテム 12 種 |
 | `data/databases.json` | 各 DB の並び順・SE 一覧・バージョン（認証情報は `<REDACTED>`） |
 | `data/ui_texts.json` | シーンごとの UI 文言（ヘルプ・チュートリアル文を含む） |
+| `tools/build_master.py` | `data/` から `spec/master` の初版を作ったスクリプト（1 回だけ使用。以後は `spec/master` を直接編集） |
 | `tools/extract_unity_data.py` | 上の JSON を作るスクリプト（ACTk の Obscured 型を復号。PyYAML が必要） |
 
 再生成:

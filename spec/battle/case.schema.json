@@ -14,7 +14,7 @@
     "steps": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/step" } }
   },
   "$defs": {
-    "attribute": { "enum": ["YANG", "NOTE", "MOON"] },
+    "attribute": { "enum": ["yang", "note", "moon"] },
     "enemyAction": {
       "enum": [
         "attack",
