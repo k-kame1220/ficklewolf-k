@@ -63,7 +63,7 @@
     "name": "B",
     "category": "main",
     "attribute": "note",
-    "description": "人工物も自然も両方愛する。 カツカレー的な。 それはそうと「Ｂ」は後二千年は生きる。",
+    "description": "人工物も自然も両方愛する。 カツカレー的な。 それはそうと「B」は後二千年は生きる。",
     "base": {
       "hp": 3400,
       "attack": 400,
@@ -295,7 +295,7 @@
     "name": "L",
     "category": "main",
     "attribute": "yang",
-    "description": "三百年前に生まれた赤子。 まだ「五月蠅い」しか喋れない。 いつかは「Ｅ」になりたい。",
+    "description": "三百年前に生まれた赤子。 まだ「五月蠅い」しか喋れない。 いつかは「E」になりたい。",
     "base": {
       "hp": 1800,
       "attack": 600,
@@ -411,7 +411,7 @@
     "name": "R",
     "category": "main",
     "attribute": "yang",
-    "description": "角は「Ｎ」に生やしてもらった。 誰よりも優しく、勇気がある。 なので腕を「Don」にあげた。",
+    "description": "角は「N」に生やしてもらった。 誰よりも優しく、勇気がある。 なので腕を「Don」にあげた。",
     "base": {
       "hp": 1800,
       "attack": 900,
@@ -556,7 +556,7 @@
     "name": "X",
     "category": "main",
     "attribute": "note",
-    "description": "すぐに全てを否定する。 全てが交わった結果 「Ｘ」が誕生した。",
+    "description": "すぐに全てを否定する。 全てが交わった結果 「X」が誕生した。",
     "base": {
       "hp": 2000,
       "attack": 1000,
