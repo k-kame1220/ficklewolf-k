@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(pnpm check)",
+      "Bash(pnpm lint)",
+      "Bash(pnpm lint:fix)",
+      "Bash(pnpm test)",
+      "Bash(pnpm typecheck)",
+      "Bash(pnpm format)",
+      "Bash(pnpm format:check)",
+      "Bash(pnpm build)",
+      "Bash(pnpm dev)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git show*)",
+      "Bash(git branch --show-current)"
+    ],
+    "ask": [
+      "Edit(/spec/**)"
+    ],
+    "deny": [
+      "Edit(/api/**)",
+      "Read(/legacy/unity/**)",
+      "Edit(/legacy/unity/**)",
+      "Read(**/.env)",
+      "Edit(**/.env)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_response.filePath // .tool_input.file_path' | { read -r f; case \"$f\" in */web/src/*.ts|*/web/src/*.tsx) cd \"${f%%/web/src/*}/web\" && pnpm exec prettier --write --log-level warn \"$f\" && pnpm exec eslint --fix \"$f\";; */web/src/*.css) cd \"${f%%/web/src/*}/web\" && pnpm exec prettier --write --log-level warn \"$f\";; esac; } 2>/dev/null || true",
+            "statusMessage": "web のファイルを整形しています"
+          }
+        ]
+      }
+    ]
+  }
+}
