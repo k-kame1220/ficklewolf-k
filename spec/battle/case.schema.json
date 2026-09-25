@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ficklewolf.com/k/spec/battle/case.schema.json",
+  "$id": "https://ficklewolf.shackw.com/k/spec/battle/case.schema.json",
   "title": "K battle golden test case",
   "type": "object",
   "required": ["name", "seed", "player", "enemy", "steps"],
