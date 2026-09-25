@@ -1,0 +1,52 @@
+name: タスク
+description: AI またはオーナーへの作業依頼
+labels: []
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: 対象
+      options:
+        - web
+        - api
+        - spec
+        - docs
+        - その他
+    validations:
+      required: true
+  - type: textarea
+    id: purpose
+    attributes:
+      label: 目的
+      description: 何のためにやるか
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: やること
+      description: 対象の画面（S-xx）・spec・API など
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: 完了条件
+      description: 何ができたら完了か（確かめ方も書く）
+      value: |
+        - [ ]
+    validations:
+      required: true
+  - type: dropdown
+    id: plan
+    attributes:
+      label: 実装前の計画レビュー
+      options:
+        - 必要（新しい画面・設計に影響する）
+        - 不要（小さな修正）
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: 補足・参考
