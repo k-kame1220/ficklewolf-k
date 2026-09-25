@@ -1,0 +1,38 @@
+{
+  "name": "1 ターン目はチェック・リターン・必殺技ができない",
+  "description": "実行できないコマンドは理由コードを返し、状態は変わらない。",
+  "seed": 1,
+  "player": {
+    "hp": 1000,
+    "attack": 300,
+    "defence": 50,
+    "attribute": "NOTE",
+    "attackBuffRate": 0.5,
+    "defenceBuffAmount": 50,
+    "checkMax": 2,
+    "rewindMax": 1,
+    "specialMax": 1,
+    "numbnessResistant": false
+  },
+  "enemy": {
+    "hp": 2000,
+    "attack": 200,
+    "defence": 100,
+    "attribute": "NOTE",
+    "attackBuffRate": 0.5,
+    "defenceBuffAmount": 0,
+    "fixedAttackPower": 0,
+    "strongAttackPower": 0,
+    "recoveryRate": 0,
+    "changeAttribute": null,
+    "attackDebuff": 0,
+    "defenceDebuff": 0,
+    "turns": ["defend", "concentration", "attack", "concentration", "deathblow"]
+  },
+  "steps": [
+    { "command": { "type": "check" }, "expect": { "rejected": "CANNOT_CHECK_FIRST_TURN" } },
+    { "command": { "type": "rewind", "to": 1 }, "expect": { "rejected": "NO_CHECKPOINT" } },
+    { "command": { "type": "special", "turn": 2, "action": "attack" }, "expect": { "rejected": "SPECIAL_UNAVAILABLE" } },
+    { "command": { "type": "attack" }, "expect": { "turn": 2, "playerHp": 1000, "enemyHp": 1940 } }
+  ]
+}

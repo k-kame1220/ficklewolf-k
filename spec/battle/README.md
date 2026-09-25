@@ -1,0 +1,66 @@
+# バトルのゴールデンテスト
+
+> 版: v0.1（下書き・オーナー未確定）
+> ルールの出典: `docs/01_legacy-analysis.md` §2（旧作ソースからの逆算）
+
+クエストバトル 1 戦分の「入力（キャラ・敵・乱数のシード・コマンドの並び）」と「期待する結果」を JSON で書く。web（TS）と api（Kotlin）の両方が、`cases/` の全ケースを通すこと。
+
+## ファイル
+| パス | 内容 |
+|---|---|
+| `case.schema.json` | ケースファイルの形（JSON Schema） |
+| `cases/*.json` | テストケース。ファイル名は `3 桁の番号-内容.json` |
+| `rng/mulberry32.json` | 乱数の実装を確かめるテストベクタ |
+
+## ケースの形
+```jsonc
+{
+  "name": "…",
+  "description": "…",
+  "seed": 1,
+  "player": { "hp": 1400, "attack": 400, "defence": 90, "attribute": "YANG", ... },
+  "enemy":  { "hp": 3100, "attack": 630, "defence": 40, "attribute": "YANG", "turns": ["attack", "defend", ...], ... },
+  "steps": [
+    { "command": { "type": "attack" }, "expect": { "turn": 2, "playerHp": 860, "enemyHp": 2740 } }
+  ]
+}
+```
+- 数値はマスタを参照せず、ケースの中に直接書く（マスタが変わってもケースが壊れないように）。
+- `expect` に書いた項目だけを比べる（書いていない項目は比べない）。
+- 実行できないコマンドは `expect.rejected` に理由コードを書く。そのとき状態は変わらない。
+
+## 用語とコード上の名前
+| 旧作 | コマンド / 敵の行動 |
+|---|---|
+| 攻撃 / 防御 / 攻撃バフ / 防御バフ | `attack` / `defend` / `attackBuff` / `defenceBuff` |
+| チェック / リターン / 必殺技 | `check` / `rewind` / `special` |
+| 固定攻撃 / 強攻撃 / 集中 / 必殺技（敵） | `fixedAttack` / `strongAttack` / `concentration` / `deathblow` |
+| 挑発 / 全回復 / 超回復 / 属性変化 | `provocation` / `fullRecovery` / `rateRecovery` / `changeAttribute` |
+| ビリビリ / 攻撃デバフ / 防御デバフ | `numbness` / `attackDebuff` / `defenceDebuff` |
+| 陽 / 音 / 月 | `YANG` / `NOTE` / `MOON` |
+
+## 計算のルール（実装がずれないように固定する）
+1. **ターン**: `turn` はこれから行うターンの番号（1 始まり）。
+2. **処理の順番**: 先制コマンド（`defend` / `defenceBuff`）→ 敵の行動 → プレイヤーの行動（`attack` / `attackBuff`）。
+3. **決着**: 敵の行動でプレイヤーの HP が 0 になったら、その時点で負け（プレイヤーの行動は行わない）。プレイヤーの行動で敵の HP が 0 になったら勝ち。
+4. **最終ターン**: 敵の行動の並び（`turns`）の最後は `deathblow`。
+5. **数値**: 計算は倍精度浮動小数（IEEE 754 double）で、`docs/01` §2.4 の式の順番どおりに行う。**HP に反映するダメージ・回復量は小数点以下を切り捨てた整数**にする。HP は 0 未満にならない。
+6. **リターン**: 戻すのはターン番号と敵の行動の位置だけ。HP・バフ・デバフ・属性は戻さない。戻ったらチェックポイントは全部消える。
+7. **乱数**: mulberry32（シードは 32 bit 整数）。ビリビリ中にプレイヤーが行動するたびに 1 回引き、`値 / 2^32 < 0.5` なら行動できない（しびれる）。それ以外では乱数を引かない。
+
+## 実行できないコマンドの理由コード
+| コード | 条件 |
+|---|---|
+| `BATTLE_FINISHED` | 決着がついている |
+| `CANNOT_CHECK_FIRST_TURN` | 1 ターン目はチェックできない |
+| `ALREADY_CHECKED` | このターンはもうチェックしている |
+| `CHECK_LIMIT` | チェックの回数を使い切っている |
+| `NO_CHECKPOINT` | チェックポイントが無い |
+| `CANNOT_REWIND_HERE` | チェックポイントが今のターンだけ |
+| `REWIND_LIMIT` | リターンの回数を使い切っている |
+| `SPECIAL_UNAVAILABLE` | 必殺技の条件を満たしていない |
+
+## 未決定（オーナーに確認）
+- 5 の丸め方（切り捨ての位置）はこれで良いか。
+- `special`（必殺技）のケースの書き方（書き換えるターンの指定方法）。
+- 旧作のバグ（防御デバフが攻撃デバフの値を使う）は直した値でケースを書く（`docs/02` §4）。

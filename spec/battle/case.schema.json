@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ficklewolf.com/k/spec/battle/case.schema.json",
+  "title": "K battle golden test case",
+  "type": "object",
+  "required": ["name", "seed", "player", "enemy", "steps"],
+  "additionalProperties": false,
+  "properties": {
+    "name": { "type": "string" },
+    "description": { "type": "string" },
+    "seed": { "type": "integer", "minimum": -2147483648, "maximum": 2147483647 },
+    "player": { "$ref": "#/$defs/player" },
+    "enemy": { "$ref": "#/$defs/enemy" },
+    "steps": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/step" } }
+  },
+  "$defs": {
+    "attribute": { "enum": ["YANG", "NOTE", "MOON"] },
+    "enemyAction": {
+      "enum": [
+        "attack",
+        "defend",
+        "attackBuff",
+        "defenceBuff",
+        "fixedAttack",
+        "strongAttack",
+        "concentration",
+        "deathblow",
+        "provocation",
+        "fullRecovery",
+        "rateRecovery",
+        "changeAttribute",
+        "numbness",
+        "attackDebuff",
+        "defenceDebuff"
+      ]
+    },
+    "player": {
+      "type": "object",
+      "required": [
+        "hp",
+        "attack",
+        "defence",
+        "attribute",
+        "attackBuffRate",
+        "defenceBuffAmount",
+        "checkMax",
+        "rewindMax",
+        "specialMax",
+        "numbnessResistant"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "hp": { "type": "integer", "minimum": 1 },
+        "attack": { "type": "number", "minimum": 0 },
+        "defence": { "type": "number", "minimum": 0 },
+        "attribute": { "$ref": "#/$defs/attribute" },
+        "attackBuffRate": { "type": "number", "minimum": 0 },
+        "defenceBuffAmount": { "type": "number", "minimum": 0 },
+        "checkMax": { "type": "integer", "minimum": 0 },
+        "rewindMax": { "type": "integer", "minimum": 0 },
+        "specialMax": { "type": "integer", "minimum": 0 },
+        "numbnessResistant": { "type": "boolean" }
+      }
+    },
+    "enemy": {
+      "type": "object",
+      "required": [
+        "hp",
+        "attack",
+        "defence",
+        "attribute",
+        "attackBuffRate",
+        "defenceBuffAmount",
+        "fixedAttackPower",
+        "strongAttackPower",
+        "recoveryRate",
+        "changeAttribute",
+        "attackDebuff",
+        "defenceDebuff",
+        "turns"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "hp": { "type": "integer", "minimum": 1 },
+        "attack": { "type": "number", "minimum": 0 },
+        "defence": { "type": "number", "minimum": 0 },
+        "attribute": { "$ref": "#/$defs/attribute" },
+        "attackBuffRate": { "type": "number", "minimum": 0 },
+        "defenceBuffAmount": { "type": "number", "minimum": 0 },
+        "fixedAttackPower": { "type": "number", "minimum": 0 },
+        "strongAttackPower": { "type": "number", "minimum": 0 },
+        "recoveryRate": { "type": "number", "minimum": 0 },
+        "changeAttribute": { "oneOf": [{ "$ref": "#/$defs/attribute" }, { "type": "null" }] },
+        "attackDebuff": { "type": "number", "minimum": 0 },
+        "defenceDebuff": { "type": "number", "minimum": 0 },
+        "turns": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/enemyAction" }
+        }
+      }
+    },
+    "command": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["type"],
+          "additionalProperties": false,
+          "properties": { "type": { "enum": ["attack", "defend", "attackBuff", "defenceBuff", "check"] } }
+        },
+        {
+          "type": "object",
+          "required": ["type", "to"],
+          "additionalProperties": false,
+          "properties": { "type": { "const": "rewind" }, "to": { "type": "integer", "minimum": 1 } }
+        },
+        {
+          "type": "object",
+          "required": ["type", "turn", "action"],
+          "additionalProperties": false,
+          "properties": {
+            "type": { "const": "special" },
+            "turn": { "type": "integer", "minimum": 1 },
+            "action": { "enum": ["attack", "defend", "attackBuff", "defenceBuff", "provocation"] }
+          }
+        }
+      ]
+    },
+    "step": {
+      "type": "object",
+      "required": ["command", "expect"],
+      "additionalProperties": false,
+      "properties": {
+        "command": { "$ref": "#/$defs/command" },
+        "expect": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": false,
+          "properties": {
+            "turn": { "type": "integer", "minimum": 1 },
+            "playerHp": { "type": "integer", "minimum": 0 },
+            "enemyHp": { "type": "integer", "minimum": 0 },
+            "outcome": { "enum": ["ongoing", "win", "lose"] },
+            "checkpoints": { "type": "array", "items": { "type": "integer", "minimum": 1 } },
+            "rejected": {
+              "enum": [
+                "BATTLE_FINISHED",
+                "CANNOT_CHECK_FIRST_TURN",
+                "ALREADY_CHECKED",
+                "CHECK_LIMIT",
+                "NO_CHECKPOINT",
+                "CANNOT_REWIND_HERE",
+                "REWIND_LIMIT",
+                "SPECIAL_UNAVAILABLE"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}
