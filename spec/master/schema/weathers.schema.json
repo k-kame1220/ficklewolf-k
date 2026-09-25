@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ficklewolf.shackw.com/k/spec/master/schema/weathers.schema.json",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["id", "name", "attribute", "weight", "bonus", "questId"],
+    "additionalProperties": false,
+    "properties": {
+      "id": { "$ref": "common.schema.json#/$defs/id" },
+      "name": { "type": "string" },
+      "attribute": { "$ref": "common.schema.json#/$defs/attribute" },
+      "weight": { "type": "integer", "minimum": 1 },
+      "bonus": { "$ref": "common.schema.json#/$defs/stats" },
+      "questId": { "$ref": "common.schema.json#/$defs/id" }
+    }
+  }
+}

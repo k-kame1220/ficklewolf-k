@@ -16,6 +16,7 @@ jobs:
     outputs:
       web: ${{ steps.filter.outputs.web }}
       api: ${{ steps.filter.outputs.api }}
+      spec: ${{ steps.filter.outputs.spec }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -26,11 +27,13 @@ jobs:
           if ! git cat-file -e "$base^{commit}" 2>/dev/null; then
             echo "web=true" >> "$GITHUB_OUTPUT"
             echo "api=true" >> "$GITHUB_OUTPUT"
+            echo "spec=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           changed="$(git diff --name-only "$base" "${{ github.sha }}")"
           if grep -qE '^(web|spec|\.github)/' <<< "$changed"; then echo "web=true" >> "$GITHUB_OUTPUT"; else echo "web=false" >> "$GITHUB_OUTPUT"; fi
           if grep -qE '^(api|spec|\.github)/' <<< "$changed"; then echo "api=true" >> "$GITHUB_OUTPUT"; else echo "api=false" >> "$GITHUB_OUTPUT"; fi
+          if grep -qE '^(spec|\.github)/' <<< "$changed"; then echo "spec=true" >> "$GITHUB_OUTPUT"; else echo "spec=false" >> "$GITHUB_OUTPUT"; fi
 
   web:
     needs: changes
@@ -68,8 +71,20 @@ jobs:
       - uses: gradle/actions/setup-gradle@v6
       - run: ./gradlew build --console=plain
 
+  spec:
+    needs: changes
+    if: needs.changes.outputs.spec == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - run: pip install jsonschema
+      - run: python3 spec/tools/validate.py
+
   result:
-    needs: [web, api]
+    needs: [web, api, spec]
     if: always()
     runs-on: ubuntu-latest
     steps:

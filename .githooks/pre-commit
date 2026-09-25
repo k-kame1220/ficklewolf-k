@@ -34,3 +34,8 @@ if grep -q '^api/' <<< "$staged"; then
   echo "pre-commit: api の format(ktlint) / test / build を確認します"
   (cd "$repo_root/api" && ./gradlew build --console=plain -q)
 fi
+
+if grep -q '^spec/' <<< "$staged"; then
+  echo "pre-commit: spec の検証（スキーマ・相互参照）を行います"
+  python3 "$repo_root/spec/tools/validate.py"
+fi

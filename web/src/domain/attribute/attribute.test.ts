@@ -4,15 +4,15 @@ import { attackMultiplier } from "./attribute";
 
 describe("attackMultiplier", () => {
   it.each([
-    ["YANG", "NOTE", 1.25],
-    ["NOTE", "MOON", 1.25],
-    ["MOON", "YANG", 1.25],
-    ["NOTE", "YANG", 0.75],
-    ["MOON", "NOTE", 0.75],
-    ["YANG", "MOON", 0.75],
-    ["YANG", "YANG", 1],
-    ["NOTE", "NOTE", 1],
-    ["MOON", "MOON", 1]
+    ["yang", "note", 1.25],
+    ["note", "moon", 1.25],
+    ["moon", "yang", 1.25],
+    ["note", "yang", 0.75],
+    ["moon", "note", 0.75],
+    ["yang", "moon", 0.75],
+    ["yang", "yang", 1],
+    ["note", "note", 1],
+    ["moon", "moon", 1]
   ] as const)("%s が %s を攻撃すると ×%d", (attacker, defender, expected) => {
     expect(attackMultiplier(attacker, defender)).toBe(expected);
   });

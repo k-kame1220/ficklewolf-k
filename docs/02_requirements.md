@@ -228,7 +228,7 @@
 ### マスタデータ
 - **正は `spec/master/*.json`**。変更は PR でレビューする。web・api・ゴールデンテストが同じものを参照する。
 - api はデプロイ時に DB へ投入（seed）し、DB から配信する。DB への投入方法・テーブル設計はオーナーが決める。
-- `legacy/data` を元に作る（移行作業はこれから）。
+- `legacy/data` から初版を作成済み（`spec/master/README.md`）。以後は `spec/master` を直接編集する。
 
 ### 素材
 | 種類 | 例 | 置き場所 |

@@ -1,0 +1,146 @@
+[
+  {
+    "id": "blue-sky",
+    "name": "青空",
+    "attribute": "yang",
+    "weight": 1,
+    "bonus": {
+      "hp": 200,
+      "attack": 0,
+      "defence": 0
+    },
+    "questId": "weather-blue-sky"
+  },
+  {
+    "id": "sunny",
+    "name": "晴",
+    "attribute": "yang",
+    "weight": 2,
+    "bonus": {
+      "hp": 0,
+      "attack": 60,
+      "defence": 0
+    },
+    "questId": "weather-sunny"
+  },
+  {
+    "id": "galleon",
+    "name": "ガレオン船",
+    "attribute": "yang",
+    "weight": 1,
+    "bonus": {
+      "hp": 0,
+      "attack": 0,
+      "defence": 15
+    },
+    "questId": "weather-galleon"
+  },
+  {
+    "id": "mexico",
+    "name": "メキシコ",
+    "attribute": "yang",
+    "weight": 1,
+    "bonus": {
+      "hp": 0,
+      "attack": 0,
+      "defence": 0
+    },
+    "questId": "weather-mexico"
+  },
+  {
+    "id": "snow",
+    "name": "雪",
+    "attribute": "note",
+    "weight": 1,
+    "bonus": {
+      "hp": 200,
+      "attack": 0,
+      "defence": 0
+    },
+    "questId": "weather-snow"
+  },
+  {
+    "id": "rain",
+    "name": "雨",
+    "attribute": "note",
+    "weight": 2,
+    "bonus": {
+      "hp": 0,
+      "attack": 60,
+      "defence": 0
+    },
+    "questId": "weather-rain"
+  },
+  {
+    "id": "dark",
+    "name": "闇",
+    "attribute": "note",
+    "weight": 1,
+    "bonus": {
+      "hp": 0,
+      "attack": 0,
+      "defence": 15
+    },
+    "questId": "weather-dark"
+  },
+  {
+    "id": "shukuchi",
+    "name": "縮地",
+    "attribute": "note",
+    "weight": 1,
+    "bonus": {
+      "hp": 0,
+      "attack": 0,
+      "defence": 0
+    },
+    "questId": "weather-shukuchi"
+  },
+  {
+    "id": "fog",
+    "name": "霧",
+    "attribute": "moon",
+    "weight": 1,
+    "bonus": {
+      "hp": 200,
+      "attack": 0,
+      "defence": 0
+    },
+    "questId": "weather-fog"
+  },
+  {
+    "id": "cloudy",
+    "name": "曇",
+    "attribute": "moon",
+    "weight": 2,
+    "bonus": {
+      "hp": 0,
+      "attack": 60,
+      "defence": 0
+    },
+    "questId": "weather-cloudy"
+  },
+  {
+    "id": "storm",
+    "name": "嵐",
+    "attribute": "moon",
+    "weight": 1,
+    "bonus": {
+      "hp": 0,
+      "attack": 0,
+      "defence": 15
+    },
+    "questId": "weather-storm"
+  },
+  {
+    "id": "thunder",
+    "name": "雷",
+    "attribute": "moon",
+    "weight": 1,
+    "bonus": {
+      "hp": 0,
+      "attack": 0,
+      "defence": 0
+    },
+    "questId": "weather-thunder"
+  }
+]

@@ -1,0 +1,23 @@
+[
+  {
+    "id": "yang",
+    "name": "陽",
+    "strongAgainst": "note",
+    "iconKey": "attributes/yang",
+    "bgmKey": "bgm/battle/yang"
+  },
+  {
+    "id": "note",
+    "name": "音",
+    "strongAgainst": "moon",
+    "iconKey": "attributes/note",
+    "bgmKey": "bgm/battle/note"
+  },
+  {
+    "id": "moon",
+    "name": "月",
+    "strongAgainst": "yang",
+    "iconKey": "attributes/moon",
+    "bgmKey": "bgm/battle/moon"
+  }
+]

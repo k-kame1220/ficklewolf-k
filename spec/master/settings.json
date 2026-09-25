@@ -1,0 +1,27 @@
+{
+  "minAppVersion": "0.1.0",
+  "growth": {
+    "itemUseMax": {
+      "hp": 20,
+      "attack": 16,
+      "defence": 15
+    },
+    "itemBonusPerUse": {
+      "hp": 42,
+      "attack": 18,
+      "defence": 2
+    },
+    "duplicateBonusPerCount": {
+      "hp": 14,
+      "attack": 8,
+      "defence": 2
+    }
+  },
+  "rewards": {
+    "firstClearRecruitRate": 1,
+    "repeatRecruitRate": 0.2,
+    "weatherItemDropMin": 1,
+    "weatherItemDropMax": 3,
+    "fudaPerEvenLevel": 1
+  }
+}

@@ -18,8 +18,8 @@
   "name": "…",
   "description": "…",
   "seed": 1,
-  "player": { "hp": 1400, "attack": 400, "defence": 90, "attribute": "YANG", ... },
-  "enemy":  { "hp": 3100, "attack": 630, "defence": 40, "attribute": "YANG", "turns": ["attack", "defend", ...], ... },
+  "player": { "hp": 1400, "attack": 400, "defence": 90, "attribute": "yang", ... },
+  "enemy":  { "hp": 3100, "attack": 630, "defence": 40, "attribute": "yang", "turns": ["attack", "defend", ...], ... },
   "steps": [
     { "command": { "type": "attack" }, "expect": { "turn": 2, "playerHp": 860, "enemyHp": 2740 } }
   ]
@@ -37,7 +37,7 @@
 | 固定攻撃 / 強攻撃 / 集中 / 必殺技（敵） | `fixedAttack` / `strongAttack` / `concentration` / `deathblow` |
 | 挑発 / 全回復 / 超回復 / 属性変化 | `provocation` / `fullRecovery` / `rateRecovery` / `changeAttribute` |
 | ビリビリ / 攻撃デバフ / 防御デバフ | `numbness` / `attackDebuff` / `defenceDebuff` |
-| 陽 / 音 / 月 | `YANG` / `NOTE` / `MOON` |
+| 陽 / 音 / 月 | `yang` / `note` / `moon` |
 
 ## 計算のルール（実装がずれないように固定する）
 1. **ターン**: `turn` はこれから行うターンの番号（1 始まり）。

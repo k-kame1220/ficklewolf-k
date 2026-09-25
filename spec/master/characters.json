@@ -1,0 +1,1104 @@
+[
+  {
+    "id": "zero",
+    "no": 1,
+    "name": "ZERO",
+    "category": "main",
+    "attribute": "moon",
+    "description": "誰も姿を見たことがない。 「I」はトイレの個室で 彼を見たことがあるらしい。",
+    "base": {
+      "hp": 1000,
+      "attack": 600,
+      "defence": 150,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 150,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/zero/main",
+      "icon": "characters/zero/icon",
+      "home": "characters/zero/home"
+    }
+  },
+  {
+    "id": "a",
+    "no": 2,
+    "name": "A",
+    "category": "main",
+    "attribute": "yang",
+    "description": "鳥が飛ぶように。魚が泳ぐように。 「A」は誰かを案内する。 良くも悪くも案内する。",
+    "base": {
+      "hp": 1400,
+      "attack": 400,
+      "defence": 90,
+      "attackBuffRate": 0.6,
+      "defenceBuffAmount": 90,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/a/main",
+      "icon": "characters/a/icon",
+      "home": "characters/a/home"
+    }
+  },
+  {
+    "id": "b",
+    "no": 3,
+    "name": "B",
+    "category": "main",
+    "attribute": "note",
+    "description": "人工物も自然も両方愛する。 カツカレー的な。 それはそうと「Ｂ」は後二千年は生きる。",
+    "base": {
+      "hp": 3400,
+      "attack": 400,
+      "defence": 50,
+      "attackBuffRate": 0.6,
+      "defenceBuffAmount": 50,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/b/main",
+      "icon": "characters/b/icon",
+      "home": "characters/b/home"
+    }
+  },
+  {
+    "id": "c",
+    "no": 4,
+    "name": "C",
+    "category": "main",
+    "attribute": "moon",
+    "description": "実は双子の誰かがいる。 だから笑ってるのかも。 めちゃくちゃ人生楽しんでる。",
+    "base": {
+      "hp": 1000,
+      "attack": 800,
+      "defence": 30,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 80,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/c/main",
+      "icon": "characters/c/icon",
+      "home": "characters/c/home"
+    }
+  },
+  {
+    "id": "d",
+    "no": 5,
+    "name": "D",
+    "category": "main",
+    "attribute": "yang",
+    "description": "「D」は前世で幸せだった。 原子の数程の家族に囲まれた。 だから皺がすごい。",
+    "base": {
+      "hp": 2000,
+      "attack": 680,
+      "defence": 110,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 110,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/d/main",
+      "icon": "characters/d/icon",
+      "home": "characters/d/home"
+    }
+  },
+  {
+    "id": "e",
+    "no": 6,
+    "name": "E",
+    "category": "main",
+    "attribute": "yang",
+    "description": "左目の視力がすごい。 自分の背がうっすら見えるほど。 足で歯磨きができる。",
+    "base": {
+      "hp": 2500,
+      "attack": 700,
+      "defence": 120,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 120,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/e/main",
+      "icon": "characters/e/icon",
+      "home": "characters/e/home"
+    }
+  },
+  {
+    "id": "f",
+    "no": 7,
+    "name": "F",
+    "category": "main",
+    "attribute": "moon",
+    "description": "いつか火が纏えると信じ 一生懸命休憩している。 「W」とは旧知の仲。",
+    "base": {
+      "hp": 1000,
+      "attack": 1000,
+      "defence": 70,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 70,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/f/main",
+      "icon": "characters/f/icon",
+      "home": "characters/f/home"
+    }
+  },
+  {
+    "id": "g",
+    "no": 8,
+    "name": "G",
+    "category": "main",
+    "attribute": "note",
+    "description": "不安を背負った神。 「Ｌ」にまで不安を悟られる。 誰よりも全知全能なのに。",
+    "base": {
+      "hp": 3000,
+      "attack": 600,
+      "defence": 200,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 200,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/g/main",
+      "icon": "characters/g/icon",
+      "home": "characters/g/home"
+    }
+  },
+  {
+    "id": "i",
+    "no": 9,
+    "name": "I",
+    "category": "main",
+    "attribute": "note",
+    "description": "陽属性を恨んでいた。 でも友達の絶対数が少ない。 なので実は仲直りしたい。",
+    "base": {
+      "hp": 2000,
+      "attack": 800,
+      "defence": 80,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 80,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/i/main",
+      "icon": "characters/i/icon",
+      "home": "characters/i/home"
+    }
+  },
+  {
+    "id": "j",
+    "no": 10,
+    "name": "J",
+    "category": "main",
+    "attribute": "note",
+    "description": "一度に四千もの世界を見ているので もううんざり。情報過多なので 最近は落語で現実逃避。",
+    "base": {
+      "hp": 1700,
+      "attack": 600,
+      "defence": 100,
+      "attackBuffRate": 0.55,
+      "defenceBuffAmount": 100,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/j/main",
+      "icon": "characters/j/icon",
+      "home": "characters/j/home"
+    }
+  },
+  {
+    "id": "l",
+    "no": 11,
+    "name": "L",
+    "category": "main",
+    "attribute": "yang",
+    "description": "三百年前に生まれた赤子。 まだ「五月蠅い」しか喋れない。 いつかは「Ｅ」になりたい。",
+    "base": {
+      "hp": 1800,
+      "attack": 600,
+      "defence": 100,
+      "attackBuffRate": 0.55,
+      "defenceBuffAmount": 120,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/l/main",
+      "icon": "characters/l/icon",
+      "home": "characters/l/home"
+    }
+  },
+  {
+    "id": "m",
+    "no": 12,
+    "name": "M",
+    "category": "main",
+    "attribute": "moon",
+    "description": "現象に対して興味がない。 常にそっぽを向いていたら 「そっぽ」が「前」になった。",
+    "base": {
+      "hp": 1200,
+      "attack": 1200,
+      "defence": 40,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 40,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/m/main",
+      "icon": "characters/m/icon",
+      "home": "characters/m/home"
+    }
+  },
+  {
+    "id": "n",
+    "no": 13,
+    "name": "N",
+    "category": "main",
+    "attribute": "moon",
+    "description": "いつも祈っている。 明日も祈れますように。と 今日も祈る。",
+    "base": {
+      "hp": 1800,
+      "attack": 900,
+      "defence": 100,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 100,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/n/main",
+      "icon": "characters/n/icon",
+      "home": "characters/n/home"
+    }
+  },
+  {
+    "id": "o",
+    "no": 14,
+    "name": "O",
+    "category": "main",
+    "attribute": "yang",
+    "description": "傷が嫌い。 傷が嫌いすぎて 液体化しつつある。",
+    "base": {
+      "hp": 2800,
+      "attack": 500,
+      "defence": 100,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 100,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/o/main",
+      "icon": "characters/o/icon",
+      "home": "characters/o/home"
+    }
+  },
+  {
+    "id": "r",
+    "no": 15,
+    "name": "R",
+    "category": "main",
+    "attribute": "yang",
+    "description": "角は「Ｎ」に生やしてもらった。 誰よりも優しく、勇気がある。 なので腕を「Don」にあげた。",
+    "base": {
+      "hp": 1800,
+      "attack": 900,
+      "defence": 120,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 120,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/r/main",
+      "icon": "characters/r/icon",
+      "home": "characters/r/home"
+    }
+  },
+  {
+    "id": "s",
+    "no": 16,
+    "name": "S",
+    "category": "main",
+    "attribute": "note",
+    "description": "全てが可笑しくて堪らない。 山爺を作った日から 笑みが止まらなくなった。",
+    "base": {
+      "hp": 1500,
+      "attack": 600,
+      "defence": 40,
+      "attackBuffRate": 0.65,
+      "defenceBuffAmount": 120,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/s/main",
+      "icon": "characters/s/icon",
+      "home": "characters/s/home"
+    }
+  },
+  {
+    "id": "t",
+    "no": 17,
+    "name": "T",
+    "category": "main",
+    "attribute": "note",
+    "description": "鼻で逆立ちができる。 人格者で皆の相談役。 最近落語を披露している。",
+    "base": {
+      "hp": 1800,
+      "attack": 1100,
+      "defence": 60,
+      "attackBuffRate": 0.4,
+      "defenceBuffAmount": 60,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/t/main",
+      "icon": "characters/t/icon",
+      "home": "characters/t/home"
+    }
+  },
+  {
+    "id": "u",
+    "no": 18,
+    "name": "U",
+    "category": "main",
+    "attribute": "yang",
+    "description": "[S」のお母さん。 霊となった今も浮遊し 「S」を見守り。「C」を警戒している。",
+    "base": {
+      "hp": 2500,
+      "attack": 2000,
+      "defence": 0,
+      "attackBuffRate": 0.05,
+      "defenceBuffAmount": 0,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/u/main",
+      "icon": "characters/u/icon",
+      "home": "characters/u/home"
+    }
+  },
+  {
+    "id": "v",
+    "no": 19,
+    "name": "V",
+    "category": "main",
+    "attribute": "moon",
+    "description": "羽の一枚一枚に価値がある。 価値がありすぎて 乱獲されてしまった。",
+    "base": {
+      "hp": 1700,
+      "attack": 1000,
+      "defence": 60,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 60,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/v/main",
+      "icon": "characters/v/icon",
+      "home": "characters/v/home"
+    }
+  },
+  {
+    "id": "x",
+    "no": 20,
+    "name": "X",
+    "category": "main",
+    "attribute": "note",
+    "description": "すぐに全てを否定する。 全てが交わった結果 「Ｘ」が誕生した。",
+    "base": {
+      "hp": 2000,
+      "attack": 1000,
+      "defence": 120,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 120,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/x/main",
+      "icon": "characters/x/icon",
+      "home": "characters/x/home"
+    }
+  },
+  {
+    "id": "y",
+    "no": 21,
+    "name": "Y",
+    "category": "main",
+    "attribute": "yang",
+    "description": "あまりにも宿主が頼りないので 自立することを選んだ。 でもたまに宿主のとこに帰る。",
+    "base": {
+      "hp": 1700,
+      "attack": 900,
+      "defence": 100,
+      "attackBuffRate": 0.6,
+      "defenceBuffAmount": 150,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/y/main",
+      "icon": "characters/y/icon",
+      "home": "characters/y/home"
+    }
+  },
+  {
+    "id": "z",
+    "no": 22,
+    "name": "Z",
+    "category": "main",
+    "attribute": "moon",
+    "description": "皆から恐れられている。 「Z」の夢は皆を 背中に乗せ空を舞うこと。",
+    "base": {
+      "hp": 2100,
+      "attack": 1100,
+      "defence": 130,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 100,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/z/main",
+      "icon": "characters/z/icon",
+      "home": "characters/z/home"
+    }
+  },
+  {
+    "id": "w",
+    "no": 23,
+    "name": "W",
+    "category": "event",
+    "attribute": "note",
+    "description": "我関せず。がポリシー。 だが実際には関しちゃうので いっぱい関するね。と思われてる。",
+    "base": {
+      "hp": 2100,
+      "attack": 1300,
+      "defence": 40,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 40,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/w/main",
+      "icon": "characters/w/icon",
+      "home": "characters/w/home"
+    }
+  },
+  {
+    "id": "kappa",
+    "no": 24,
+    "name": "Kappa",
+    "category": "event",
+    "attribute": "yang",
+    "description": "キュウリが大嫌い。 怖いとさえ思うほどらしい。 だが家からはポリポリと音がする。",
+    "base": {
+      "hp": 3500,
+      "attack": 900,
+      "defence": 170,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 150,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/kappa/main",
+      "icon": "characters/kappa/icon",
+      "home": "characters/kappa/home"
+    }
+  },
+  {
+    "id": "dress",
+    "no": 25,
+    "name": "Dress",
+    "category": "event",
+    "attribute": "note",
+    "description": "着られるのが嫌い。 でも「X」になら全てを許す。 「Pants撲滅連合」会長を務める。",
+    "base": {
+      "hp": 2800,
+      "attack": 1400,
+      "defence": 80,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 80,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/dress/main",
+      "icon": "characters/dress/icon",
+      "home": "characters/dress/home"
+    }
+  },
+  {
+    "id": "wooden",
+    "no": 26,
+    "name": "Wooden",
+    "category": "gacha",
+    "attribute": "moon",
+    "description": "彼がこの地に来たのは最近のこと。 皆は大いに歓迎した。 歓迎されすぎた。",
+    "base": {
+      "hp": 2800,
+      "attack": 1100,
+      "defence": 150,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 150,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/wooden/main",
+      "icon": "characters/wooden/icon",
+      "home": "characters/wooden/home"
+    }
+  },
+  {
+    "id": "smile",
+    "no": 27,
+    "name": "Smile",
+    "category": "gacha",
+    "attribute": "note",
+    "description": "常に泣いていて疲れたので 感情を当番制にした。 いまはおでこが「笑い」担当。",
+    "base": {
+      "hp": 2500,
+      "attack": 1200,
+      "defence": 120,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 120,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/smile/main",
+      "icon": "characters/smile/icon",
+      "home": "characters/smile/home"
+    }
+  },
+  {
+    "id": "uneri",
+    "no": 28,
+    "name": "Uneri",
+    "category": "gacha",
+    "attribute": "moon",
+    "description": "うねっている。 二年前「うねり選手権」にて 予選突破した実力者。",
+    "base": {
+      "hp": 2400,
+      "attack": 1000,
+      "defence": 135,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 135,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/uneri/main",
+      "icon": "characters/uneri/icon",
+      "home": "characters/uneri/home"
+    }
+  },
+  {
+    "id": "invalid",
+    "no": 29,
+    "name": "Invalid",
+    "category": "gacha",
+    "attribute": "moon",
+    "description": "彼は泥水を好んで泳ぐ。 ヘドロばかり食すので 目つきが悪くなった。",
+    "base": {
+      "hp": 2500,
+      "attack": 1000,
+      "defence": 150,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 150,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": true
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/invalid/main",
+      "icon": "characters/invalid/icon",
+      "home": "characters/invalid/home"
+    }
+  },
+  {
+    "id": "fever",
+    "no": 30,
+    "name": "Fever",
+    "category": "event",
+    "attribute": "note",
+    "description": "「I」の事を愛玩動物として見ている。 数百年前に流行った病を調べていたら 自分も感染した。でも元気♪",
+    "base": {
+      "hp": 2300,
+      "attack": 900,
+      "defence": 140,
+      "attackBuffRate": 0.6,
+      "defenceBuffAmount": 180,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/fever/main",
+      "icon": "characters/fever/icon",
+      "home": "characters/fever/home"
+    }
+  },
+  {
+    "id": "ganesha",
+    "no": 31,
+    "name": "Ganesha",
+    "category": "gacha",
+    "attribute": "note",
+    "description": "筋肉を増量させるのが好き。 でも握力はたったの「２４」 「L」に腕相撲で負けた過去あり。",
+    "base": {
+      "hp": 2400,
+      "attack": 900,
+      "defence": 220,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 180,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/ganesha/main",
+      "icon": "characters/ganesha/icon",
+      "home": "characters/ganesha/home"
+    }
+  },
+  {
+    "id": "moi",
+    "no": 32,
+    "name": "Moi",
+    "category": "main",
+    "attribute": "yang",
+    "description": "数千年間動かなかったら 石像になってた。意思はあるので 今日も挨拶する「Moi!」と。",
+    "base": {
+      "hp": 2600,
+      "attack": 1000,
+      "defence": 200,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 180,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": true
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/moi/main",
+      "icon": "characters/moi/icon",
+      "home": "characters/moi/home"
+    }
+  },
+  {
+    "id": "nomb",
+    "no": 33,
+    "name": "Nomb",
+    "category": "main",
+    "attribute": "note",
+    "description": "「陽属性」希望。だが 陽属性適正テストに落ちた。 来年も受ける。",
+    "base": {
+      "hp": 2000,
+      "attack": 900,
+      "defence": 150,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 150,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": true
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/nomb/main",
+      "icon": "characters/nomb/icon",
+      "home": "characters/nomb/home"
+    }
+  },
+  {
+    "id": "per-o",
+    "no": 34,
+    "name": "Per-o",
+    "category": "event",
+    "attribute": "yang",
+    "description": "自分以外好き。恋愛的な意味で。 好きが過ぎると盲目になる。 石ころに振られたことがある。",
+    "base": {
+      "hp": 2600,
+      "attack": 900,
+      "defence": 150,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 150,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/per-o/main",
+      "icon": "characters/per-o/icon",
+      "home": "characters/per-o/home"
+    }
+  },
+  {
+    "id": "pest",
+    "no": 35,
+    "name": "Pest",
+    "category": "gacha",
+    "attribute": "moon",
+    "description": "「Fever」に怪しまれてる。 それもそのはず 人を滅ぼした主犯の一人。",
+    "base": {
+      "hp": 1800,
+      "attack": 1600,
+      "defence": 60,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 60,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/pest/main",
+      "icon": "characters/pest/icon",
+      "home": "characters/pest/home"
+    }
+  },
+  {
+    "id": "ronove",
+    "no": 36,
+    "name": "Ronove",
+    "category": "event",
+    "attribute": "yang",
+    "description": "悪魔みたいに優しい性格。 今までしてきた一番悪いことは 「ガム」を道に捨てたこと。",
+    "base": {
+      "hp": 2500,
+      "attack": 1300,
+      "defence": 130,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 130,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": true
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/ronove/main",
+      "icon": "characters/ronove/icon",
+      "home": "characters/ronove/home"
+    }
+  },
+  {
+    "id": "dawn",
+    "no": 37,
+    "name": "Dawn",
+    "category": "main",
+    "attribute": "yang",
+    "description": "IQが一番高い。 なんと「44」もある。 みんなから博士と呼ばれている。",
+    "base": {
+      "hp": 1800,
+      "attack": 900,
+      "defence": 100,
+      "attackBuffRate": 0.5,
+      "defenceBuffAmount": 100,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 40,
+      "attack": 24,
+      "defence": 15
+    },
+    "assets": {
+      "main": "characters/dawn/main",
+      "icon": "characters/dawn/icon",
+      "home": "characters/dawn/home"
+    }
+  },
+  {
+    "id": "kame",
+    "no": 38,
+    "name": "Kame",
+    "category": "other",
+    "attribute": "yang",
+    "description": "兎と亀が競争することになりました。 兎は油断してお昼寝をしました。 さて、どっちが勝ったかな？",
+    "base": {
+      "hp": 1996,
+      "attack": 120,
+      "defence": 200,
+      "attackBuffRate": 0.6,
+      "defenceBuffAmount": 200,
+      "checkMax": 2,
+      "rewindMax": 1,
+      "specialMax": 1,
+      "numbnessResistant": false
+    },
+    "duplicateBonusMax": {
+      "hp": 0,
+      "attack": 0,
+      "defence": 235
+    },
+    "assets": {
+      "main": "characters/kame/main",
+      "icon": "characters/kame/icon",
+      "home": "characters/kame/home"
+    }
+  }
+]
