@@ -71,7 +71,7 @@
 | フロント（Web+iOS+Android） | **React + TypeScript（Vite）、ストア配信は Capacitor**（D-2） | 設計は [03_frontend-architecture.md](03_frontend-architecture.md)。iOS は Mac が無いのでクラウドでビルドする |
 | バトルのルール | フロントとサーバで別々に実装し、ゴールデンテストで一致を保証（D-1） | `spec/battle/` |
 | マスタデータ | `spec/master/*.json` が正。api が DB に投入して配信（D-6） | [02_requirements.md](02_requirements.md) §10 |
-| API 仕様 | OpenAPI | api の実装を始めるときに作る |
+| API 仕様 | OpenAPI（`spec/openapi/openapi.yaml`） | 実装を始める API から順に書き足す |
 
 ## 5. リポジトリ（2026-09-26）
 GitHub: https://github.com/k-kame1220/ficklewolf-k （公開・既定のブランチは `develop`）

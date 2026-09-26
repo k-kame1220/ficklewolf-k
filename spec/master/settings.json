@@ -1,5 +1,6 @@
 {
   "minAppVersion": "0.1.0",
+  "starterCharacterId": "zero",
   "growth": {
     "itemUseMax": {
       "hp": 20,

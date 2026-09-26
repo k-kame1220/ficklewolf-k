@@ -1,0 +1,207 @@
+openapi: 3.1.0
+info:
+  title: K API
+  version: 0.1.0
+  description: |
+    K（リメイク）の API。web と api の約束事で、ここに書かれたものが正。
+    エラーは RFC 9457（Problem Details）の形で返し、機械で見分けるための `code` を付ける。
+servers:
+  - url: http://localhost:8080
+    description: ローカル開発
+security:
+  - bearerAuth: []
+tags:
+  - name: auth
+    description: アカウント・認証
+  - name: me
+    description: 自分のプレイヤー情報
+paths:
+  /auth/guest:
+    post:
+      tags: [auth]
+      operationId: createGuest
+      summary: ゲストアカウントを作る
+      description: |
+        プレイヤーを作り、認証トークンを発行する。トークン本体を返すのはこのときだけ。
+        作成直後のプレイヤーは Lv 1、お札 0、所持キャラは `settings.starterCharacterId`（zero）だけで、出撃キャラもそのキャラになる。
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGuestRequest"
+      responses:
+        "201":
+          description: 作成した
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateGuestResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /me:
+    get:
+      tags: [me]
+      operationId: getMe
+      summary: 自分のプロフィールを取る
+      responses:
+        "200":
+          description: 取れた
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Me"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    patch:
+      tags: [me]
+      operationId: updateMe
+      summary: 名前・出撃キャラを変える
+      description: 送った項目だけを変える。1 項目以上を送る。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateMeRequest"
+      responses:
+        "200":
+          description: 変えた後のプロフィール
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Me"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: |
+        `POST /auth/guest` で受け取ったトークンを `Authorization: Bearer <token>` で送る。
+        トークンは中身に意味のない文字列（JWT ではない）。クライアントは中身を解釈しない。
+  schemas:
+    PlayerName:
+      type: string
+      minLength: 1
+      maxLength: 6
+      description: |
+        プレイヤー名。前後の空白を取り除いてから数える。
+        文字数はコードポイント単位（TS は `[...name].length`、Kotlin は `codePointCount`）で 1〜6 文字。
+        制御文字は使えない。
+      examples: [ゲスト]
+    CharacterId:
+      type: string
+      pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+      description: "`spec/master/characters.json` の `id`"
+      examples: [zero]
+    CreateGuestRequest:
+      type: object
+      required: [name]
+      additionalProperties: false
+      properties:
+        name:
+          $ref: "#/components/schemas/PlayerName"
+    CreateGuestResponse:
+      type: object
+      required: [token, me]
+      additionalProperties: false
+      properties:
+        token:
+          type: string
+          description: 認証トークン。端末に保存し、以降のリクエストで送る。
+        me:
+          $ref: "#/components/schemas/Me"
+    UpdateMeRequest:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        name:
+          $ref: "#/components/schemas/PlayerName"
+        selectedCharacterId:
+          $ref: "#/components/schemas/CharacterId"
+    Me:
+      type: object
+      required: [id, name, level, fuda, selectedCharacterId]
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          $ref: "#/components/schemas/PlayerName"
+        level:
+          type: integer
+          minimum: 1
+        fuda:
+          type: integer
+          minimum: 0
+          description: 所持しているお札の数
+        selectedCharacterId:
+          $ref: "#/components/schemas/CharacterId"
+    ErrorCode:
+      type: string
+      enum:
+        - VALIDATION_FAILED
+        - INVALID_NAME
+        - CHARACTER_NOT_OWNED
+        - UNAUTHORIZED
+      description: |
+        - `VALIDATION_FAILED`: リクエストの形が違う（JSON が壊れている・必須項目がない・余計な項目がある・PATCH の項目が 0 個）
+        - `INVALID_NAME`: 名前が空・7 文字以上・制御文字を含む
+        - `CHARACTER_NOT_OWNED`: 持っていない（または存在しない）キャラを出撃させようとした
+        - `UNAUTHORIZED`: トークンがない・正しくない
+    Problem:
+      type: object
+      required: [type, title, status, code]
+      properties:
+        type:
+          type: string
+          format: uri-reference
+          default: about:blank
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+          description: 開発者向けの説明。画面にそのまま出さない。
+        instance:
+          type: string
+          format: uri-reference
+        code:
+          $ref: "#/components/schemas/ErrorCode"
+  responses:
+    BadRequest:
+      description: 入力が正しくない（`VALIDATION_FAILED` / `INVALID_NAME` / `CHARACTER_NOT_OWNED`）
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          example:
+            type: about:blank
+            title: Bad Request
+            status: 400
+            detail: name must be 1 to 6 characters
+            code: INVALID_NAME
+    Unauthorized:
+      description: 認証が必要（`UNAUTHORIZED`）
+      headers:
+        WWW-Authenticate:
+          schema:
+            type: string
+            examples: [Bearer]
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          example:
+            type: about:blank
+            title: Unauthorized
+            status: 401
+            code: UNAUTHORIZED

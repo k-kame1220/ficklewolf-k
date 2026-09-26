@@ -28,7 +28,7 @@ GitHub: https://github.com/k-kame1220/ficklewolf-k （公開・既定のブラ�
   - `spec/battle/`: バトルの計算ルール（README）とゴールデンテスト
   - `spec/master/`: マスタデータ（キャラ・クエスト・天気・アイテム・設定）
   - `spec/tools/validate.py`: spec の検証（pre-commit・CI でも実行）
-  - OpenAPI は api の実装を始めるときに追加する
+  - `spec/openapi/openapi.yaml`: API の定義（実装を始める API から順に書き足す）
 - `docs/`: なぜそうするか・どう感じてほしいか。
 
 ## ドキュメント
