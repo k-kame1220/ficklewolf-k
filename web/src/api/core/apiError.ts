@@ -29,6 +29,21 @@ export class ApiError extends Error {
   }
 }
 
+/** api のレスポンスの本文が OpenAPI の形と違ったときの例外（api と web の食い違い） */
+export class InvalidResponseError extends Error {
+  /** 呼んだ API の URL */
+  readonly url: string;
+  /** 形が違った場所（valibot の issue の要約） */
+  readonly issues: readonly string[];
+
+  constructor(url: string, issues: readonly string[]) {
+    super(`invalid response: ${url} ${issues.join(", ")}`);
+    this.name = "InvalidResponseError";
+    this.url = url;
+    this.issues = issues;
+  }
+}
+
 /** エラーのレスポンスと本文から ApiError を作る */
 export const toApiError = (response: Response, body: unknown): ApiError => {
   const problem = v.safeParse(ProblemSchema, body);

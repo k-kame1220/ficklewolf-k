@@ -1,17 +1,18 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
 
-import { toApiError } from "@/api/core/apiError";
 import { apiClient } from "@/api/core/client";
+import { parseResponse } from "@/api/core/response";
 import type { PlayerModel } from "@/domain/player/player";
 
 import { meKeys } from "./me.keys";
 import { meResponseToDomain } from "./me.mapper";
+import { MeResponseSchema } from "./me.schema";
 
-/** 自分のプロフィールを取る。失敗したら ApiError を投げる（未認証は 401） */
+/** 自分のプロフィールを取る。失敗したら ApiError（未認証は 401）/ InvalidResponseError を投げる */
 export const fetchMe = async (): Promise<PlayerModel> => {
-  const { data, error, response } = await apiClient.GET("/me");
-  if (data === undefined) throw toApiError(response, error);
-  return meResponseToDomain(data);
+  const result = await apiClient.GET("/me");
+  const body = parseResponse(result, MeResponseSchema);
+  return meResponseToDomain(body);
 };
 
 /** 自分のプロフィールのクエリ */
