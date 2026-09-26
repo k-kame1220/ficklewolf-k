@@ -112,9 +112,11 @@ api/
 - 本番のビルドにはモックを含めない（`import.meta.env.DEV` のときだけ読み込む）。
 - モック（`mocks/` と `*.mock.ts`）の中だけは、DB の代わりとして `Map` の書き換えを許可している（`eslint.config.ts`）。
 
-#### 認証トークン
+#### 認証トークンとログインの流れ
 - `POST /auth/guest` で受け取ったトークンを `shared/storage` に保存し、`client.ts` が毎回 `Authorization: Bearer` に付ける。
-- 401 が返ったらトークンを消す。画面は名前登録に戻す（「データが見つかりませんでした」）。
+- ルートの守り（`app/router.ts` の `beforeLoad`）: 認証が要るルート（`/home` など）はトークンが無ければ `/register` へ。`/register` はトークンがあれば `/home` へ。タイトルの「Tap to Start」は `/home` へ進むだけで、行き先はルートの守りが決める。
+- 401 が返ったら（アカウントが消えた・トークンが無効）: `client.ts` がトークンを消し、`app/queryClient.ts` がキャッシュを捨てて `/register?reason=lost` へ移る。名前登録に「データが見つかりませんでした」を出す。
+- api が返したエラー（4xx）は再試行しない。通信そのものの失敗だけ 2 回まで再試行し、それでも失敗したら画面に「通信エラー」とリトライのボタンを出す（旧作の文言）。
 
 ### 3.3 features/ — 機能
 ```
@@ -316,8 +318,10 @@ export default BattleStoreProvider;
 |---|---|---|
 | domain（バトル・ステータス） | Vitest | **ゴールデンテストを全件通す**。分岐はすべてテストする |
 | features のフック・部品 | Vitest + Testing Library + MSW | 主な操作（コマンドを押す → 表示が変わる）を確認する |
-| 画面の通し | Playwright | ログイン → クエスト → 勝利 → 報酬、の主な流れを数本 |
+| 画面の通し | Playwright（`web/e2e/`。`pnpm e2e`） | ログイン → クエスト → 勝利 → 報酬、の主な流れを数本。スマホの幅（390px）で動かし、スクリーンショットを `web/screenshots/`（git の対象外）に撮る |
 - テストファイルは対象の隣に `*.test.ts(x)` で置く。テストの書き方は `it` に統一し、`describe` で囲む。
+- 通信は MSW（`src/test/setup.ts`）が受ける。部品は `renderWithQueryClient`（`src/test/render.tsx`）で描画する。
+- E2E はまだ `pnpm check`・CI に入れていない（ブラウザのインストールが要るため）。画面を変えた PR では手元で `pnpm e2e` を実行する。
 
 ### 5.6 品質ツール
 - ESLint 10（`web/eslint.config.ts`）＋ Prettier（`web/prettier.config.ts`。shackw と同じ書式: 1 行 120 文字・ダブルクォート・末尾カンマなし・引数 1 つのアロー関数は括弧なし）。Prettier は ESLint から実行する（eslint-plugin-prettier）。

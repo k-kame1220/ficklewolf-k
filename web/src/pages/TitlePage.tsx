@@ -1,3 +1,5 @@
+import { Link } from "@tanstack/react-router";
+
 import styles from "./TitlePage.module.css";
 
 const TitlePage = () => {
@@ -5,9 +7,9 @@ const TitlePage = () => {
     <div className={styles.root}>
       <h1 className={styles.logo}>K</h1>
       <p className={styles.subtitle}>ターン式タイムリターンバトル</p>
-      <button type="button" className={styles.start}>
+      <Link className={styles.start} to="/home">
         Tap to Start...
-      </button>
+      </Link>
     </div>
   );
 };
