@@ -4,6 +4,9 @@
 バトルのルールの正は `../spec/battle/README.md`、マスタデータの正は `../spec/master/`（旧作の記録は `../docs/01_legacy-analysis.md`）。
 **`../api/` はオーナー専用。AI はコードを書かない。**
 
+## API の型
+- OpenAPI（`../spec/openapi/openapi.yaml`）を変えたら `pnpm api:generate` で `src/api/generated/schema.ts` を作り直してコミットする。`pnpm check` がずれを検出する。
+
 ## 必ず守ること（オーナーの方針・最優先）
 1. **上から順に読める実装にする。** 処理は起きる順に上から書く。読む人の目を上下させない。
 2. **むやみに関数に切り出さない。** 一度しか使わない処理は、その場に書く。切り出すのは「2 か所以上で使う」「ゲームのルール（domain）」「単体でテストしたい」場合だけ。

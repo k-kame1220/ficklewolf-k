@@ -75,15 +75,34 @@ domain/
 ### 3.2 api/ — 通信
 ```
 api/
-├── generated/     OpenAPI から生成した型（手で編集しない）
-├── client.ts      openapi-fetch のクライアント（認証トークン付与・エラーの共通処理）
-├── queries/       TanStack Query のフック（useMe, useMaster, useMyCharacters, useStartQuest…）
-├── mappers/       DTO → domain の型へ変換
-└── mocks/         MSW のハンドラ（OpenAPI どおりの仮データ）
+├── generated/schema.ts   OpenAPI から生成した型（`pnpm api:generate`。手で編集しない。コミットする）
+├── config.ts             基点 URL・モックを使うか（環境変数から読む）
+├── client.ts             openapi-fetch のクライアント（認証トークンの付与・401 でトークンを消す）
+├── apiError.ts           ApiError（`status` と `code`）。エラーの本文（Problem Details）から作る
+├── authToken.ts          認証トークンの読み書き（shared/storage を使う）
+├── keys.ts               TanStack Query のクエリキー
+├── me.model.ts           DTO → モデル（`MeModel`）の変換
+├── me.query.ts           取得（`fetchMe` と `useMe`）
+├── me.mutate.ts          変更（`updateMe` と `useUpdateMe`）
+├── auth.mutate.ts        ゲスト作成（`createGuest` と `useCreateGuest`）
+└── mocks/                MSW（`handlers.ts` = OpenAPI どおりに振る舞うハンドラ、`browser.ts` = 開発用、`node.ts` = テスト用）
 ```
 - **サーバの状態は TanStack Query だけで持つ**（別のストアに複製しない）。
-- 画面やドメインは DTO の型を使わない。`mappers` で domain の型に変換してから渡す。API が変わっても影響を `api/` の中に閉じ込めるため。
-- クエリキーは `queries/keys.ts` にまとめる。
+- 画面やドメインは DTO の型を使わない。`*.model.ts` でモデルに変換してから渡す。API が変わっても影響を `api/` の中に閉じ込めるため。
+- 通信する関数（`fetchMe` など）と、それを包むフック（`useMe` など）を同じファイルに置く。関数はテストで直接呼べる。
+- api がエラーを返したら `ApiError` を投げる。画面は `code` を見てメッセージを決める。通信そのものの失敗（オフラインなど）は `ApiError` にならない。
+- **生成した型は OpenAPI とずれないようにする。** `pnpm check` の最初に `pnpm api:check` で確かめる（OpenAPI を変えたら `pnpm api:generate` してコミットする）。
+
+#### モック（MSW）
+- 開発サーバー（`pnpm dev`）は、既定で MSW のモックを使う。本物の api につなぐときは `web/.env.development.local`（git の対象外）に `VITE_API_MOCK=false` を書く。基点 URL は `VITE_API_BASE_URL`（既定は `http://localhost:8080`）。
+- モックはプレイヤーとトークンをメモリに持つ。**ページを読み直すとモックの中身は消える**ので、保存済みのトークンは 401 になり、名前登録からやり直しになる（401 の流れの確認にもなる）。
+- テストは `src/test/setup.ts` で Node 用の MSW を起動し、テストごとに空の状態のハンドラを入れ直す。知らない通信はエラーにする。
+- 本番のビルドにはモックを含めない（`import.meta.env.DEV` のときだけ読み込む）。
+- モックの中だけは、DB の代わりとして `Map` の書き換えを許可している（`eslint.config.ts`）。
+
+#### 認証トークン
+- `POST /auth/guest` で受け取ったトークンを `shared/storage` に保存し、`client.ts` が毎回 `Authorization: Bearer` に付ける。
+- 401 が返ったらトークンを消す。画面は名前登録に戻す（「データが見つかりませんでした」）。
 
 ### 3.3 features/ — 機能
 ```

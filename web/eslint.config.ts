@@ -351,6 +351,16 @@ export default defineConfig(
   },
 
   {
+    files: ["src/api/mocks/**/*.ts"],
+    rules: {
+      "functional/immutable-data": [
+        "error",
+        { ignoreImmediateMutation: true, ignoreClasses: false, ignoreMapsAndSets: true }
+      ]
+    }
+  },
+
+  {
     files: ["src/shared/storage/**/*.ts"],
     rules: {
       "no-restricted-globals": ["error", { name: "sessionStorage", message: "sessionStorage は使いません。" }],
