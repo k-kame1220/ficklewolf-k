@@ -8,7 +8,7 @@ import { fetchMe } from "./me.query";
 
 describe("fetchMe", () => {
   it("保存したトークンで自分のプロフィールを取る", async () => {
-    const created = await createGuest("ゲスト");
+    const created = await createGuest({ name: "ゲスト" });
 
     await expect(fetchMe()).resolves.toStrictEqual(created);
   });
@@ -27,7 +27,7 @@ describe("fetchMe", () => {
 
 describe("updateMe", () => {
   it("名前を変える", async () => {
-    await createGuest("ゲスト");
+    await createGuest({ name: "ゲスト" });
 
     const updated = await updateMe({ name: "ウルフ" });
 
@@ -36,13 +36,13 @@ describe("updateMe", () => {
   });
 
   it("持っているキャラを出撃キャラにできる", async () => {
-    await createGuest("ゲスト");
+    await createGuest({ name: "ゲスト" });
 
     await expect(updateMe({ selectedCharacterId: "zero" })).resolves.toMatchObject({ selectedCharacterId: "zero" });
   });
 
   it("持っていないキャラは CHARACTER_NOT_OWNED", async () => {
-    await createGuest("ゲスト");
+    await createGuest({ name: "ゲスト" });
 
     await expect(updateMe({ selectedCharacterId: "a" })).rejects.toStrictEqual(
       new ApiError(400, "CHARACTER_NOT_OWNED")
@@ -50,13 +50,13 @@ describe("updateMe", () => {
   });
 
   it("変える項目が無ければ VALIDATION_FAILED", async () => {
-    await createGuest("ゲスト");
+    await createGuest({ name: "ゲスト" });
 
     await expect(updateMe({})).rejects.toStrictEqual(new ApiError(400, "VALIDATION_FAILED"));
   });
 
   it("名前が空なら INVALID_NAME", async () => {
-    await createGuest("ゲスト");
+    await createGuest({ name: "ゲスト" });
 
     await expect(updateMe({ name: "  " })).rejects.toStrictEqual(new ApiError(400, "INVALID_NAME"));
   });

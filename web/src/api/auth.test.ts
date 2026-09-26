@@ -6,7 +6,7 @@ import { readAuthToken } from "./authToken";
 
 describe("createGuest", () => {
   it("ゲストを作り、トークンを端末に保存する", async () => {
-    const me = await createGuest("  ゲスト  ");
+    const me = await createGuest({ name: "  ゲスト  " });
 
     expect(me).toStrictEqual({
       id: me.id,
@@ -20,7 +20,7 @@ describe("createGuest", () => {
   });
 
   it("名前が 7 文字なら INVALID_NAME で、トークンは保存しない", async () => {
-    await expect(createGuest("abcdefg")).rejects.toStrictEqual(new ApiError(400, "INVALID_NAME"));
+    await expect(createGuest({ name: "abcdefg" })).rejects.toStrictEqual(new ApiError(400, "INVALID_NAME"));
     expect(readAuthToken()).toBeNull();
   });
 });

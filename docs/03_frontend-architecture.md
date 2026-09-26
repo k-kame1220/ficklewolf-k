@@ -58,6 +58,7 @@ shared → （外部ライブラリのみ）
 domain/
 ├── master/        マスタの型（`spec/master` の形に合わせる）と読み取り関数
 ├── attribute/     属性相性（陽 > 音 > 月 > 陽）
+├── player/        プレイヤーの型（PlayerModel・CreateGuestCommand・UpdatePlayerCommand）と名前のルール
 ├── stats/         ステータス計算（HP・攻撃・防御 = 基礎 + アイテム + 被り + 天気。係数は `spec/master/settings.json`）
 ├── battle/
 │   ├── types.ts            コマンド・プレイヤーと敵の設定・状態（BattleState）・イベント（BattleEvent）・理由コード
@@ -67,6 +68,7 @@ domain/
 │   ├── engine.golden.test.ts  spec/battle/cases を全件読み込んで 1 手ずつ比べる
 │   └── rng.test.ts         spec/battle/rng のテストベクタ
 ```
+- **アプリの中で使う型（`XxxModel`）と操作の入力（`XxxCommand`）は domain に置く**（Shackw の wallet-app と同じ）。API の形（DTO）は domain に持ち込まない。
 - **すべて純粋関数**。入力が同じなら結果も同じ。状態は `readonly` で、書き換えずに新しいオブジェクトを返す。
 - 乱数は状態（`rngState`）として持ち回り、現在時刻は引数で受け取る。
 - 実行できないコマンドは例外にせず、**理由付きの結果**を返す: `{ ok: false, reason: 'NO_CHECKPOINT' }`。画面はこれを見てメッセージを出す（旧作の「チェックポイントがありません。」など）。
@@ -81,14 +83,16 @@ api/
 ├── apiError.ts           ApiError（`status` と `code`）。エラーの本文（Problem Details）から作る
 ├── authToken.ts          認証トークンの読み書き（shared/storage を使う）
 ├── keys.ts               TanStack Query のクエリキー
-├── me.model.ts           DTO → モデル（`MeModel`）の変換
+├── me.mapper.ts          DTO → domain の型（`meResponseToDomain` → `PlayerModel`）
 ├── me.query.ts           取得（`fetchMe` と `useMe`）
 ├── me.mutate.ts          変更（`updateMe` と `useUpdateMe`）
 ├── auth.mutate.ts        ゲスト作成（`createGuest` と `useCreateGuest`）
 └── mocks/                MSW（`handlers.ts` = OpenAPI どおりに振る舞うハンドラ、`browser.ts` = 開発用、`node.ts` = テスト用）
 ```
 - **サーバの状態は TanStack Query だけで持つ**（別のストアに複製しない）。
-- 画面やドメインは DTO の型を使わない。`*.model.ts` でモデルに変換してから渡す。API が変わっても影響を `api/` の中に閉じ込めるため。
+- 画面やドメインは DTO の型を使わない。`*.mapper.ts`（`xxxResponseToDomain`）で domain の `XxxModel` に変換してから渡す。API が変わっても影響を `api/` の中に閉じ込めるため。
+- 通信する関数の入力は domain の `XxxCommand` で受け取る。
+- **api が外部との境界**。wallet-app の ports・infrastructure・DI コンテナは作らない（外部は api と端末保存だけで、テストの差し替えは MSW が通信の手前で行うため）。外部が増えたら見直す。
 - 通信する関数（`fetchMe` など）と、それを包むフック（`useMe` など）を同じファイルに置く。関数はテストで直接呼べる。
 - api がエラーを返したら `ApiError` を投げる。画面は `code` を見てメッセージを決める。通信そのものの失敗（オフラインなど）は `ApiError` にならない。
 - **生成した型は OpenAPI とずれないようにする。** `pnpm check` の最初に `pnpm api:check` で確かめる（OpenAPI を変えたら `pnpm api:generate` してコミットする）。
@@ -233,7 +237,7 @@ export default BattleStoreProvider;
 - tsconfig は shackw と同じく `tsconfig.app.json`（src）と `tsconfig.node.json`（設定ファイル）に分ける。`strict` と shackw の設定（`erasableSyntaxOnly`, `noUncheckedSideEffectImports` など）に加えて、`noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noImplicitOverride`, `noImplicitReturns` を有効にする。
 - `any` は禁止。外から来る値（端末に保存した値、ゴールデンテストの JSON）は `unknown` で受けて **valibot で検証**する。
 - 型の種類はユニオン（判別可能ユニオン）で表す。`enum` は使わない（`as const` のオブジェクトかユニオンで書く）。定数の表は `as const satisfies` で型を確かめる。
-- 型は `type` で書く。名前は `XxxProps`（props）/ `XxxContextType`（Context）/ `XxxState`（ストアの状態）/ `XxxModel`（API から作るモデル）/ `XxxSchema`（valibot のスキーマ）。
+- 型は `type` で書く。名前は `XxxProps`（props）/ `XxxContextType`（Context）/ `XxxState`（ストアの状態）/ `XxxModel`（domain の型。アプリの中で使う形）/ `XxxCommand`（domain。操作の入力）/ `XxxSchema`（valibot のスキーマ）。
 - `class` は `Error` を継承するとき（`ApiError` など）だけ使う。
 - `switch` で判別するときは網羅チェックをする（lint の `switch-exhaustiveness-check`）。
 - 非 null アサーション（`!`）と `as` による型の上書きは原則禁止。使う場合は理由をコメントに書く。
@@ -285,7 +289,7 @@ export default BattleStoreProvider;
 | コンポーネント | PascalCase.tsx | `CommandPanel.tsx` |
 | フック | `use` + camelCase.ts | `useEventPlayer.ts` |
 | その他の TS | camelCase.ts | `enemyActions.ts` |
-| API まわり | `名前.種類.ts`（shackw と同じ） | `character.query.ts`, `quest.mutate.ts`, `character.model.ts`, `character.schema.ts` |
+| API まわり | `名前.種類.ts`（shackw と同じ） | `character.query.ts`, `quest.mutate.ts`, `character.mapper.ts` |
 | CSS | コンポーネント名.module.css | `CommandPanel.module.css` |
 | 型 | PascalCase。`I` などの接頭辞は付けない | `BattleState` |
 | 定数 | UPPER_SNAKE_CASE | `MAX_CHECK_COUNT` |

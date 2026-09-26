@@ -45,8 +45,8 @@ export default EnemyPanel;
 - コンポーネントはアロー関数。props は本体の 1 行目で分割代入。1 ファイル 1 つを default export。
 - 1 行の early return は波括弧なし（`if (x) return null;`）。
 - 画面はセクション単位の部品を並べるだけ。子部品があるセクションはフォルダにし、`index.tsx` ＋ 親の名前を頭に付けた子部品（`EnemyPanel/EnemyPanelImage.tsx`）。
-- 型は `type`。`XxxProps` / `XxxContextType` / `XxxState` / `XxxModel` / `XxxSchema`。定数の表は `as const satisfies`。
-- API まわりのファイル名は `character.query.ts` / `quest.mutate.ts` / `character.model.ts` / `character.schema.ts`。
+- 型は `type`。`XxxProps` / `XxxContextType` / `XxxState` / `XxxModel`（domain の型）/ `XxxCommand`（domain。操作の入力）/ `XxxSchema`。定数の表は `as const satisfies`。
+- API まわりのファイル名は `character.query.ts` / `quest.mutate.ts` / `character.mapper.ts`。Model と Command は domain に置き、api は DTO → domain の変換だけを持つ。
 - 書式は Prettier（1 行 120 文字・ダブルクォート・末尾カンマなし・引数 1 つのアロー関数は括弧なし）。
 
 ## 構成と依存
