@@ -3,7 +3,7 @@ import { RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import { isApiMockEnabled } from "@/api/config";
+import { isApiMockEnabled } from "@/api/core/config";
 import "@/shared/styles/global.css";
 
 import { router } from "./router";

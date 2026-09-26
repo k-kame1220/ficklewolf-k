@@ -1,9 +1,9 @@
 import createClient from "openapi-fetch";
 
+import type { paths } from "@/api/generated/schema";
+
 import { clearAuthToken, readAuthToken } from "./authToken";
 import { API_BASE_URL } from "./config";
-
-import type { paths } from "./generated/schema";
 
 const HTTP_UNAUTHORIZED = 401;
 

@@ -78,17 +78,25 @@ domain/
 ```
 api/
 ├── generated/schema.ts   OpenAPI から生成した型（`pnpm api:generate`。手で編集しない。コミットする）
-├── config.ts             基点 URL・モックを使うか（環境変数から読む）
-├── client.ts             openapi-fetch のクライアント（認証トークンの付与・401 でトークンを消す）
-├── apiError.ts           ApiError（`status` と `code`）。エラーの本文（Problem Details）から作る
-├── authToken.ts          認証トークンの読み書き（shared/storage を使う）
-├── keys.ts               TanStack Query のクエリキー
-├── me.mapper.ts          DTO → domain の型（`meResponseToDomain` → `PlayerModel`）
-├── me.query.ts           取得（`fetchMe` と `useMe`）
-├── me.mutate.ts          変更（`updateMe` と `useUpdateMe`）
-├── auth.mutate.ts        ゲスト作成（`createGuest` と `useCreateGuest`）
-└── mocks/                MSW（`handlers.ts` = OpenAPI どおりに振る舞うハンドラ、`browser.ts` = 開発用、`node.ts` = テスト用）
+├── core/                 どの resource でも使うもの
+│   ├── config.ts         基点 URL・モックを使うか（環境変数から読む）
+│   ├── client.ts         openapi-fetch のクライアント（認証トークンの付与・401 でトークンを消す）
+│   ├── apiError.ts       ApiError（`status` と `code`）。エラーの本文（Problem Details）から作る
+│   └── authToken.ts      認証トークンの読み書き（shared/storage を使う）
+├── auth/                 OpenAPI の tag ごとにフォルダを分ける
+│   ├── auth.mutate.ts    ゲスト作成（`createGuest` と `useCreateGuest`）
+│   ├── auth.mock.ts      MSW のハンドラ
+│   └── auth.test.ts
+├── me/
+│   ├── me.keys.ts        TanStack Query のクエリキー
+│   ├── me.mapper.ts      DTO → domain の型（`meResponseToDomain` → `PlayerModel`）
+│   ├── me.query.ts       取得（`fetchMe` と `useMe`）
+│   ├── me.mutate.ts      変更（`updateMe` と `useUpdateMe`）
+│   ├── me.mock.ts        MSW のハンドラ
+│   └── me.test.ts
+└── mocks/                MSW の組み立て（`db.ts` = モックの DB と共通の関数、`handlers.ts` = 全 resource のハンドラをまとめる、`browser.ts` = 開発用、`node.ts` = テスト用）
 ```
+- **resource（OpenAPI の tag）ごとにフォルダを分ける。** 1 つの resource に関するもの（取得・変更・変換・キー・モック・テスト）は同じフォルダに置く。features とは分けない（`/me` はホーム・名前変更・キャラなど複数の feature から使うため）。
 - **サーバの状態は TanStack Query だけで持つ**（別のストアに複製しない）。
 - 画面やドメインは DTO の型を使わない。`*.mapper.ts`（`xxxResponseToDomain`）で domain の `XxxModel` に変換してから渡す。API が変わっても影響を `api/` の中に閉じ込めるため。
 - 通信する関数の入力は domain の `XxxCommand` で受け取る。
@@ -102,7 +110,7 @@ api/
 - モックはプレイヤーとトークンをメモリに持つ。**ページを読み直すとモックの中身は消える**ので、保存済みのトークンは 401 になり、名前登録からやり直しになる（401 の流れの確認にもなる）。
 - テストは `src/test/setup.ts` で Node 用の MSW を起動し、テストごとに空の状態のハンドラを入れ直す。知らない通信はエラーにする。
 - 本番のビルドにはモックを含めない（`import.meta.env.DEV` のときだけ読み込む）。
-- モックの中だけは、DB の代わりとして `Map` の書き換えを許可している（`eslint.config.ts`）。
+- モック（`mocks/` と `*.mock.ts`）の中だけは、DB の代わりとして `Map` の書き換えを許可している（`eslint.config.ts`）。
 
 #### 認証トークン
 - `POST /auth/guest` で受け取ったトークンを `shared/storage` に保存し、`client.ts` が毎回 `Authorization: Bearer` に付ける。

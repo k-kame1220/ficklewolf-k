@@ -1,6 +1,6 @@
 import * as v from "valibot";
 
-import type { components } from "./generated/schema";
+import type { components } from "@/api/generated/schema";
 
 /** api が返すエラーの種類（spec/openapi の ErrorCode） */
 export type ErrorCode = components["schemas"]["ErrorCode"];

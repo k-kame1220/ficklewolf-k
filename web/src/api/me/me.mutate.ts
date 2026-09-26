@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { toApiError } from "@/api/core/apiError";
+import { apiClient } from "@/api/core/client";
 import type { PlayerModel, UpdatePlayerCommand } from "@/domain/player/player";
 
-import { toApiError } from "./apiError";
-import { apiClient } from "./client";
-import { apiKeys } from "./keys";
+import { meKeys } from "./me.keys";
 import { meResponseToDomain } from "./me.mapper";
 
 /** プロフィールを変える。失敗したら ApiError を投げる */
@@ -21,7 +21,7 @@ export const useUpdateMe = () => {
   return useMutation({
     mutationFn: updateMe,
     onSuccess: me => {
-      queryClient.setQueryData(apiKeys.me, me);
+      queryClient.setQueryData(meKeys.me, me);
     }
   });
 };

@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { ApiError } from "./apiError";
+import { ApiError } from "@/api/core/apiError";
+import { readAuthToken } from "@/api/core/authToken";
+
 import { createGuest } from "./auth.mutate";
-import { readAuthToken } from "./authToken";
 
 describe("createGuest", () => {
   it("ゲストを作り、トークンを端末に保存する", async () => {

@@ -351,7 +351,7 @@ export default defineConfig(
   },
 
   {
-    files: ["src/api/mocks/**/*.ts"],
+    files: ["src/api/mocks/**/*.ts", "src/api/**/*.mock.ts"],
     rules: {
       "functional/immutable-data": [
         "error",

@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { ApiError } from "./apiError";
-import { createGuest } from "./auth.mutate";
-import { readAuthToken, saveAuthToken } from "./authToken";
+import { createGuest } from "@/api/auth/auth.mutate";
+import { ApiError } from "@/api/core/apiError";
+import { readAuthToken, saveAuthToken } from "@/api/core/authToken";
+
 import { updateMe } from "./me.mutate";
 import { fetchMe } from "./me.query";
 
