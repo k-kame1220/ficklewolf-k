@@ -60,17 +60,15 @@ domain/
 ├── attribute/     属性相性（陽 > 音 > 月 > 陽）
 ├── stats/         ステータス計算（HP・攻撃・防御 = 基礎 + アイテム + 被り + 天気。係数は `spec/master/settings.json`）
 ├── battle/
-│   ├── state.ts       BattleState（HP・バフ・ターン・チェックポイント・残り回数…）
-│   ├── commands.ts    Command（attack / defend / attackBuff / defenceBuff / check / rewind / special）。みえーるみえーる（reveal）は画面の機能でエンジンには入れない
-│   ├── events.ts      BattleEvent（enemyAction, damage, buff, attributeChanged, numbness, paralyzed, rewound, stageChanged, finished…）
-│   ├── engine.ts      step(state, command) → { ok: true, state, events } | { ok: false, reason }（reason は spec の理由コード）
-│   ├── enemyActions.ts 敵の行動ごとの処理
-│   ├── replay.ts      コマンドログの再生（サーバ検証と同じことをフロントでも確かめる）
-│   └── rng.ts         シード付き乱数（仕様で決めたアルゴリズム）
-└── rounding.ts    数値の丸め（ゴールデンテストの仕様に合わせる）
+│   ├── types.ts            コマンド・プレイヤーと敵の設定・状態（BattleState）・イベント（BattleEvent）・理由コード
+│   ├── engine.ts           createBattle(setup) と step(state, command) → { ok: true, state, events } | { ok: false, reason }
+│   ├── enemyAction.ts      敵の行動 15 種の処理と、ダメージ・攻撃力の計算
+│   ├── rng.ts              mulberry32（状態を引数と戻り値で受け渡す純粋関数）
+│   ├── engine.golden.test.ts  spec/battle/cases を全件読み込んで 1 手ずつ比べる
+│   └── rng.test.ts         spec/battle/rng のテストベクタ
 ```
 - **すべて純粋関数**。入力が同じなら結果も同じ。状態は `readonly` で、書き換えずに新しいオブジェクトを返す。
-- 乱数・現在時刻は引数で受け取る（`ctx.rng`）。
+- 乱数は状態（`rngState`）として持ち回り、現在時刻は引数で受け取る。
 - 実行できないコマンドは例外にせず、**理由付きの結果**を返す: `{ ok: false, reason: 'NO_CHECKPOINT' }`。画面はこれを見てメッセージを出す（旧作の「チェックポイントがありません。」など）。
 - ゴールデンテスト（`spec/battle/cases/*.json`）は `domain/battle` に対して直接実行する。ルールの正は `spec/battle/README.md`。
 
