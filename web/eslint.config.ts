@@ -206,6 +206,8 @@ export default defineConfig(
         "error",
         { vars: "all", varsIgnorePattern: "^_", args: "after-used", argsIgnorePattern: "^_" }
       ],
+      "@typescript-eslint/no-explicit-any": ["error", { fixToUnknown: true, ignoreRestArgs: false }],
+      "@typescript-eslint/no-unsafe-type-assertion": "error",
       "@typescript-eslint/naming-convention": [
         "error",
         { selector: "typeLike", format: ["PascalCase"] },

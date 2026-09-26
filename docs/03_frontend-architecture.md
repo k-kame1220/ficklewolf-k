@@ -81,14 +81,17 @@ api/
 ├── core/                 どの resource でも使うもの
 │   ├── config.ts         基点 URL・モックを使うか（環境変数から読む）
 │   ├── client.ts         openapi-fetch のクライアント（認証トークンの付与・401 でトークンを消す）
-│   ├── apiError.ts       ApiError（`status` と `code`）。エラーの本文（Problem Details）から作る
+│   ├── apiError.ts       ApiError（`status` と `code`）と InvalidResponseError（本文が OpenAPI の形と違う）
+│   ├── response.ts       parseResponse（レスポンスを確かめて本文を返す）
 │   └── authToken.ts      認証トークンの読み書き（shared/storage を使う）
 ├── auth/                 OpenAPI の tag ごとにフォルダを分ける
+│   ├── auth.schema.ts    レスポンスの valibot のスキーマ
 │   ├── auth.mutate.ts    ゲスト作成（`createGuest` と `useCreateGuest`）
 │   ├── auth.mock.ts      MSW のハンドラ
 │   └── auth.test.ts
 ├── me/
 │   ├── me.keys.ts        TanStack Query のクエリキー
+│   ├── me.schema.ts      レスポンスの valibot のスキーマ（`MeResponseSchema`）
 │   ├── me.mapper.ts      DTO → domain の型（`meResponseToDomain` → `PlayerModel`）
 │   ├── me.query.ts       取得（`fetchMe` と `useMe`）
 │   ├── me.mutate.ts      変更（`updateMe` と `useUpdateMe`）
@@ -100,6 +103,13 @@ api/
 - **サーバの状態は TanStack Query だけで持つ**（別のストアに複製しない）。
 - 画面やドメインは DTO の型を使わない。`*.mapper.ts`（`xxxResponseToDomain`）で domain の `XxxModel` に変換してから渡す。API が変わっても影響を `api/` の中に閉じ込めるため。
 - 通信する関数の入力は domain の `XxxCommand` で受け取る。
+- **レスポンスは信用しない。** 生成した型は「そう書いてある」だけなので、本文は必ず `parseResponse(result, XxxResponseSchema)` で valibot にかけてから使う。通信する関数は次の形にそろえる。
+  ```ts
+  const result = await apiClient.GET("/me");
+  const body = parseResponse(result, MeResponseSchema);   // エラーなら ApiError、形が違えば InvalidResponseError
+  return meResponseToDomain(body);
+  ```
+- スキーマの型は `v.GenericSchema<unknown, components["schemas"]["Xxx"]>` と書き、OpenAPI から生成した型とずれたら型チェックで気づけるようにする。未知の項目は `v.object` で捨てる（api に項目が増えても古いアプリが壊れないように）。
 - **api が外部との境界**。wallet-app の ports・infrastructure・DI コンテナは作らない（外部は api と端末保存だけで、テストの差し替えは MSW が通信の手前で行うため）。外部が増えたら見直す。
 - 通信する関数（`fetchMe` など）と、それを包むフック（`useMe` など）を同じファイルに置く。関数はテストで直接呼べる。
 - api がエラーを返したら `ApiError` を投げる。画面は `code` を見てメッセージを決める。通信そのものの失敗（オフラインなど）は `ApiError` にならない。
@@ -243,7 +253,10 @@ export default BattleStoreProvider;
 
 ### 5.1 TypeScript
 - tsconfig は shackw と同じく `tsconfig.app.json`（src）と `tsconfig.node.json`（設定ファイル）に分ける。`strict` と shackw の設定（`erasableSyntaxOnly`, `noUncheckedSideEffectImports` など）に加えて、`noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noImplicitOverride`, `noImplicitReturns` を有効にする。
-- `any` は禁止。外から来る値（端末に保存した値、ゴールデンテストの JSON）は `unknown` で受けて **valibot で検証**する。
+- **`any` は禁止。** 外から来る値（api のレスポンス、端末に保存した値、ゴールデンテストの JSON）は `unknown` で受けて **valibot で検証**する。
+  - lint: `no-explicit-any`・`no-unsafe-*`（any の代入・引数・呼び出し・メンバー参照・戻り値）・`no-unsafe-type-assertion`。
+  - 標準の型で any を返す `JSON.parse` と `Response.json()` は、`src/app/builtins.d.ts` で unknown を返すように上書きしている。
+  - tsconfig: `strict` に加えて `noUncheckedIndexedAccess`・`exactOptionalPropertyTypes`・`noImplicitReturns`・`noImplicitOverride`・`allowUnreachableCode: false`・`allowUnusedLabels: false` など。`noPropertyAccessFromIndexSignature` は CSS Modules（`styles.root`）とぶつかるので使わない。
 - 型の種類はユニオン（判別可能ユニオン）で表す。`enum` は使わない（`as const` のオブジェクトかユニオンで書く）。定数の表は `as const satisfies` で型を確かめる。
 - 型は `type` で書く。名前は `XxxProps`（props）/ `XxxContextType`（Context）/ `XxxState`（ストアの状態）/ `XxxModel`（domain の型。アプリの中で使う形）/ `XxxCommand`（domain。操作の入力）/ `XxxSchema`（valibot のスキーマ）。
 - `class` は `Error` を継承するとき（`ApiError` など）だけ使う。
@@ -297,7 +310,7 @@ export default BattleStoreProvider;
 | コンポーネント | PascalCase.tsx | `CommandPanel.tsx` |
 | フック | `use` + camelCase.ts | `useEventPlayer.ts` |
 | その他の TS | camelCase.ts | `enemyActions.ts` |
-| API まわり | `名前.種類.ts`（shackw と同じ） | `character.query.ts`, `quest.mutate.ts`, `character.mapper.ts` |
+| API まわり | `名前.種類.ts`（shackw と同じ） | `character.query.ts`, `quest.mutate.ts`, `character.schema.ts`, `character.mapper.ts` |
 | CSS | コンポーネント名.module.css | `CommandPanel.module.css` |
 | 型 | PascalCase。`I` などの接頭辞は付けない | `BattleState` |
 | 定数 | UPPER_SNAKE_CASE | `MAX_CHECK_COUNT` |
