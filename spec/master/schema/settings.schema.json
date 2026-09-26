@@ -2,10 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ficklewolf.shackw.com/k/spec/master/schema/settings.schema.json",
   "type": "object",
-  "required": ["minAppVersion", "growth", "rewards"],
+  "required": ["minAppVersion", "starterCharacterId", "growth", "rewards"],
   "additionalProperties": false,
   "properties": {
     "minAppVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "starterCharacterId": { "$ref": "common.schema.json#/$defs/id" },
     "growth": {
       "type": "object",
       "required": ["itemUseMax", "itemBonusPerUse", "duplicateBonusPerCount"],

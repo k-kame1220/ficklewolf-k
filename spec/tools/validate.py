@@ -89,6 +89,10 @@ def main() -> int:
     item_keys = Counter((i["attribute"], i["stat"]) for i in master["items"])
     errors += [f"items: {k} のアイテムが重複しています" for k, n in item_keys.items() if n > 1]
 
+    starter = master["settings"]["starterCharacterId"]
+    if starter not in character_ids:
+        errors.append(f"settings: starterCharacterId '{starter}' のキャラがいません")
+
     rewards = master["settings"]["rewards"]
     if rewards["weatherItemDropMin"] > rewards["weatherItemDropMax"]:
         errors.append("settings: weatherItemDropMin が weatherItemDropMax より大きいです")
