@@ -4,6 +4,9 @@
 バトルのルールの正は `../spec/battle/README.md`、マスタデータの正は `../spec/master/`（旧作の記録は `../docs/01_legacy-analysis.md`）。
 **`../api/` はオーナー専用。AI はコードを書かない。**
 
+## API の型
+- OpenAPI（`../spec/openapi/openapi.yaml`）を変えたら `pnpm api:generate` で `src/api/generated/schema.ts` を作り直してコミットする。`pnpm check` がずれを検出する。
+
 ## 必ず守ること（オーナーの方針・最優先）
 1. **上から順に読める実装にする。** 処理は起きる順に上から書く。読む人の目を上下させない。
 2. **むやみに関数に切り出さない。** 一度しか使わない処理は、その場に書く。切り出すのは「2 か所以上で使う」「ゲームのルール（domain）」「単体でテストしたい」場合だけ。
@@ -42,8 +45,8 @@ export default EnemyPanel;
 - コンポーネントはアロー関数。props は本体の 1 行目で分割代入。1 ファイル 1 つを default export。
 - 1 行の early return は波括弧なし（`if (x) return null;`）。
 - 画面はセクション単位の部品を並べるだけ。子部品があるセクションはフォルダにし、`index.tsx` ＋ 親の名前を頭に付けた子部品（`EnemyPanel/EnemyPanelImage.tsx`）。
-- 型は `type`。`XxxProps` / `XxxContextType` / `XxxState` / `XxxModel` / `XxxSchema`。定数の表は `as const satisfies`。
-- API まわりのファイル名は `character.query.ts` / `quest.mutate.ts` / `character.model.ts` / `character.schema.ts`。
+- 型は `type`。`XxxProps` / `XxxContextType` / `XxxState` / `XxxModel`（domain の型）/ `XxxCommand`（domain。操作の入力）/ `XxxSchema`。定数の表は `as const satisfies`。
+- API まわりのファイル名は `character.query.ts` / `quest.mutate.ts` / `character.mapper.ts`。Model と Command は domain に置き、api は DTO → domain の変換だけを持つ。
 - 書式は Prettier（1 行 120 文字・ダブルクォート・末尾カンマなし・引数 1 つのアロー関数は括弧なし）。
 
 ## 構成と依存

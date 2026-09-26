@@ -25,7 +25,7 @@ fi
 repo_root="$(git rev-parse --show-toplevel)"
 staged="$(git diff --cached --name-only)"
 
-if grep -q '^web/' <<< "$staged"; then
+if grep -qE '^(web|spec/openapi)/' <<< "$staged"; then
   echo "pre-commit: web の format / lint / test / build を確認します"
   (cd "$repo_root/web" && pnpm check)
 fi
