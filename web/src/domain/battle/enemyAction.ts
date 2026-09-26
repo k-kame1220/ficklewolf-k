@@ -2,37 +2,51 @@ import { attackMultiplier } from "../attribute/attribute";
 
 import type { BattleEvent, EnemyAction, EnemyState, PlayerSetup, PlayerState } from "./types";
 
+/** 防御中に受ける `attack` / `strongAttack` の攻撃力に掛ける倍率 */
 export const DEFEND_DAMAGE_RATE = 0.2;
+/** 敵の `defend` で、このターンの敵の防御力を「プレイヤーの攻撃力 × この値」にする */
 export const ENEMY_DEFEND_RATE = 0.8;
+/** 敵の `deathblow` で攻撃力に掛ける倍率 */
 export const DEATHBLOW_MULTIPLIER = 100;
+/** 挑発 1 回で敵の攻撃力に足す値 */
 export const PROVOCATION_BONUS = 10;
+/** ビリビリを受けたときの残りターン数 */
 export const NUMBNESS_TURNS = 3;
 
+/** 敵の行動を処理するのに必要な値 */
 export type EnemyActionInput = {
   readonly action: EnemyAction;
   readonly playerSetup: PlayerSetup;
   readonly player: PlayerState;
   readonly enemy: EnemyState;
+  /** 敵の行動の前のビリビリの残りターン数 */
   readonly numbnessTurns: number;
+  /** このターンにプレイヤーが防御しているか（しびれて失敗したときは false） */
   readonly isDefending: boolean;
 };
 
+/** 敵の行動の結果 */
 export type EnemyActionResult = {
   readonly player: PlayerState;
   readonly enemy: EnemyState;
+  /** このターンのプレイヤーの攻撃に使う敵の防御力（敵の `defend` を反映） */
   readonly enemyDefenceThisTurn: number;
   readonly numbnessTurns: number;
   readonly events: readonly BattleEvent[];
 };
 
+/** 計算したダメージを HP に反映する値にする（0 未満にせず、切り捨てる） */
 export const toDamage = (value: number): number => Math.floor(Math.max(0, value));
 
+/** 敵の攻撃力（属性の倍率と挑発を反映。攻撃倍率は掛けない） */
 export const enemyAttackPower = (enemy: EnemyState, playerSetup: PlayerSetup): number =>
   enemy.setup.attack * attackMultiplier(enemy.attribute, playerSetup.attribute) + enemy.provocation;
 
+/** プレイヤーの攻撃力（属性の倍率と攻撃倍率を反映） */
 export const playerAttackPower = (player: PlayerState, playerSetup: PlayerSetup, enemy: EnemyState): number =>
   playerSetup.attack * attackMultiplier(playerSetup.attribute, enemy.attribute) * player.attackMultiplier;
 
+/** 1 ターン分の敵の行動（③）を処理する。プレイヤーの HP が 0 になっても決着の判定はしない */
 export const resolveEnemyAction = (input: EnemyActionInput): EnemyActionResult => {
   const { action, playerSetup, player, enemy, numbnessTurns, isDefending } = input;
 

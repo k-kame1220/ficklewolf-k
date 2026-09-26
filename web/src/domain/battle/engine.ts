@@ -47,6 +47,7 @@ const createEnemy = (setup: EnemySetup): EnemyState => ({
   turns: setup.turns
 });
 
+/** バトルを 1 ターン目・1 体目の敵から始めた状態を作る */
 export const createBattle = (setup: BattleSetup): BattleState => ({
   setup,
   stage: FIRST_STAGE,
@@ -232,6 +233,10 @@ const act = (state: BattleState, action: PlayerAction): StepResult => {
   };
 };
 
+/**
+ * バトルの 1 コマンドを処理する。状態は書き換えず、新しい状態と起きたことを返す。
+ * 同じ状態とコマンドなら必ず同じ結果になる（乱数は `rngState` で受け渡す）。
+ */
 export const step = (state: BattleState, command: Command): StepResult => {
   if (state.outcome !== "ongoing") return reject("BATTLE_FINISHED");
 
