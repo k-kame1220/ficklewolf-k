@@ -6,8 +6,6 @@ import type { BattleEvent, EnemyAction, EnemyState, PlayerSetup, PlayerState } f
 export const DEFEND_DAMAGE_RATE = 0.2;
 /** 敵の `defend` で、このターンの敵の防御力を「プレイヤーの攻撃力 × この値」にする */
 export const ENEMY_DEFEND_RATE = 0.8;
-/** 敵の `deathblow` で攻撃力に掛ける倍率 */
-export const DEATHBLOW_MULTIPLIER = 100;
 /** 挑発 1 回で敵の攻撃力に足す値 */
 export const PROVOCATION_BONUS = 10;
 /** ビリビリを受けたときの残りターン数 */
@@ -76,9 +74,7 @@ export const resolveEnemyAction = (input: EnemyActionInput): EnemyActionResult =
     case "fixedAttack":
       return damagePlayer(toDamage(enemy.setup.fixedAttackPower));
     case "deathblow":
-      return damagePlayer(
-        toDamage(enemyAttackPower(enemy, playerSetup) * enemy.attackMultiplier * DEATHBLOW_MULTIPLIER)
-      );
+      return damagePlayer(player.hp);
     case "defend": {
       const playerPower = playerAttackPower(player, playerSetup, enemy);
       if (playerPower <= enemy.defence) return unchanged;
