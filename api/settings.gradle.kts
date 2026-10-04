@@ -4,4 +4,7 @@ pluginManagement {
 
 rootProject.name = "k"
 
-include(":bootstrap")
+include(
+    ":shared:kernel",
+    ":bootstrap",
+)
