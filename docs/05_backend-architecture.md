@@ -76,14 +76,31 @@ bootstrap ─→ modules/*/adapter ─→ modules/*/core ─→ shared/kernel
 - **外に公開するのは「インターフェース」と「組み立て関数」だけ。** ユースケースの実装は `internal` にする（Kotlin の `internal` は Gradle のモジュール単位で効く）。
 - ports（リポジトリなどのインターフェース）は、adapter が実装するので公開する。
 
+### 名前の付け方
+| 種類 | 名前 | 公開 | 例 |
+|---|---|---|---|
+| 公開する窓口（抽象） | `<モジュール>Service` の interface | public | `PlayerService` |
+| その実装 | `Default<モジュール>Service` | `internal` | `DefaultPlayerService` |
+| 組み立て関数 | `<モジュール>Service(...)`（先頭は小文字） | public | `playerService(repository, transaction)` |
+| ports | `<対象>Repository` など | public | `PlayerRepository` |
+
 ```kotlin
 // player:core
-interface PlayerApi {
+interface PlayerService {
     fun createPlayer(name: PlayerName): Player
+
     fun find(id: PlayerId): Player?
 }
 
-fun playerApplication(repository: PlayerRepository, tx: TransactionRunner): PlayerApplication // 実装は internal
+fun playerService(
+    repository: PlayerRepository,
+    transaction: TransactionRunner,
+): PlayerService = DefaultPlayerService(repository, transaction)
+
+internal class DefaultPlayerService(
+    private val repository: PlayerRepository,
+    private val transaction: TransactionRunner,
+) : PlayerService { /* … */ }
 ```
 
 ### トランザクション
@@ -96,14 +113,17 @@ fun playerApplication(repository: PlayerRepository, tx: TransactionRunner): Play
 
 - adapter の中はパッケージで `web`（コントローラ・リクエスト / レスポンスの型）と `persistence`（リポジトリの実装）に分ける。
 - **各モジュールの組み立ては、そのモジュールの adapter の `@Configuration` で行う。** bootstrap は起動するだけ。
-- 他モジュールの公開 API（例: `PlayerApi`）は Bean として受け取る。
+- 他モジュールの公開する窓口（例: `PlayerService`）は Bean として受け取る。
 
 ```kotlin
 // player:adapter
 @Configuration
 class PlayerConfiguration {
-    @Bean fun playerApplication(repository: PlayerRepository, tx: TransactionRunner) = playerApplication(repository, tx)
-    @Bean fun playerApi(app: PlayerApplication): PlayerApi = app.api
+    @Bean
+    fun playerService(
+        repository: PlayerRepository,
+        transaction: TransactionRunner,
+    ): PlayerService = playerService(repository, transaction)
 }
 ```
 
@@ -150,6 +170,7 @@ com.ficklewolf.k.<モジュール>.adapter.web / .adapter.persistence
 | 2026-10-04 | モジュラーモノリスにする。モジュールは `auth` と `player` から始める（認証とプロフィールを分ける） |
 | 2026-10-04 | core（domain + application）は Spring に依存しない。トランザクションは `TransactionRunner` で表す |
 | 2026-10-04 | 各モジュールを **core と adapter** の 2 つの Gradle モジュールに分け、横断的な仕組みは `platform` に置く |
+| 2026-10-04 | 公開する窓口は `<モジュール>Service`（interface）、実装は `Default<モジュール>Service`（`internal`）、組み立て関数は `<モジュール>Service(...)` |
 
 ### 不採用にした案
 - **外側（presentation・infrastructure）を全モジュールで共通にする**: Gradle のモジュールは少なく済むが、外側では境界をコンパイラで守れない（特に DB で他モジュールのテーブルを触れてしまう）。モジュール数はほぼ変わらないので、境界を守れる core + adapter にした。

@@ -3,5 +3,5 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":shared:kernel"))
+    api(project(":shared:kernel"))
 }
