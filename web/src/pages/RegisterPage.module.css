@@ -1,0 +1,6 @@
+.root {
+  display: flex;
+  align-items: center;
+  min-height: 100dvh;
+  padding: 0 var(--space-6);
+}

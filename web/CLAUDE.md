@@ -62,7 +62,7 @@ src/app → src/pages → src/features/* → src/api → src/domain
 - スタイルは CSS Modules ＋ `shared/styles/tokens.css` の CSS 変数。
 
 ## 作業の流れ
-- コマンド（`web/` で実行）: `pnpm dev`（開発サーバ http://localhost:4100）/ `pnpm check`（型チェック・lint・テストをまとめて実行）/ `pnpm build` / `pnpm lint:fix`
+- コマンド（`web/` で実行）: `pnpm dev`（開発サーバ http://localhost:4100）/ `pnpm check`（型チェック・lint・テストをまとめて実行）/ `pnpm build` / `pnpm lint:fix` / `pnpm e2e`（Playwright。開発サーバを使い、`screenshots/` に画面を撮る。初回は `pnpm exec playwright install chromium`）
 - 作業の最後に `pnpm check` を実行し、すべて通してから完了とする。
 - ライブラリは使う時点で追加する（MSW・openapi-fetch は API ができたとき、Howler・Motion はバトルの演出を作るとき）。
 - lint のルールを無効化するときは `// eslint-disable-next-line <rule> -- 理由` と理由を必ず書く。
