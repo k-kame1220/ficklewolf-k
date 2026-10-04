@@ -2,9 +2,9 @@ package com.ficklewolf.k.auth.adapter.web
 
 import com.ficklewolf.k.auth.application.AuthService
 import com.ficklewolf.k.auth.application.RegisterGuestResult
+import com.ficklewolf.k.platform.web.problemResponse
 import com.ficklewolf.k.player.api.PlayerSummary
 import org.springframework.http.HttpStatus
-import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -43,11 +43,7 @@ class AuthController(
             }
 
             RegisterGuestResult.InvalidName -> {
-                ResponseEntity.badRequest().body(
-                    ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "name must be 1 to 6 characters").apply {
-                        setProperty("code", "INVALID_NAME")
-                    },
-                )
+                problemResponse(HttpStatus.BAD_REQUEST, "INVALID_NAME", "name must be 1 to 6 characters")
             }
         }
 }

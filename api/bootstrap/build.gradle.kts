@@ -9,6 +9,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("tools.jackson.module:jackson-module-kotlin")
+    implementation(project(":platform:web"))
     implementation(project(":platform:persistence"))
     implementation(project(":modules:player:adapter"))
     implementation(project(":modules:auth:adapter"))
