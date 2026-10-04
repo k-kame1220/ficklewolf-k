@@ -42,6 +42,8 @@ paths:
                 $ref: "#/components/schemas/CreateGuestResponse"
         "400":
           $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
   /me:
     get:
       tags: [me]
@@ -56,6 +58,8 @@ paths:
                 $ref: "#/components/schemas/Me"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
     patch:
       tags: [me]
       operationId: updateMe
@@ -78,6 +82,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
   /master/version:
     get:
       tags: [master]
@@ -98,6 +104,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MasterVersion"
+        "500":
+          $ref: "#/components/responses/InternalError"
   /master:
     get:
       tags: [master]
@@ -134,6 +142,8 @@ paths:
                 $ref: "#/components/schemas/Master"
         "304":
           description: 手元のキャッシュと同じ（本文なし）
+        "500":
+          $ref: "#/components/responses/InternalError"
 components:
   securitySchemes:
     bearerAuth:
@@ -244,11 +254,13 @@ components:
         - INVALID_NAME
         - CHARACTER_NOT_OWNED
         - UNAUTHORIZED
+        - INTERNAL_ERROR
       description: |
         - `VALIDATION_FAILED`: リクエストの形が違う（JSON が壊れている・必須項目がない・余計な項目がある・PATCH の項目が 0 個）
         - `INVALID_NAME`: 名前が空・7 文字以上・制御文字を含む
         - `CHARACTER_NOT_OWNED`: 持っていない（または存在しない）キャラを出撃させようとした
         - `UNAUTHORIZED`: トークンがない・正しくない
+        - `INTERNAL_ERROR`: api の予期しないエラー（バグなど）。原因はレスポンスに出さず、api のログにだけ残す
     Problem:
       type: object
       required: [type, title, status, code]
@@ -270,6 +282,18 @@ components:
         code:
           $ref: "#/components/schemas/ErrorCode"
   responses:
+    InternalError:
+      description: api の予期しないエラー（`INTERNAL_ERROR`）。どの API でも起こりうる
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          example:
+            type: about:blank
+            title: Internal Server Error
+            status: 500
+            detail: unexpected error
+            code: INTERNAL_ERROR
     BadRequest:
       description: 入力が正しくない（`VALIDATION_FAILED` / `INVALID_NAME` / `CHARACTER_NOT_OWNED`）
       content:
