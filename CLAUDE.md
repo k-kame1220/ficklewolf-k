@@ -39,6 +39,7 @@ GitHub: https://github.com/k-kame1220/ficklewolf-k （公開・既定のブラ�
 | `docs/02_requirements.md` | 要件定義（フェーズ・機能・画面・API・マスタと素材の配信・決定事項） |
 | `docs/03_frontend-architecture.md` | フロントの設計とコーディングルール |
 | `docs/04_git-workflow.md` | Git 運用・AI との作業の進め方・CI |
+| `docs/05_backend-architecture.md` | バックエンドの設計（モジュラーモノリス・core / adapter・依存のルール） |
 | `spec/battle/README.md` | バトルの計算ルール（正） |
 | `spec/master/README.md` | マスタデータのルール |
 | `web/CLAUDE.md` | フロント実装時に守ること |
