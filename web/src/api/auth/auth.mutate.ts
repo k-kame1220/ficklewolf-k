@@ -1,18 +1,20 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { toApiError } from "@/api/core/apiError";
 import { saveAuthToken } from "@/api/core/authToken";
 import { apiClient } from "@/api/core/client";
+import { parseResponse } from "@/api/core/response";
 import { meKeys } from "@/api/me/me.keys";
 import { meResponseToDomain } from "@/api/me/me.mapper";
 import type { CreateGuestCommand, PlayerModel } from "@/domain/player/player";
 
-/** ゲストアカウントを作り、認証トークンを端末に保存する。失敗したら ApiError を投げる */
+import { CreateGuestResponseSchema } from "./auth.schema";
+
+/** ゲストアカウントを作り、認証トークンを端末に保存する。失敗したら ApiError / InvalidResponseError を投げる */
 export const createGuest = async (command: CreateGuestCommand): Promise<PlayerModel> => {
-  const { data, error, response } = await apiClient.POST("/auth/guest", { body: command });
-  if (data === undefined) throw toApiError(response, error);
-  saveAuthToken(data.token);
-  return meResponseToDomain(data.me);
+  const result = await apiClient.POST("/auth/guest", { body: command });
+  const body = parseResponse(result, CreateGuestResponseSchema);
+  saveAuthToken(body.token);
+  return meResponseToDomain(body.me);
 };
 
 /** ゲストアカウントを作る。成功したらプロフィールをキャッシュに入れる */

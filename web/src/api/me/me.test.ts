@@ -1,8 +1,11 @@
+import { http, HttpResponse } from "msw";
 import { describe, expect, it } from "vitest";
 
 import { createGuest } from "@/api/auth/auth.mutate";
-import { ApiError } from "@/api/core/apiError";
+import { ApiError, InvalidResponseError } from "@/api/core/apiError";
 import { readAuthToken, saveAuthToken } from "@/api/core/authToken";
+import { API_BASE_URL } from "@/api/core/config";
+import { server } from "@/api/mocks/node";
 
 import { updateMe } from "./me.mutate";
 import { fetchMe } from "./me.query";
@@ -12,6 +15,13 @@ describe("fetchMe", () => {
     const created = await createGuest({ name: "ゲスト" });
 
     await expect(fetchMe()).resolves.toStrictEqual(created);
+  });
+
+  it("レスポンスの形が OpenAPI と違えば InvalidResponseError", async () => {
+    await createGuest({ name: "ゲスト" });
+    server.use(http.get(`${API_BASE_URL}/me`, () => HttpResponse.json({ id: "not-uuid", name: "ゲスト" })));
+
+    await expect(fetchMe()).rejects.toBeInstanceOf(InvalidResponseError);
   });
 
   it("トークンが無ければ UNAUTHORIZED", async () => {

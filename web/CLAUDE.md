@@ -46,7 +46,7 @@ export default EnemyPanel;
 - 1 行の early return は波括弧なし（`if (x) return null;`）。
 - 画面はセクション単位の部品を並べるだけ。子部品があるセクションはフォルダにし、`index.tsx` ＋ 親の名前を頭に付けた子部品（`EnemyPanel/EnemyPanelImage.tsx`）。
 - 型は `type`。`XxxProps` / `XxxContextType` / `XxxState` / `XxxModel`（domain の型）/ `XxxCommand`（domain。操作の入力）/ `XxxSchema`。定数の表は `as const satisfies`。
-- API まわりのファイル名は `character.query.ts` / `quest.mutate.ts` / `character.mapper.ts`。Model と Command は domain に置き、api は DTO → domain の変換だけを持つ。
+- API まわりのファイル名は `character.query.ts` / `quest.mutate.ts` / `character.schema.ts` / `character.mapper.ts`。レスポンスは必ず `parseResponse(result, XxxResponseSchema)` で valibot にかけてから使う。Model と Command は domain に置き、api は DTO → domain の変換だけを持つ。
 - 書式は Prettier（1 行 120 文字・ダブルクォート・末尾カンマなし・引数 1 つのアロー関数は括弧なし）。
 
 ## 構成と依存
