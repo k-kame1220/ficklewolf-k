@@ -208,6 +208,10 @@ export default defineConfig(
       ],
       "@typescript-eslint/no-explicit-any": ["error", { fixToUnknown: true, ignoreRestArgs: false }],
       "@typescript-eslint/no-unsafe-type-assertion": "error",
+      "@typescript-eslint/only-throw-error": [
+        "error",
+        { allow: [{ from: "package", package: "@tanstack/router-core", name: "Redirect" }] }
+      ],
       "@typescript-eslint/naming-convention": [
         "error",
         { selector: "typeLike", format: ["PascalCase"] },
@@ -375,7 +379,7 @@ export default defineConfig(
   },
 
   {
-    files: ["src/**/*.test.{ts,tsx}", "e2e/**/*.ts"],
+    files: ["src/**/*.test.{ts,tsx}"],
     plugins: { vitest },
     rules: {
       ...vitest.configs.recommended.rules,
@@ -383,6 +387,13 @@ export default defineConfig(
       "vitest/no-focused-tests": "error",
       "vitest/no-disabled-tests": "error",
       "vitest/require-top-level-describe": "error",
+      "@typescript-eslint/no-magic-numbers": "off"
+    }
+  },
+
+  {
+    files: ["e2e/**/*.ts"],
+    rules: {
       "@typescript-eslint/no-magic-numbers": "off"
     }
   },

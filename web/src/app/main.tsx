@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
@@ -6,6 +6,7 @@ import { createRoot } from "react-dom/client";
 import { isApiMockEnabled } from "@/api/core/config";
 import "@/shared/styles/global.css";
 
+import { createAppQueryClient } from "./queryClient";
 import { router } from "./router";
 
 if (import.meta.env.DEV && isApiMockEnabled) {
@@ -13,7 +14,10 @@ if (import.meta.env.DEV && isApiMockEnabled) {
   await worker.start({ onUnhandledRequest: "bypass" });
 }
 
-const queryClient = new QueryClient();
+const queryClient = createAppQueryClient(() => {
+  queryClient.clear();
+  void router.navigate({ to: "/register", search: { reason: "lost" } });
+});
 
 const rootElement = document.getElementById("root");
 if (rootElement === null) throw new Error("#root が index.html にありません。");
