@@ -11,5 +11,6 @@ include(
     ":modules:player:api",
     ":modules:player:core",
     ":modules:player:adapter",
+    ":modules:auth:adapter",
     ":modules:auth:core",
 )
