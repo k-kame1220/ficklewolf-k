@@ -4,10 +4,14 @@ const DEFAULT_API_BASE_URL = "http://localhost:8080";
 
 const EnvSchema = v.object({
   VITE_API_BASE_URL: v.optional(v.pipe(v.string(), v.url()), DEFAULT_API_BASE_URL),
-  VITE_API_MOCK: v.optional(v.picklist(["true", "false"]), "true")
+  VITE_API_MOCK: v.optional(v.picklist(["true", "false"]), "true"),
+  VITE_APP_VERSION: v.pipe(v.string(), v.regex(/^[0-9]+\.[0-9]+\.[0-9]+$/u))
 });
 
 const env = v.parse(EnvSchema, import.meta.env);
+
+/** アプリのバージョン（`web/package.json` の version をビルド時に埋め込む） */
+export const APP_VERSION = env.VITE_APP_VERSION;
 
 /** api の基点 URL（`VITE_API_BASE_URL`。未設定ならローカルの api） */
 export const API_BASE_URL = env.VITE_API_BASE_URL;

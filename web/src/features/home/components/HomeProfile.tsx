@@ -1,4 +1,5 @@
 import { ApiError } from "@/api/core/apiError";
+import { useMaster } from "@/api/master/master.query";
 import { useMe } from "@/api/me/me.query";
 
 import { HOME_MESSAGES } from "../messages";
@@ -7,6 +8,7 @@ import styles from "./HomeProfile.module.css";
 
 const HomeProfile = () => {
   const me = useMe();
+  const master = useMaster();
 
   if (me.isPending) return <p className={styles.status}>{HOME_MESSAGES.loading}</p>;
   if (me.isError && me.error instanceof ApiError) return null;
@@ -27,6 +29,8 @@ const HomeProfile = () => {
     );
   }
 
+  const characterName = master.characters.get(me.data.selectedCharacterId)?.name ?? me.data.selectedCharacterId;
+
   return (
     <section className={styles.root}>
       <h1 className={styles.name}>{me.data.name}</h1>
@@ -34,7 +38,7 @@ const HomeProfile = () => {
       <p className={styles.item}>{`${HOME_MESSAGES.fuda} ${String(me.data.fuda)}`}</p>
       <dl className={styles.character}>
         <dt>{HOME_MESSAGES.selectedCharacter}</dt>
-        <dd>{me.data.selectedCharacterId}</dd>
+        <dd>{characterName}</dd>
       </dl>
     </section>
   );

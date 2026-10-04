@@ -1,4 +1,5 @@
 import { createAuthMockHandlers } from "@/api/auth/auth.mock";
+import { createMasterMockHandlers } from "@/api/master/master.mock";
 import { createMeMockHandlers } from "@/api/me/me.mock";
 
 import { createMockDb } from "./db";
@@ -8,5 +9,5 @@ import { createMockDb } from "./db";
  */
 export const createMockHandlers = () => {
   const db = createMockDb();
-  return [...createAuthMockHandlers(db), ...createMeMockHandlers(db)];
+  return [...createAuthMockHandlers(db), ...createMeMockHandlers(db), ...createMasterMockHandlers()];
 };

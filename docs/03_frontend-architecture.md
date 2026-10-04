@@ -56,7 +56,8 @@ shared → （外部ライブラリのみ）
 ### 3.1 domain/ — ゲームのルール
 ```
 domain/
-├── master/        マスタの型（`spec/master` の形に合わせる）と読み取り関数
+├── master/        マスタの型（MasterModel など。`spec/master` の形に合わせ、各マスタは ID で引ける Map）
+├── version/       アプリのバージョンの比較（必要な最低バージョンより古いか）
 ├── attribute/     属性相性（陽 > 音 > 月 > 陽）
 ├── player/        プレイヤーの型（PlayerModel・CreateGuestCommand・UpdatePlayerCommand）と名前のルール
 ├── stats/         ステータス計算（HP・攻撃・防御 = 基礎 + アイテム + 被り + 天気。係数は `spec/master/settings.json`）
@@ -97,6 +98,12 @@ api/
 │   ├── me.mutate.ts      変更（`updateMe` と `useUpdateMe`）
 │   ├── me.mock.ts        MSW のハンドラ
 │   └── me.test.ts
+├── master/
+│   ├── master.schema.ts  レスポンスの valibot のスキーマ（マスタの形は spec/master/schema が正）
+│   ├── master.mapper.ts  DTO → MasterModel（配列を ID の Map にする）
+│   ├── master.query.ts   fetchMasterVersion / fetchMaster / useMaster
+│   ├── master.mock.ts    spec/master の JSON をそのまま返す（バージョンは validate.py と同じ計算、ETag / 304）
+│   └── master.test.ts
 └── mocks/                MSW の組み立て（`db.ts` = モックの DB と共通の関数、`handlers.ts` = 全 resource のハンドラをまとめる、`browser.ts` = 開発用、`node.ts` = テスト用）
 ```
 - **resource（OpenAPI の tag）ごとにフォルダを分ける。** 1 つの resource に関するもの（取得・変更・変換・キー・モック・テスト）は同じフォルダに置く。features とは分けない（`/me` はホーム・名前変更・キャラなど複数の feature から使うため）。
@@ -121,6 +128,16 @@ api/
 - テストは `src/test/setup.ts` で Node 用の MSW を起動し、テストごとに空の状態のハンドラを入れ直す。知らない通信はエラーにする。
 - 本番のビルドにはモックを含めない（`import.meta.env.DEV` のときだけ読み込む）。
 - モック（`mocks/` と `*.mock.ts`）の中だけは、DB の代わりとして `Map` の書き換えを許可している（`eslint.config.ts`）。
+
+#### 起動の流れとマスタ
+- どの画面でも最初に、ルートの一番上（`app/router.ts` の root の `beforeLoad`）で次を行う。
+  1. `GET /master/version` で必要なアプリの最低バージョンを確かめる。アプリ（`web/package.json` の version をビルド時に埋め込んだ `APP_VERSION`）が古ければ `/update`（アップデートを促す画面）へ移り、マスタは読まない。
+  2. `GET /master` でマスタを読み込んでから画面を出す。
+  3. 通信に失敗したら、root の `errorComponent`（リトライの画面）を出す。リトライでルートを読み直す。
+- マスタは TanStack Query に `staleTime: "static"` で持つ（起動中は取り直さない）。部品は `useMaster()` で読む（読み込み済みの前提。`useSuspenseQuery`）。
+- **マスタは端末に保存しない。** HTTP キャッシュ（api の ETag と 304）に任せる（`docs/02` §10）。
+- ルーターは `createAppRouter(queryClient)` で作り、`queryClient` をルートの context で渡す。
+- 画面の外枠（スマホの幅で中央に出す）は `shared/ui/ScreenFrame`。エラー時も同じ枠で出す。
 
 #### 認証トークンとログインの流れ
 - `POST /auth/guest` で受け取ったトークンを `shared/storage` に保存し、`client.ts` が毎回 `Authorization: Bearer` に付ける。
