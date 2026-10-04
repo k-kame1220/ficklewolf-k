@@ -9,7 +9,8 @@ const ERROR_CODES = [
   "VALIDATION_FAILED",
   "INVALID_NAME",
   "CHARACTER_NOT_OWNED",
-  "UNAUTHORIZED"
+  "UNAUTHORIZED",
+  "INTERNAL_ERROR"
 ] as const satisfies readonly ErrorCode[];
 
 const ProblemSchema = v.object({ code: v.picklist(ERROR_CODES) });

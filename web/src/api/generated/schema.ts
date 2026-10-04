@@ -148,9 +148,10 @@ export type components = {
          *     - `INVALID_NAME`: 名前が空・7 文字以上・制御文字を含む
          *     - `CHARACTER_NOT_OWNED`: 持っていない（または存在しない）キャラを出撃させようとした
          *     - `UNAUTHORIZED`: トークンがない・正しくない
+         *     - `INTERNAL_ERROR`: api の予期しないエラー（バグなど）。原因はレスポンスに出さず、api のログにだけ残す
          * @enum {string}
          */
-        readonly ErrorCode: "VALIDATION_FAILED" | "INVALID_NAME" | "CHARACTER_NOT_OWNED" | "UNAUTHORIZED";
+        readonly ErrorCode: "VALIDATION_FAILED" | "INVALID_NAME" | "CHARACTER_NOT_OWNED" | "UNAUTHORIZED" | "INTERNAL_ERROR";
         readonly Problem: {
             /**
              * Format: uri-reference
@@ -280,6 +281,24 @@ export type components = {
         };
     };
     responses: {
+        /** @description api の予期しないエラー（`INTERNAL_ERROR`）。どの API でも起こりうる */
+        readonly InternalError: {
+            headers: {
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "type": "about:blank",
+                 *       "title": "Internal Server Error",
+                 *       "status": 500,
+                 *       "detail": "unexpected error",
+                 *       "code": "INTERNAL_ERROR"
+                 *     }
+                 */
+                readonly "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
         /** @description 入力が正しくない（`VALIDATION_FAILED` / `INVALID_NAME` / `CHARACTER_NOT_OWNED`） */
         readonly BadRequest: {
             headers: {
@@ -347,6 +366,7 @@ export interface operations {
                 };
             };
             readonly 400: components["responses"]["BadRequest"];
+            readonly 500: components["responses"]["InternalError"];
         };
     };
     readonly getMe: {
@@ -368,6 +388,7 @@ export interface operations {
                 };
             };
             readonly 401: components["responses"]["Unauthorized"];
+            readonly 500: components["responses"]["InternalError"];
         };
     };
     readonly updateMe: {
@@ -394,6 +415,7 @@ export interface operations {
             };
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
+            readonly 500: components["responses"]["InternalError"];
         };
     };
     readonly getMasterVersion: {
@@ -415,6 +437,7 @@ export interface operations {
                     readonly "application/json": components["schemas"]["MasterVersion"];
                 };
             };
+            readonly 500: components["responses"]["InternalError"];
         };
     };
     readonly getMaster: {
@@ -448,6 +471,7 @@ export interface operations {
                 };
                 content?: never;
             };
+            readonly 500: components["responses"]["InternalError"];
         };
     };
 }
