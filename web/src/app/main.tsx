@@ -7,7 +7,7 @@ import { isApiMockEnabled } from "@/api/core/config";
 import "@/shared/styles/global.css";
 
 import { createAppQueryClient } from "./queryClient";
-import { router } from "./router";
+import { createAppRouter } from "./router";
 
 if (import.meta.env.DEV && isApiMockEnabled) {
   const { worker } = await import("@/api/mocks/browser");
@@ -18,6 +18,7 @@ const queryClient = createAppQueryClient(() => {
   queryClient.clear();
   void router.navigate({ to: "/register", search: { reason: "lost" } });
 });
+const router = createAppRouter(queryClient);
 
 const rootElement = document.getElementById("root");
 if (rootElement === null) throw new Error("#root が index.html にありません。");

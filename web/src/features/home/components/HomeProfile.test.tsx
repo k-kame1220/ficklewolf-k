@@ -19,7 +19,7 @@ describe("HomeProfile", () => {
     expect(await screen.findByText("ゲスト")).toBeInTheDocument();
     expect(screen.getByText("Lv 1")).toBeInTheDocument();
     expect(screen.getByText("お札 0")).toBeInTheDocument();
-    expect(screen.getByText("zero")).toBeInTheDocument();
+    expect(screen.getByText("ZERO")).toBeInTheDocument();
   });
 
   it("通信に失敗したらメッセージを出し、リトライで取り直す", async () => {
