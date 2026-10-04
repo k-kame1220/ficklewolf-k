@@ -4,5 +4,5 @@ plugins {
 
 dependencies {
     api(project(":shared:kernel"))
-    api(project(":modules:player:core"))
+    api(project(":modules:player:api"))
 }
