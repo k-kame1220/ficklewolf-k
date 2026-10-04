@@ -6,6 +6,7 @@ rootProject.name = "k"
 
 include(
     ":shared:kernel",
-    ":modules:player:core",
     ":bootstrap",
+    ":modules:player:core",
+    ":modules:auth:core",
 )

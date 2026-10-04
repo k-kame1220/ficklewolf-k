@@ -160,6 +160,7 @@ com.ficklewolf.k.<モジュール>.adapter.web / .adapter.persistence
 | `k.spring-boot-app` | bootstrap | `k.spring-adapter` ＋ Spring Boot のプラグイン（実行可能な jar） |
 
 - **jar 名はプロジェクトのパスから付ける**（例: `modules-player-core`）。`core`・`adapter` という同じ名前のモジュールが並ぶので、そのままだと実行可能な jar の中で衝突する。
+- **group もプロジェクトのパスから付ける**（例: `:modules:auth:core` → `com.ficklewolf.k.modules.auth`）。Gradle はモジュールを「group・名前・version」で見分けるので、group が同じだと `auth:core` から `player:core` への依存を自分自身への依存と取り違え、循環した依存のエラーになる（jar 名を変えても見分けには効かない）。
 
 ---
 

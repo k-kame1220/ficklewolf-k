@@ -3,7 +3,7 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint")
 }
 
-group = "com.ficklewolf"
+group = "com.ficklewolf.k" + path.substringBeforeLast(":").replace(":", ".")
 version = "0.1.0"
 
 repositories {
