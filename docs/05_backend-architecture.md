@@ -157,19 +157,23 @@ internal class DefaultPlayerApi(
 - adapter の中はパッケージで `web`（コントローラ・リクエスト / レスポンスの型）と `persistence`（リポジトリの実装）に分ける。
 - **各モジュールの組み立ては、そのモジュールの adapter の `@Configuration` で行う。** bootstrap は起動するだけ。
 - 他モジュールの公開する窓口（例: `PlayerApi`）は Bean として受け取る。
+- **core の組み立て関数は `import … as create<名前>` で別名を付けて呼ぶ。** Bean の関数と名前・引数が同じだと、クラスの中では Bean の関数自身が優先されて自分を呼び続ける（起動時に StackOverflowError）。
 
 ```kotlin
 // player:adapter
+import com.ficklewolf.k.player.application.playerApi as createPlayerApi
+import com.ficklewolf.k.player.application.playerService as createPlayerService
+
 @Configuration
 class PlayerConfiguration {
     @Bean
     fun playerService(
         repository: PlayerRepository,
         transaction: TransactionRunner,
-    ): PlayerService = playerService(repository, transaction) // 自分の adapter（コントローラ）が使う
+    ): PlayerService = createPlayerService(repository, transaction) // 自分の adapter（コントローラ）が使う
 
     @Bean
-    fun playerApi(playerService: PlayerService): PlayerApi = playerApi(playerService) // 他モジュールが使う
+    fun playerApi(playerService: PlayerService): PlayerApi = createPlayerApi(playerService) // 他モジュールが使う
 }
 ```
 

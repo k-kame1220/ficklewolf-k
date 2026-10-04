@@ -10,5 +10,6 @@ include(
     ":platform:persistence",
     ":modules:player:api",
     ":modules:player:core",
+    ":modules:player:adapter",
     ":modules:auth:core",
 )
