@@ -32,8 +32,6 @@ class AuthConfiguration {
     ): AuthService =
         createAuthService(playerApi, authTokenRepository, tokenGenerator, transactionRunner, Clock.systemUTC())
 
-    // …今ある 3 つの @Bean はそのまま…
-
     @Bean
     fun tokenAuthenticator(authService: AuthService): TokenAuthenticator =
         TokenAuthenticator { token -> authService.authenticate(token) }

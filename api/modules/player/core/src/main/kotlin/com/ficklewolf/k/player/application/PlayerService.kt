@@ -10,6 +10,11 @@ interface PlayerService {
     fun createPlayer(name: PlayerName): Player
 
     fun find(id: PlayerId): Player?
+
+    fun rename(
+        id: PlayerId,
+        name: PlayerName,
+    ): Player?
 }
 
 fun playerService(
@@ -29,4 +34,12 @@ internal class DefaultPlayerService(
         }
 
     override fun find(id: PlayerId): Player? = repository.findById(id)
+
+    override fun rename(
+        id: PlayerId,
+        name: PlayerName,
+    ): Player? =
+        transaction.run {
+            repository.findById(id)?.rename(name)?.also { repository.save(it) }
+        }
 }

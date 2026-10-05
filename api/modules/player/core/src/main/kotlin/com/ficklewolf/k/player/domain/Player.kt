@@ -18,4 +18,6 @@ data class Player(
             name: PlayerName,
         ): Player = Player(id, name, FIRST_LEVEL, 0, STARTER_CHARACTER_ID)
     }
+
+    fun rename(newName: PlayerName): Player = copy(name = newName)
 }

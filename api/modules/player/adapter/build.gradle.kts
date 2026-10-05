@@ -3,6 +3,6 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":platform:web"))
     implementation(project(":modules:player:core"))
-    implementation("org.springframework:spring-context")
 }
