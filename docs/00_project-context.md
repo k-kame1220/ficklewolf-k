@@ -83,7 +83,7 @@ K/
 ├── .github/        Issue / PR テンプレート・CI
 ├── .gitignore      モノリポ共通の除外設定（legacy/unity など）
 ├── CLAUDE.md       AI が最初に読む案内
-├── api/            バックエンド（オーナー）。Spring Boot マルチモジュール
+├── api/            バックエンド（オーナー）。モジュラーモノリス（`docs/05`）
 ├── docs/           要件・設計・運用ルール
 ├── legacy/
 │   ├── unity/      旧 Unity プロジェクト（git の対象外。署名鍵・GS2 認証情報を含む）

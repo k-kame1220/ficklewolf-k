@@ -1,6 +1,20 @@
+pluginManagement {
+    includeBuild("build-logic")
+}
+
 rootProject.name = "k"
-include("domain")
-include("presentation")
-include("application")
-include("infrastructure")
-include("bootstrap")
+
+include(
+    ":shared:kernel",
+    ":bootstrap",
+    ":platform:web",
+    ":platform:persistence",
+    ":modules:player:api",
+    ":modules:player:core",
+    ":modules:player:adapter",
+    ":modules:auth:adapter",
+    ":modules:auth:core",
+    ":modules:master:api",
+    ":modules:master:core",
+    ":modules:master:adapter",
+)

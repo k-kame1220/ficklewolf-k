@@ -4,3 +4,4 @@
 *.apk
 *:Zone.Identifier
 .DS_Store
+.idea/
