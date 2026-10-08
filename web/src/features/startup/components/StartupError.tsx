@@ -1,3 +1,6 @@
+import Button from "@/shared/ui/Button";
+import Panel from "@/shared/ui/Panel";
+
 import { STARTUP_MESSAGES } from "../messages";
 
 import styles from "./Startup.module.css";
@@ -12,12 +15,14 @@ const StartupError = (props: StartupErrorProps) => {
 
   return (
     <div className={styles.root}>
-      <p className={styles.message} role="alert">
-        {STARTUP_MESSAGES.networkError}
-      </p>
-      <button className={styles.button} type="button" onClick={onRetry}>
-        {STARTUP_MESSAGES.retry}
-      </button>
+      <Panel>
+        <p className={styles.message} role="alert">
+          {STARTUP_MESSAGES.networkError}
+        </p>
+        <Button variant="pencil" onClick={onRetry}>
+          {STARTUP_MESSAGES.retry}
+        </Button>
+      </Panel>
     </div>
   );
 };

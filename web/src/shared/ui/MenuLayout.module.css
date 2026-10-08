@@ -1,0 +1,28 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.band {
+  flex: none;
+  height: var(--band-height);
+  background: var(--color-night) var(--image-noise) center / cover;
+}
+
+.header {
+  padding: var(--space-3) var(--space-3) 0;
+}
+
+.content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+.footer {
+  padding: 0 var(--space-1) var(--space-2);
+}

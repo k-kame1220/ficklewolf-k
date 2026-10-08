@@ -1,0 +1,41 @@
+.root {
+  display: grid;
+  grid-template-areas:
+    "date . name"
+    ". level fuda";
+  grid-template-columns: repeat(3, 1fr);
+  row-gap: var(--space-1);
+  align-items: baseline;
+}
+
+.root p,
+.root h1 {
+  margin: 0;
+}
+
+.date {
+  grid-area: date;
+  font-size: var(--font-size-sm);
+  letter-spacing: normal;
+}
+
+.name {
+  grid-area: name;
+  font-size: var(--font-size-md);
+  font-weight: normal;
+  text-align: center;
+}
+
+.level {
+  grid-area: level;
+  font-size: var(--font-size-lg);
+  text-align: center;
+}
+
+.fuda {
+  display: flex;
+  grid-area: fuda;
+  justify-content: space-between;
+  padding: 0 var(--space-2);
+  font-size: var(--font-size-md);
+}

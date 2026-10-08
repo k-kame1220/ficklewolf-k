@@ -2,7 +2,7 @@
   display: flex;
   justify-content: center;
   min-height: 100%;
-  background: #000;
+  background: var(--color-night);
 }
 
 .screen {
@@ -11,6 +11,6 @@
   max-width: var(--layout-max-width);
   min-height: 100dvh;
   overflow: hidden;
-  background: var(--color-bg);
+  background: var(--color-paper) var(--image-paper) center / cover;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }

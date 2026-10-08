@@ -10,18 +10,19 @@ test.describe("ゲスト登録", () => {
 
     await page.getByRole("link", { name: "Tap to Start..." }).click();
     await expect(page).toHaveURL(/\/register$/);
-    await expect(page.getByLabel("なまえを教えて(6文字まで)")).toBeVisible();
+    await expect(page.getByLabel("早速ですがあなたの忌み名を教えてください。")).toBeVisible();
     await page.screenshot({ path: `${SCREENSHOT_DIR}/02-register.png` });
 
-    await page.getByLabel("なまえを教えて(6文字まで)").fill("abcdefg");
+    await page.getByLabel("早速ですがあなたの忌み名を教えてください。").fill("abcdefg");
     await page.getByRole("button", { name: "決定" }).click();
     await expect(page.getByRole("alert")).toHaveText("なまえは6文字までです");
     await page.screenshot({ path: `${SCREENSHOT_DIR}/03-register-error.png` });
 
-    await page.getByLabel("なまえを教えて(6文字まで)").fill("ゲスト");
+    await page.getByLabel("早速ですがあなたの忌み名を教えてください。").fill("ゲスト");
     await page.getByRole("button", { name: "決定" }).click();
     await expect(page).toHaveURL(/\/home$/);
     await expect(page.getByRole("heading", { name: "ゲスト" })).toBeVisible();
+    await expect(page.getByRole("img", { name: "ZERO" })).toBeVisible();
     await page.screenshot({ path: `${SCREENSHOT_DIR}/04-home.png` });
 
     await page.reload();

@@ -3,6 +3,7 @@ import { useId, useState } from "react";
 import { useCreateGuest } from "@/api/auth/auth.mutate";
 import { ApiError } from "@/api/core/apiError";
 import { normalizePlayerName } from "@/domain/player/name";
+import Button from "@/shared/ui/Button";
 
 import { NAME_REJECT_MESSAGES, REGISTER_MESSAGES } from "../messages";
 
@@ -21,6 +22,7 @@ const RegisterForm = (props: RegisterFormProps) => {
   const { isAccountLost, onRegistered } = props;
 
   const inputId = useId();
+  const hintId = useId();
   const [name, setName] = useState("");
   const [inputError, setInputError] = useState<string | null>(null);
   const createGuest = useCreateGuest();
@@ -56,19 +58,25 @@ const RegisterForm = (props: RegisterFormProps) => {
         className={styles.input}
         type="text"
         autoComplete="nickname"
+        aria-describedby={hintId}
         value={name}
         onChange={event => {
           setName(event.target.value);
         }}
       />
+      <p id={hintId} className={styles.hint}>
+        {REGISTER_MESSAGES.hint}
+      </p>
       {errorMessage !== null && (
         <p className={styles.error} role="alert">
           {errorMessage}
         </p>
       )}
-      <button className={styles.submit} type="submit" disabled={createGuest.isPending}>
-        {REGISTER_MESSAGES.submit}
-      </button>
+      <div className={styles.submit}>
+        <Button variant="bold" type="submit" isDisabled={createGuest.isPending}>
+          {REGISTER_MESSAGES.submit}
+        </Button>
+      </div>
     </form>
   );
 };

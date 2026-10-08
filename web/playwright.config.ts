@@ -1,6 +1,8 @@
 import { defineConfig } from "@playwright/test";
 
-const DEV_SERVER_URL = "http://localhost:4100";
+const DEFAULT_DEV_SERVER_PORT = "4100";
+const DEV_SERVER_PORT = process.env.E2E_PORT ?? DEFAULT_DEV_SERVER_PORT;
+const DEV_SERVER_URL = `http://localhost:${DEV_SERVER_PORT}`;
 const PHONE_VIEWPORT = { width: 390, height: 844 };
 
 export default defineConfig({
@@ -13,7 +15,7 @@ export default defineConfig({
     locale: "ja-JP"
   },
   webServer: {
-    command: "pnpm dev",
+    command: `pnpm dev --port ${DEV_SERVER_PORT} --strictPort`,
     url: DEV_SERVER_URL,
     reuseExistingServer: true
   }

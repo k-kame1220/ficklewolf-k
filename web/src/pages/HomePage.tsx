@@ -1,12 +1,26 @@
-import { HomeProfile } from "@/features/home";
+import { useNavigate } from "@tanstack/react-router";
 
-import styles from "./HomePage.module.css";
+import { HomeCharacter, HomeStatus } from "@/features/home";
+import { MenuTabs } from "@/features/menu";
+import MenuLayout from "@/shared/ui/MenuLayout";
 
 const HomePage = () => {
+  const navigate = useNavigate();
+
   return (
-    <div className={styles.root}>
-      <HomeProfile />
-    </div>
+    <MenuLayout
+      header={<HomeStatus />}
+      footer={
+        <MenuTabs
+          current="home"
+          onSelect={() => {
+            void navigate({ to: "/home" });
+          }}
+        />
+      }
+    >
+      <HomeCharacter />
+    </MenuLayout>
   );
 };
 

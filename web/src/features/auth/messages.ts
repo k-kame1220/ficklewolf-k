@@ -1,8 +1,9 @@
 import type { PlayerNameRejectReason } from "@/domain/player/name";
 
-/** 名前登録の文言 */
+/** 名前登録の文言（旧作のチュートリアルの文言を流用） */
 export const REGISTER_MESSAGES = {
-  label: "なまえを教えて(6文字まで)",
+  label: "早速ですがあなたの忌み名を教えてください。",
+  hint: "6文字まで",
   submit: "決定",
   accountLost: "データが見つかりませんでした。なまえを決めてはじめからあそんでください。",
   invalidName: "このなまえは使えません",

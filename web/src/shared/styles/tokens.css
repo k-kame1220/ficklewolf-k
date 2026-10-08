@@ -1,9 +1,11 @@
 :root {
-  --color-bg: #1a1414;
-  --color-surface: #2a2020;
-  --color-text: #f3ece0;
-  --color-text-muted: #b8ab98;
-  --color-accent: #c8423b;
+  --color-paper: #f2f0eb;
+  --color-ink: #1c1b1a;
+  --color-ink-muted: #55524d;
+  --color-ink-faint: #9b978f;
+  --color-night: #0b0b0b;
+  --color-vermilion: #d9401c;
+  --color-on-night: #f2f0eb;
   --color-yang: #e8a33c;
   --color-note: #4f8fd0;
   --color-moon: #8a6cc9;
@@ -13,16 +15,43 @@
   --space-4: 16px;
   --space-6: 24px;
   --space-8: 32px;
-  --font-family: "Hiragino Maru Gothic ProN", "Zen Maru Gothic", system-ui, sans-serif;
-  --font-size-sm: 14px;
-  --font-size-md: 16px;
-  --font-size-lg: 20px;
+  --space-12: 48px;
+  --font-family: "Mushin", "Hiragino Maru Gothic ProN", "Zen Maru Gothic", system-ui, sans-serif;
+  --font-size-xs: 13px;
+  --font-size-sm: 15px;
+  --font-size-md: 18px;
+  --font-size-lg: 22px;
   --font-size-xl: 32px;
   --font-size-logo: 96px;
-  --radius-md: 8px;
+  --letter-spacing-wide: 0.12em;
+  --line-height-text: 1.8;
   --layout-max-width: 480px;
   --tap-min-size: 44px;
+  --band-height: 56px;
+  --tab-height: 72px;
+  --button-min-width: 160px;
+  --character-size: min(80vw, 360px);
+  --emblem-size: min(80vw, 360px);
+  --logo-k-size: min(48vw, 220px);
   --duration-fast: 150ms;
   --duration-normal: 300ms;
   --duration-slow: 600ms;
+  --duration-blink: 900ms;
+  --blink-min-opacity: 0.3;
+  --press-scale: 0.96;
+
+  /* 旧作の素材（紙・ノイズ・手描きの枠）。web/src/shared/assets/bundled（legacy/tools/convert_assets.py で変換） */
+  --image-paper: url("../assets/bundled/paper.webp");
+  --image-noise: url("../assets/bundled/noise.webp");
+  --image-pencil-fill: url("../assets/bundled/pencil-fill.webp");
+  --image-title-background: url("../assets/bundled/title-background.webp");
+  --frame-bold-width: 12px;
+  --frame-bold: url("../assets/bundled/frame-bold.webp") 28 fill / var(--frame-bold-width) stretch;
+  --frame-paper-width: 8px;
+  --frame-paper: url("../assets/bundled/frame-paper.webp") 18 fill / var(--frame-paper-width) stretch;
+  --frame-pencil-width: 9px;
+  --frame-pencil: url("../assets/bundled/frame-pencil.webp") 22 fill / var(--frame-pencil-width) stretch;
+  --frame-pencil-line: url("../assets/bundled/frame-pencil.webp") 22 / var(--frame-pencil-width) stretch;
+  --frame-square-width: 10px;
+  --frame-square: url("../assets/bundled/frame-square.webp") 30 fill / var(--frame-square-width) stretch;
 }

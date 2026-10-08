@@ -3,24 +3,34 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-6);
+  gap: var(--space-8);
   min-height: 100dvh;
   padding: 0 var(--space-6);
-  text-align: center;
+  background: var(--color-night) var(--image-noise) center / cover;
 }
 
 .message {
   margin: 0;
-  line-height: 1.6;
 }
 
-.button {
-  min-height: var(--tap-min-size);
-  padding: 0 var(--space-8);
-  border: none;
-  border-radius: var(--radius-md);
-  background: var(--color-accent);
-  color: var(--color-text);
-  font-size: var(--font-size-md);
-  cursor: pointer;
+.logo {
+  display: block;
+  width: var(--logo-k-size);
+  height: auto;
+}
+
+.loading {
+  margin: 0;
+  color: var(--color-vermilion);
+  font-size: var(--font-size-lg);
+  animation: blink var(--duration-blink) ease-in-out infinite alternate;
+}
+
+@keyframes blink {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: var(--blink-min-opacity);
+  }
 }
