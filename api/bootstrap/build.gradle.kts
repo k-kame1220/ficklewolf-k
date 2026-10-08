@@ -13,4 +13,5 @@ dependencies {
     implementation(project(":platform:persistence"))
     implementation(project(":modules:player:adapter"))
     implementation(project(":modules:auth:adapter"))
+    implementation(project(":modules:master:adapter"))
 }
