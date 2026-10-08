@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.web.cors.CorsConfigurationSource
 
 @Configuration
 class SecurityConfiguration {
@@ -15,8 +16,10 @@ class SecurityConfiguration {
         http: HttpSecurity,
         tokenAuthenticator: TokenAuthenticator,
         publicEndpoints: ObjectProvider<PublicEndpoint>,
+        corsConfigurationSource: CorsConfigurationSource,
     ): SecurityFilterChain {
         http
+            .cors { it.configurationSource(corsConfigurationSource) }
             .csrf { it.disable() }
             .httpBasic { it.disable() }
             .formLogin { it.disable() }
