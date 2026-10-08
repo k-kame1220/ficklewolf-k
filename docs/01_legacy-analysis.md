@@ -2,6 +2,7 @@
 
 > 作成: 2026-09-25 / 対象: `legacy/unity/`（最終更新 2022-02、Unity + GS2）
 > 旧作の数値は `legacy/data/*.json`（`legacy/tools/extract_unity_data.py` で抽出）。
+> 旧作の画面は `legacy/screenshots/`（実機のスクリーンショット。手元にだけあり、コミットしない）。
 > **これは旧作の記録**。リメイクで使う値とルールは `spec/master`・`spec/battle/README.md` が正で、旧作から変えた点は `docs/02` §4 にまとめている。
 > 「※」は旧実装のバグ・未完成・要判断ポイント。
 
