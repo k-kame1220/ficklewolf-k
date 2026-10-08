@@ -1,5 +1,12 @@
 @import "./tokens.css";
 
+/* 無心（MODI工場。商用・改変・再配布・埋め込み可）。legacy/tools/convert_assets.py で WOFF2 に変換 */
+@font-face {
+  font-family: "Mushin";
+  src: url("../assets/fonts/mushin.woff2") format("woff2");
+  font-display: swap;
+}
+
 *,
 *::before,
 *::after {
@@ -14,17 +21,20 @@ body,
 }
 
 body {
-  background: #000;
-  color: var(--color-text);
+  background: var(--color-night);
+  color: var(--color-ink);
   font-family: var(--font-family);
   font-size: var(--font-size-md);
+  letter-spacing: var(--letter-spacing-wide);
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior: none;
 }
 
-button {
+button,
+input {
   font: inherit;
   color: inherit;
+  letter-spacing: inherit;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,6 +1,6 @@
 # フロントエンド設計（レイヤー構成とコーディングルール）
 
-> 版: v0.4（2026-09-26、spec（ゴールデンテスト・マスタ）に合わせて更新）/ 前提: [02_requirements.md](02_requirements.md) §4・§9（D-1: ルールは別々に実装、D-2: React + TS + Capacitor）
+> 版: v0.5（2026-10-08、見た目の方針（旧作の白黒の手描き）と素材の使い方を追記）/ 前提: [02_requirements.md](02_requirements.md) §4・§9（D-1: ルールは別々に実装、D-2: React + TS + Capacitor）
 > 対象: `web/`。フロントは AI が実装する。このルールは AI が守るものであり、オーナーのレビューの基準にもなる。
 
 ---
@@ -343,12 +343,20 @@ export default BattleStoreProvider;
 - タップできる要素は 44px 以上。ボタンは `<button>` を使う。
 - アニメーションは Motion か CSS。`prefers-reduced-motion` のときは揺れ・点滅を弱める。
 
+#### 見た目の方針（旧作の雰囲気を引き継ぐ）
+旧作の実機のスクリーンショット（`legacy/screenshots/`）を正とする。
+- **白黒の手描き。** くしゃくしゃの紙（`--image-paper`）にペンの黒（`--color-ink`）。色は原則使わず、**朱（`--color-vermilion`）は「ここぞ」だけ**（ロゴの K・ロアディング中・エラーの文言）。角丸・グラデーション・影は使わない。
+- **メニューの画面は上下を黒いノイズの帯で挟む**（`shared/ui/MenuLayout`）。起動中・エラー・アップデートはノイズの背景、タイトルは寺のスケッチの背景に赤い K の紋。
+- **枠は旧作の手描きの枠の画像を `border-image` で使う。** トークンは `--frame-bold`（太いペン。決定・今いるタブ）、`--frame-pencil`（鉛筆。ふつうのボタン・入力欄）、`--frame-paper`（紙の窓。お知らせ・エラー）、`--frame-square`（四角。タブ）。押せないボタンは鉛筆の塗り（`--image-pencil-fill`）か薄い文字にする。
+- **フォントは無心（MODI工場。商用・改変・再配布・埋め込み可）。** 字間を少し空ける（`--letter-spacing-wide`）。文言は旧作の口調（ひらがな多め・話しかける）に合わせ、旧作の文言があれば流用する。
+- 共通の見た目の部品は `shared/ui`（`Button`・`Panel`・`MenuLayout`・`TabBar`・`ScreenFrame`）。
+
 ### 5.5 テスト
 | 対象 | ツール | 基準 |
 |---|---|---|
 | domain（バトル・ステータス） | Vitest | **ゴールデンテストを全件通す**。分岐はすべてテストする |
 | features のフック・部品 | Vitest + Testing Library + MSW | 主な操作（コマンドを押す → 表示が変わる）を確認する |
-| 画面の通し | Playwright（`web/e2e/`。`pnpm e2e`） | ログイン → クエスト → 勝利 → 報酬、の主な流れを数本。スマホの幅（390px）で動かし、スクリーンショットを `web/screenshots/`（git の対象外）に撮る |
+| 画面の通し | Playwright（`web/e2e/`。`pnpm e2e`。ポートは `E2E_PORT` で変えられる。既定は 4100） | ログイン → クエスト → 勝利 → 報酬、の主な流れを数本。スマホの幅（390px）で動かし、スクリーンショットを `web/screenshots/`（git の対象外）に撮る |
 - テストファイルは対象の隣に `*.test.ts(x)` で置く。テストの書き方は `it` に統一し、`describe` で囲む。
 - 通信は MSW（`src/test/setup.ts`）が受ける。部品は `renderWithQueryClient`（`src/test/render.tsx`）で描画する。
 - E2E はまだ `pnpm check`・CI に入れていない（ブラウザのインストールが要るため）。画面を変えた PR では手元で `pnpm e2e` を実行する。
@@ -365,6 +373,9 @@ export default BattleStoreProvider;
 - 文言は日本語のみ。多言語化はしないが、文言は各 feature の `messages.ts` などにまとめ、コンポーネントに直接書き散らさない。
 - エラー表示: 通信エラーは共通のダイアログ（リトライ / タイトルへ）。旧作の文言を流用する。
 - 素材は 2 種類（`docs/02` §10）。同梱素材は `web/` にコミットし、取得素材はマスタに書かれたキーと基点 URL（設定）から組み立てて取得する。どちらも型付きのマニフェスト・キーから参照し、パスを文字列で直接書かない。
+  - 変換は `legacy/tools/convert_assets.py`（Pillow・fonttools。`legacy/README.md`）。同梱素材は `web/src/shared/assets/bundled/`（WebP）と `fonts/`（WOFF2）に出力してコミットする。
+  - 同梱素材は、背景・枠なら `tokens.css` の変数（`--image-*`・`--frame-*`）、`<img>` で出すものは `shared/assets/bundledAssets.ts` の `BUNDLED_ASSETS` から使う。Vite がハッシュ付きの名前にする。
+  - 取得素材は `web/public/assets/`（git の外）にハッシュ付きの名前で出力し、キー → ファイル名の一覧 `shared/assets/remoteAssets.json` をコミットする。URL は `remoteAssetUrl(key)`（基点は `VITE_ASSET_BASE_URL`。未設定なら同じサーバーの `/assets`）。
 - バトル画面に入る前に、その戦闘で使う画像・音を先読みする。
 
 ---
@@ -389,6 +400,7 @@ export default BattleStoreProvider;
 | F-6 | ESLint | 10 系。React のルールは @eslint-react |
 | F-7 | 言語 | `web/` の中は TS で統一（設定ファイルも TS）。移行スクリプトは `legacy/tools/` に Python |
 | F-9 | pnpm | `web/` 単体のプロジェクト（lockfile・設定も `web/` の中）。直下に pnpm のワークスペースは作らない |
+| F-10 | 見た目（2026-10-08） | 旧作の白黒の手描きを引き継ぐ（§5.4「見た目の方針」）。フォントは無心、枠は旧作の画像を `border-image` で使う |
 | F-8 | 書き方 | shackw（portal-web-app / wallet-web-app）の書き方に合わせる（§5.2・§5.3）。ただし §5.0 の方針が優先 |
 
 ---

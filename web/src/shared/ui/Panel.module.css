@@ -1,0 +1,13 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  width: 100%;
+  padding: var(--space-8) var(--space-6);
+  border: var(--frame-paper-width) solid transparent;
+  border-image: var(--frame-paper);
+  color: var(--color-ink);
+  line-height: var(--line-height-text);
+  text-align: center;
+}

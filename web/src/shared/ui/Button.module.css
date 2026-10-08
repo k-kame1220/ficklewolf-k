@@ -1,0 +1,36 @@
+.root {
+  min-width: var(--button-min-width);
+  min-height: var(--tap-min-size);
+  padding: var(--space-2) var(--space-8);
+  border: 0 solid transparent;
+  background: none;
+  color: var(--color-ink);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  transition: transform var(--duration-fast) ease-out;
+}
+
+.root:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+}
+
+.root:disabled {
+  color: var(--color-ink-faint);
+  cursor: default;
+}
+
+.bold {
+  border-width: var(--frame-bold-width);
+  border-image: var(--frame-bold);
+  font-size: var(--font-size-lg);
+}
+
+.pencil {
+  border-width: var(--frame-pencil-width);
+  border-image: var(--frame-pencil);
+}
+
+.pencil:disabled {
+  border-image: var(--frame-pencil-line);
+  background: var(--image-pencil-fill) center / cover;
+}

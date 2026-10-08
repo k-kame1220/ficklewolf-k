@@ -15,7 +15,7 @@ describe("RegisterForm", () => {
     const onRegistered = vi.fn();
     renderWithQueryClient(<RegisterForm isAccountLost={false} onRegistered={onRegistered} />);
 
-    await userEvent.type(screen.getByLabelText("なまえを教えて(6文字まで)"), "ゲスト");
+    await userEvent.type(screen.getByLabelText("早速ですがあなたの忌み名を教えてください。"), "ゲスト");
     await userEvent.click(screen.getByRole("button", { name: "決定" }));
 
     await vi.waitFor(() => {
@@ -28,7 +28,7 @@ describe("RegisterForm", () => {
     const onRegistered = vi.fn();
     renderWithQueryClient(<RegisterForm isAccountLost={false} onRegistered={onRegistered} />);
 
-    await userEvent.type(screen.getByLabelText("なまえを教えて(6文字まで)"), "abcdefg");
+    await userEvent.type(screen.getByLabelText("早速ですがあなたの忌み名を教えてください。"), "abcdefg");
     await userEvent.click(screen.getByRole("button", { name: "決定" }));
 
     expect(screen.getByRole("alert")).toHaveTextContent("なまえは6文字までです");
@@ -56,7 +56,7 @@ describe("RegisterForm", () => {
     const onRegistered = vi.fn();
     renderWithQueryClient(<RegisterForm isAccountLost={false} onRegistered={onRegistered} />);
 
-    await userEvent.type(screen.getByLabelText("なまえを教えて(6文字まで)"), "ゲスト");
+    await userEvent.type(screen.getByLabelText("早速ですがあなたの忌み名を教えてください。"), "ゲスト");
     await userEvent.click(screen.getByRole("button", { name: "決定" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent("このなまえは使えません");
@@ -67,7 +67,7 @@ describe("RegisterForm", () => {
     server.use(http.post(`${API_BASE_URL}/auth/guest`, () => HttpResponse.error()));
     renderWithQueryClient(<RegisterForm isAccountLost={false} onRegistered={vi.fn()} />);
 
-    await userEvent.type(screen.getByLabelText("なまえを教えて(6文字まで)"), "ゲスト");
+    await userEvent.type(screen.getByLabelText("早速ですがあなたの忌み名を教えてください。"), "ゲスト");
     await userEvent.click(screen.getByRole("button", { name: "決定" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent("通信エラーが発生しました。");

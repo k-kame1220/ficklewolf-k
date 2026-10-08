@@ -1,0 +1,24 @@
+.image {
+  display: block;
+  width: var(--character-size);
+  height: var(--character-size);
+  object-fit: contain;
+}
+
+.name {
+  margin: 0;
+  font-size: var(--font-size-xl);
+}
+
+.status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  line-height: var(--line-height-text);
+  text-align: center;
+}
+
+.status p {
+  margin: 0;
+}

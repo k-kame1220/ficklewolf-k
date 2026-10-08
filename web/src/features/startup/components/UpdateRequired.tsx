@@ -1,3 +1,6 @@
+import Button from "@/shared/ui/Button";
+import Panel from "@/shared/ui/Panel";
+
 import { STARTUP_MESSAGES } from "../messages";
 
 import styles from "./Startup.module.css";
@@ -12,10 +15,12 @@ const UpdateRequired = (props: UpdateRequiredProps) => {
 
   return (
     <div className={styles.root}>
-      <p className={styles.message}>{STARTUP_MESSAGES.updateRequired}</p>
-      <button className={styles.button} type="button" onClick={onUpdate}>
-        {STARTUP_MESSAGES.reload}
-      </button>
+      <Panel>
+        <p className={styles.message}>{STARTUP_MESSAGES.updateRequired}</p>
+        <Button variant="pencil" onClick={onUpdate}>
+          {STARTUP_MESSAGES.reload}
+        </Button>
+      </Panel>
     </div>
   );
 };

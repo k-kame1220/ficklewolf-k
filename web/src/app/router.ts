@@ -12,6 +12,7 @@ import { readAuthToken } from "@/api/core/authToken";
 import { APP_VERSION } from "@/api/core/config";
 import { masterQueryOptions, masterVersionQueryOptions } from "@/api/master/master.query";
 import { isUpdateRequired } from "@/domain/version/version";
+import LoadingPage from "@/pages/LoadingPage";
 
 import RootLayout from "./RootLayout";
 
@@ -38,6 +39,7 @@ const rootRoute = createRootRouteWithContext<RouterContext>()({
     await context.queryClient.query(masterQueryOptions);
   },
   component: RootLayout,
+  pendingComponent: LoadingPage,
   errorComponent: lazyRouteComponent(() => import("@/pages/StartupErrorPage")),
   notFoundComponent: lazyRouteComponent(() => import("@/pages/NotFoundPage"))
 });
