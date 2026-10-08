@@ -6,6 +6,7 @@
 legacy/
 ├── unity/          旧 Unity プロジェクト（.gitignore 済み。署名鍵・GS2 認証情報を含む）
 ├── data/           抽出したマスタデータ（JSON）
+├── screenshots/    旧作の実機のスクリーンショット（中身は .gitignore 済み。手元にだけある）
 └── tools/          移行用のスクリプト（Python）
 ```
 
@@ -27,3 +28,5 @@ python3 legacy/tools/extract_unity_data.py
 （引数を省略すると `legacy/unity/Assets` → `legacy/data` に書き出す）
 
 画像・音声のパス（`mainImage` など）は `unity/Assets/` からの相対パス。
+
+`screenshots/` は旧作を実機で動かして撮った画面（ホーム・クエスト・戦闘・ガチャ・チュートリアルなど）。画面を作り直すときの見た目と流れの参考にする。画像は重く、公開リポジトリには置かないので、コミットするのは `.gitignore` だけ。
