@@ -4,8 +4,10 @@ import com.ficklewolf.k.player.domain.Player
 import com.ficklewolf.k.player.domain.PlayerName
 import com.ficklewolf.k.shared.kernel.PlayerId
 import com.ficklewolf.k.shared.kernel.TransactionRunner
+import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class PlayerServiceTest {
     private val players = mutableMapOf<PlayerId, Player>()
@@ -36,5 +38,23 @@ class PlayerServiceTest {
         assertEquals(0, created.fuda)
         assertEquals("zero", created.selectedCharacterId)
         assertEquals(created, service.find(created.id))
+    }
+
+    @Test
+    fun `名前を変えると保存され、あとで取ると新しい名前になる`() {
+        val created = service.createPlayer(PlayerName.of("ゲスト") ?: error("名前が使えない"))
+        val newName = PlayerName.of("ウルフ") ?: error("名前が使えない")
+
+        val renamed = service.rename(created.id, newName)
+
+        assertEquals("ウルフ", renamed?.name?.value)
+        assertEquals("ウルフ", service.find(created.id)?.name?.value)
+    }
+
+    @Test
+    fun `いないプレイヤーの名前は変えられない`() {
+        val newName = PlayerName.of("ウルフ") ?: error("名前が使えない")
+
+        assertNull(service.rename(PlayerId(UUID.randomUUID()), newName))
     }
 }
