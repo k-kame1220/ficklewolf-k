@@ -46,6 +46,195 @@ export type paths = {
         readonly patch: operations["updateMe"];
         readonly trace?: never;
     };
+    readonly "/app/version": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * 必要なアプリの最低バージョンを取る
+         * @description 起動時に最初に呼ぶ。アプリのバージョンが `minAppVersion` より古ければ、アップデートを促す画面を出してそれ以上進まない。
+         */
+        readonly get: operations["getAppVersion"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/me/characters": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * 所持キャラの一覧を取る
+         * @description 持っているキャラだけを返す（持っていないキャラの情報は返さない）。並びは図鑑の番号順。
+         */
+        readonly get: operations["listMyCharacters"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/me/quests": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * 挑戦できるクエストの一覧を取る
+         * @description 解放済みのメインクエストと、今日の天気のお天気クエストを返す。まだ解放されていないクエストは返さない。
+         *     **敵の行動は返さない**（バトル中にそのつど返す。docs/02 §4）。
+         */
+        readonly get: operations["listMyQuests"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/quests/{questId}/sessions": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * クエストを始める（バトルを作る）
+         * @description 出撃キャラ（`/me` の `selectedCharacterId`）でバトルを作る。プレイヤーのステータス（強化・天気込み）と敵のステータスはこの時点で確定する。
+         *     進行中のバトルがあれば、それは無効になる（1 人 1 つ）。有効期限は 24 時間。
+         */
+        readonly post: operations["startQuest"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/quest-sessions/current": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * 進行中のバトルを取る
+         * @description アプリを閉じた・通信が切れたあとに、続きから再開するために使う。決着がついたバトル・期限切れのバトルは返さない。
+         *     送ったコマンドの結果が分からなくなったとき（`STALE_SEQUENCE` を受け取ったときなど）も、これで今の状態を取り直す。
+         */
+        readonly get: operations["getCurrentBattle"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/quest-sessions/{sessionId}/commands": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * コマンドを 1 つ実行する
+         * @description api がそのコマンドを計算し（`spec/battle/README.md` のルール）、起きたこと（`events`）と新しい状態を返す。
+         *     **次のターン以降の敵の行動は返さない。** 返すのは、このコマンドで実際に起きた敵の行動だけ。
+         *     `seq` には手元の `Battle.seq` をそのまま入れる。api の `seq` と違えば実行せずに `STALE_SEQUENCE` を返す（通信が切れて送り直したときに 2 回実行されないように）。
+         *     勝ったときは、このレスポンスで報酬も付与済み（`battle.reward`）。
+         */
+        readonly post: operations["sendBattleCommand"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/quest-sessions/{sessionId}/reveal": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * みえーるみえーる（今の敵の全行動を見る）
+         * @description 今の敵（連戦なら今のステージ）の全ターンの行動を返し、残り回数（`revealRemaining`）を 1 減らす。回数はクエストごと（`revealCount`）。
+         *     必殺技で書き換えた行動は書き換え後の値。画面は 10 秒間だけ表示する（旧作どおり。表示の時間は画面の決まり）。
+         */
+        readonly post: operations["revealEnemyActions"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/quest-sessions/{sessionId}/special": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * 必殺技を使う（書き換えられる敵の行動を見る）
+         * @description 必殺技の条件を満たしていれば、`turn − 2` 〜 `turn + 2` の敵の行動（存在するターンだけ）を返す。
+         *     **この時点で必殺技の回数を 1 使い**、バトルは書き換えを選ぶ状態（`phase: choosingSpecial`）になる。
+         *     その状態では `special` コマンド（書き換え）以外は受け付けない（行動を見てからやめることはできない）。
+         */
+        readonly post: operations["openSpecial"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/quest-sessions/{sessionId}/retire": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * リタイアする
+         * @description 負けと同じ扱い（報酬なし）でバトルを終える。
+         */
+        readonly post: operations["retireBattle"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/master/version": {
         readonly parameters: {
             readonly query?: never;
@@ -54,8 +243,10 @@ export type paths = {
             readonly cookie?: never;
         };
         /**
-         * マスタのバージョンと、必要なアプリの最低バージョンを取る
-         * @description 起動時に最初に呼ぶ。アプリのバージョンが `minAppVersion` より古ければ、アップデートを促す画面を出してそれ以上進まない。
+         * （廃止予定）マスタのバージョンと、必要なアプリの最低バージョンを取る
+         * @deprecated
+         * @description **廃止予定。** `GET /app/version` に置き換える（マスタはまとめて配信しないため。docs/02 §10）。
+         *     起動時に最初に呼ぶ。アプリのバージョンが `minAppVersion` より古ければ、アップデートを促す画面を出してそれ以上進まない。
          */
         readonly get: operations["getMasterVersion"];
         readonly put?: never;
@@ -74,8 +265,10 @@ export type paths = {
             readonly cookie?: never;
         };
         /**
-         * マスタデータ一式を取る
-         * @description 中身は `spec/master/*.json` と同じ（api がデプロイ時に DB へ投入したもの）。素材はパスではなくキーで書かれている。
+         * （廃止予定）マスタデータ一式を取る
+         * @deprecated
+         * @description **廃止予定。** 敵の行動などがすべて見えてしまうため、まとめて配信するのをやめる。画面ごとの API（`/me/characters`・`/me/quests`・バトル）で必要な分だけ返す（docs/02 §10）。
+         *     中身は `spec/master/*.json` と同じ（api がデプロイ時に DB へ投入したもの）。素材はパスではなくキーで書かれている。
          *     **HTTP キャッシュで配信する。** api は `ETag`（マスタのバージョン）と `Cache-Control: no-cache` を付け、
          *     リクエストの `If-None-Match` がバージョンと一致すれば本文なしの 304 を返す。
          *     `If-None-Match` はブラウザ・アプリの HTTP キャッシュが自動で付けるので、クライアントのコードは意識しない。
@@ -143,15 +336,266 @@ export type components = {
             readonly items: components["schemas"]["items.schema"];
             readonly settings: components["schemas"]["settings.schema"];
         };
+        readonly AppVersion: {
+            /** @description 必要なアプリの最低バージョン（`settings.minAppVersion`） */
+            readonly minAppVersion: string;
+        };
+        /**
+         * @description `spec/master/quests.json` の `id`
+         * @example main-a
+         */
+        readonly QuestId: string;
+        /**
+         * @description 属性（陽 / 音 / 月）
+         * @enum {string}
+         */
+        readonly Attribute: "yang" | "note" | "moon";
+        /** @description 素材のキー（`characters/zero/home` など。URL は web が基点 URL と組み立てる） */
+        readonly CharacterAssets: {
+            readonly main: string;
+            readonly icon: string;
+            readonly home: string;
+        };
+        /** @description 所持キャラ。ステータスの内訳・強化の回数は F-06 / F-07 を作るときに足す */
+        readonly MyCharacter: {
+            readonly id: components["schemas"]["CharacterId"];
+            readonly name: string;
+            readonly attribute: components["schemas"]["Attribute"];
+            readonly description: string;
+            readonly assets: components["schemas"]["CharacterAssets"];
+        };
+        readonly MyCharacterList: {
+            readonly characters: readonly components["schemas"]["MyCharacter"][];
+        };
+        /** @description クエスト一覧の 1 件。敵の行動・ステータスは含めない */
+        readonly MyQuest: {
+            readonly id: components["schemas"]["QuestId"];
+            /** @enum {string} */
+            readonly kind: "main" | "weather";
+            readonly name: string;
+            /** @description 敵の画像のキー（最初のステージ） */
+            readonly imageKey: string;
+            readonly attribute: components["schemas"]["Attribute"];
+            /** @description 敵の数（2 以上なら連戦） */
+            readonly stageCount: number;
+            /** @description 最初の敵のターン数（最終ターンに敵の必殺技が来る） */
+            readonly turnCount: number;
+            /** @description みえーるみえーるを使える回数 */
+            readonly revealCount: number;
+            readonly isCleared: boolean;
+        };
+        readonly MyQuestList: {
+            readonly quests: readonly components["schemas"]["MyQuest"][];
+        };
+        /**
+         * @description 敵の行動（`spec/battle/README.md` の名前）
+         * @enum {string}
+         */
+        readonly EnemyAction: "attack" | "defend" | "attackBuff" | "defenceBuff" | "fixedAttack" | "strongAttack" | "concentration" | "deathblow" | "provocation" | "fullRecovery" | "rateRecovery" | "changeAttribute" | "numbness" | "attackDebuff" | "defenceDebuff";
+        /**
+         * @description 必殺技で書き換えられる行動
+         * @enum {string}
+         */
+        readonly SpecialAction: "attack" | "defend" | "attackBuff" | "defenceBuff" | "provocation";
+        readonly BattleCommand: {
+            /** @enum {string} */
+            readonly type: "attack" | "defend" | "attackBuff" | "defenceBuff" | "check";
+        } | {
+            /** @constant */
+            readonly type: "rewind";
+            /** @description 戻るチェックポイントのターン */
+            readonly to: number;
+        } | {
+            /** @constant */
+            readonly type: "special";
+            /** @description 書き換えるターン */
+            readonly turn: number;
+            readonly action: components["schemas"]["SpecialAction"];
+        };
+        readonly SequenceRequest: {
+            /** @description 手元の `Battle.seq`（api の値と違えば `STALE_SEQUENCE`） */
+            readonly seq: number;
+        };
+        readonly BattleCommandRequest: {
+            /** @description 手元の `Battle.seq`（api の値と違えば `STALE_SEQUENCE`） */
+            readonly seq: number;
+            readonly command: components["schemas"]["BattleCommand"];
+        };
+        readonly BattlePlayer: {
+            readonly characterId: components["schemas"]["CharacterId"];
+            readonly name: string;
+            readonly attribute: components["schemas"]["Attribute"];
+            readonly assets: components["schemas"]["CharacterAssets"];
+            readonly hp: number;
+            readonly maxHp: number;
+            /** @description 今の攻撃力（属性の倍率込み。攻撃倍率は含まない） */
+            readonly attack: number;
+            /** @description 今の防御力（防御バフ込み） */
+            readonly defence: number;
+            /** @description 攻撃倍率（1 から始まり、攻撃バフで増える） */
+            readonly attackRate: number;
+            /** @description ビリビリの残りターン数 */
+            readonly numbnessTurns: number;
+            readonly checkRemaining: number;
+            readonly rewindRemaining: number;
+            readonly specialRemaining: number;
+            /** @description 今、必殺技の条件を満たしているか（ボタンを押せるか） */
+            readonly isSpecialAvailable: boolean;
+        };
+        /** @description 今の敵。行動の並びは含めない */
+        readonly BattleEnemy: {
+            readonly name: string;
+            readonly imageKey: string;
+            readonly attribute: components["schemas"]["Attribute"];
+            readonly hp: number;
+            readonly maxHp: number;
+        };
+        /** @description 済んだターンの記録（ログの画面）。済んだターンの敵の行動だけを含む */
+        readonly BattleHistoryEntry: {
+            readonly stage: number;
+            readonly turn: number;
+            /** @enum {string} */
+            readonly command?: "attack" | "defend" | "attackBuff" | "defenceBuff";
+            /** @description プレイヤーの行動がしびれて失敗したか */
+            readonly isParalyzed?: boolean;
+            readonly enemyAction: components["schemas"]["EnemyAction"];
+        };
+        /** @description 勝ったときの報酬（api が付与済み。docs/02 F-05） */
+        readonly Reward: {
+            /** @description 報酬を受け取ったあとの Lv */
+            readonly level: number;
+            readonly isLevelUp: boolean;
+            readonly fudaGained: number;
+            /** @description 仲間になったキャラ（初めて仲間になったとき） */
+            readonly recruitedCharacterId: components["schemas"]["CharacterId"] | null;
+            /** @description 被りで上がったステータス */
+            readonly duplicate: {
+                readonly characterId: components["schemas"]["CharacterId"];
+                /** @enum {string} */
+                readonly stat: "hp" | "attack" | "defence";
+            } | null;
+            /** @description もらった強化アイテム（お天気クエスト） */
+            readonly items: readonly {
+                readonly itemId: string;
+                readonly count: number;
+            }[];
+        };
+        /**
+         * @description バトルの今の状態。**先のターンの敵の行動は含めない。**
+         *     画面はこれを表示するだけで、計算はしない（計算は api。docs/02 §4）。
+         */
+        readonly Battle: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly questId: components["schemas"]["QuestId"];
+            /** @description 状態の番号。コマンド・みえーる・必殺技を受け付けるたびに 1 増える */
+            readonly seq: number;
+            /**
+             * @description `command`: コマンドを待っている / `choosingSpecial`: 必殺技の書き換えを待っている / `finished`: 決着がついた
+             * @enum {string}
+             */
+            readonly phase: "command" | "choosingSpecial" | "finished";
+            /** @enum {string} */
+            readonly outcome: "ongoing" | "win" | "lose";
+            /** @description 何体目の敵か */
+            readonly stage: number;
+            readonly stageCount: number;
+            /** @description これから行うターンの番号 */
+            readonly turn: number;
+            /** @description 今の敵のターン数（最終ターンに敵の必殺技が来る） */
+            readonly turnCount: number;
+            readonly player: components["schemas"]["BattlePlayer"];
+            readonly enemy: components["schemas"]["BattleEnemy"];
+            readonly checkpoints: readonly number[];
+            readonly revealRemaining: number;
+            readonly history: readonly components["schemas"]["BattleHistoryEntry"][];
+            /** @description 勝ったときだけ入る */
+            readonly reward: components["schemas"]["Reward"] | null;
+            /** Format: date-time */
+            readonly expiresAt: string;
+        };
+        /** @description コマンドで起きたこと。web はこれを順に演出する（HP は演出のあとの値） */
+        readonly BattleEvent: {
+            /** @constant */
+            readonly type: "playerAction";
+            /** @enum {string} */
+            readonly command: "attack" | "defend" | "attackBuff" | "defenceBuff";
+            readonly isParalyzed: boolean;
+            /** @description 敵に与えたダメージ（攻撃以外は 0） */
+            readonly damage: number;
+            readonly playerHp: number;
+            readonly enemyHp: number;
+        } | {
+            /** @constant */
+            readonly type: "enemyAction";
+            readonly action: components["schemas"]["EnemyAction"];
+            /** @description プレイヤーが受けたダメージ（攻撃系以外は 0） */
+            readonly damage: number;
+            readonly playerHp: number;
+            readonly enemyHp: number;
+        } | {
+            /** @constant */
+            readonly type: "stageCleared";
+            readonly nextStage: number;
+        } | {
+            /** @constant */
+            readonly type: "checked";
+            readonly turn: number;
+        } | {
+            /** @constant */
+            readonly type: "rewound";
+            readonly to: number;
+        } | {
+            /** @constant */
+            readonly type: "specialApplied";
+            readonly turn: number;
+            readonly action: components["schemas"]["SpecialAction"];
+        } | {
+            /** @constant */
+            readonly type: "finished";
+            /** @enum {string} */
+            readonly outcome: "win" | "lose";
+        };
+        readonly BattleStepResult: {
+            readonly events: readonly components["schemas"]["BattleEvent"][];
+            readonly battle: components["schemas"]["Battle"];
+        };
+        readonly TurnAction: {
+            readonly turn: number;
+            readonly action: components["schemas"]["EnemyAction"];
+        };
+        readonly RevealResult: {
+            /** @description 今の敵の全ターンの行動（1 ターン目から） */
+            readonly turns: readonly components["schemas"]["TurnAction"][];
+            readonly battle: components["schemas"]["Battle"];
+        };
+        readonly SpecialChoices: {
+            /** @description 書き換えられるターン（`turn − 2` 〜 `turn + 2` のうち存在するもの）の敵の行動 */
+            readonly turns: readonly components["schemas"]["TurnAction"][];
+            readonly battle: components["schemas"]["Battle"];
+        };
+        /**
+         * @description 実行できなかった理由。`REVEAL_LIMIT` より上は `spec/battle/README.md` の理由コード（判定の順番も同じ）。
+         *     - `REVEAL_LIMIT`: みえーるみえーるの回数を使い切っている
+         *     - `SPECIAL_PENDING`: 必殺技の書き換えを選ぶ状態なので、書き換え以外は受け付けない
+         *     - `SPECIAL_NOT_OPENED`: 必殺技を使っていない（`POST .../special` の前）のに書き換えを送った
+         * @enum {string}
+         */
+        readonly BattleRejectReason: "BATTLE_FINISHED" | "CANNOT_CHECK_FIRST_TURN" | "ALREADY_CHECKED" | "CHECK_LIMIT" | "NO_CHECKPOINT" | "REWIND_LIMIT" | "CANNOT_REWIND_HERE" | "INVALID_REWIND_TARGET" | "SPECIAL_UNAVAILABLE" | "INVALID_SPECIAL_TARGET" | "REVEAL_LIMIT" | "SPECIAL_PENDING" | "SPECIAL_NOT_OPENED";
         /**
          * @description - `VALIDATION_FAILED`: リクエストの形が違う（JSON が壊れている・必須項目がない・余計な項目がある・PATCH の項目が 0 個）
          *     - `INVALID_NAME`: 名前が空・7 文字以上・制御文字を含む
          *     - `CHARACTER_NOT_OWNED`: 持っていない（または存在しない）キャラを出撃させようとした
          *     - `UNAUTHORIZED`: トークンがない・正しくない
+         *     - `QUEST_NOT_AVAILABLE`: そのクエストは存在しない・まだ解放されていない・今日の天気ではない
+         *     - `BATTLE_NOT_FOUND`: そのバトルは無い（自分のものでない・期限切れ・新しいバトルで無効になった）
+         *     - `NO_ACTIVE_BATTLE`: 進行中のバトルが無い
+         *     - `STALE_SEQUENCE`: 送った `seq` が今の状態と違う（`GET /quest-sessions/current` で取り直す）
+         *     - `COMMAND_REJECTED`: そのコマンドは今は実行できない（理由は `reason`）
          *     - `INTERNAL_ERROR`: api の予期しないエラー（バグなど）。原因はレスポンスに出さず、api のログにだけ残す
          * @enum {string}
          */
-        readonly ErrorCode: "VALIDATION_FAILED" | "INVALID_NAME" | "CHARACTER_NOT_OWNED" | "UNAUTHORIZED" | "INTERNAL_ERROR";
+        readonly ErrorCode: "VALIDATION_FAILED" | "INVALID_NAME" | "CHARACTER_NOT_OWNED" | "UNAUTHORIZED" | "QUEST_NOT_AVAILABLE" | "BATTLE_NOT_FOUND" | "NO_ACTIVE_BATTLE" | "STALE_SEQUENCE" | "COMMAND_REJECTED" | "INTERNAL_ERROR";
         readonly Problem: {
             /**
              * Format: uri-reference
@@ -165,6 +609,8 @@ export type components = {
             /** Format: uri-reference */
             readonly instance?: string;
             readonly code: components["schemas"]["ErrorCode"];
+            /** @description `COMMAND_REJECTED` のときだけ入る */
+            readonly reason?: components["schemas"]["BattleRejectReason"];
         };
         /** @enum {unknown} */
         readonly attribute: "yang" | "note" | "moon";
@@ -281,6 +727,75 @@ export type components = {
         };
     };
     responses: {
+        /** @description そのクエストは始められない（`QUEST_NOT_AVAILABLE`） */
+        readonly QuestNotAvailable: {
+            headers: {
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "type": "about:blank",
+                 *       "title": "Not Found",
+                 *       "status": 404,
+                 *       "code": "QUEST_NOT_AVAILABLE"
+                 *     }
+                 */
+                readonly "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
+        /** @description そのバトルは無い（`BATTLE_NOT_FOUND`） */
+        readonly BattleNotFound: {
+            headers: {
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "type": "about:blank",
+                 *       "title": "Not Found",
+                 *       "status": 404,
+                 *       "code": "BATTLE_NOT_FOUND"
+                 *     }
+                 */
+                readonly "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
+        /** @description 進行中のバトルが無い（`NO_ACTIVE_BATTLE`） */
+        readonly NoActiveBattle: {
+            headers: {
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "type": "about:blank",
+                 *       "title": "Not Found",
+                 *       "status": 404,
+                 *       "code": "NO_ACTIVE_BATTLE"
+                 *     }
+                 */
+                readonly "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
+        /** @description 今の状態では実行できない（`STALE_SEQUENCE` / `COMMAND_REJECTED`） */
+        readonly BattleConflict: {
+            headers: {
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "type": "about:blank",
+                 *       "title": "Conflict",
+                 *       "status": 409,
+                 *       "code": "COMMAND_REJECTED",
+                 *       "reason": "CHECK_LIMIT"
+                 *     }
+                 */
+                readonly "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
         /** @description api の予期しないエラー（`INTERNAL_ERROR`）。どの API でも起こりうる */
         readonly InternalError: {
             headers: {
@@ -336,7 +851,10 @@ export type components = {
             };
         };
     };
-    parameters: never;
+    parameters: {
+        readonly QuestId: components["schemas"]["QuestId"];
+        readonly SessionId: string;
+    };
     requestBodies: never;
     headers: never;
     pathItems: never;
@@ -415,6 +933,236 @@ export interface operations {
             };
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
+            readonly 500: components["responses"]["InternalError"];
+        };
+    };
+    readonly getAppVersion: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description 取れた */
+            readonly 200: {
+                headers: {
+                    readonly "Cache-Control"?: string;
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["AppVersion"];
+                };
+            };
+            readonly 500: components["responses"]["InternalError"];
+        };
+    };
+    readonly listMyCharacters: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description 取れた */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["MyCharacterList"];
+                };
+            };
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 500: components["responses"]["InternalError"];
+        };
+    };
+    readonly listMyQuests: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description 取れた */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["MyQuestList"];
+                };
+            };
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 500: components["responses"]["InternalError"];
+        };
+    };
+    readonly startQuest: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                readonly questId: components["parameters"]["QuestId"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description 作った */
+            readonly 201: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["Battle"];
+                };
+            };
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 404: components["responses"]["QuestNotAvailable"];
+            readonly 500: components["responses"]["InternalError"];
+        };
+    };
+    readonly getCurrentBattle: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description 進行中のバトルがある */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["Battle"];
+                };
+            };
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 404: components["responses"]["NoActiveBattle"];
+            readonly 500: components["responses"]["InternalError"];
+        };
+    };
+    readonly sendBattleCommand: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                readonly sessionId: components["parameters"]["SessionId"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": components["schemas"]["BattleCommandRequest"];
+            };
+        };
+        readonly responses: {
+            /** @description 実行した */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["BattleStepResult"];
+                };
+            };
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 404: components["responses"]["BattleNotFound"];
+            readonly 409: components["responses"]["BattleConflict"];
+            readonly 500: components["responses"]["InternalError"];
+        };
+    };
+    readonly revealEnemyActions: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                readonly sessionId: components["parameters"]["SessionId"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": components["schemas"]["SequenceRequest"];
+            };
+        };
+        readonly responses: {
+            /** @description 見せた */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["RevealResult"];
+                };
+            };
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 404: components["responses"]["BattleNotFound"];
+            readonly 409: components["responses"]["BattleConflict"];
+            readonly 500: components["responses"]["InternalError"];
+        };
+    };
+    readonly openSpecial: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                readonly sessionId: components["parameters"]["SessionId"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": components["schemas"]["SequenceRequest"];
+            };
+        };
+        readonly responses: {
+            /** @description 書き換えを選ぶ状態になった */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["SpecialChoices"];
+                };
+            };
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 404: components["responses"]["BattleNotFound"];
+            readonly 409: components["responses"]["BattleConflict"];
+            readonly 500: components["responses"]["InternalError"];
+        };
+    };
+    readonly retireBattle: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                readonly sessionId: components["parameters"]["SessionId"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description 終えた */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["Battle"];
+                };
+            };
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 404: components["responses"]["BattleNotFound"];
             readonly 500: components["responses"]["InternalError"];
         };
     };

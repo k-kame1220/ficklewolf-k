@@ -69,7 +69,7 @@
 |------|------|------|
 | バックエンド | **Kotlin + Spring Boot 4 / MySQL 8.4** | `api/`。パッケージ `com.ficklewolf.k`、起動クラス `KApplication`、ヘルスチェックは Actuator |
 | フロント（Web+iOS+Android） | **React + TypeScript（Vite）、ストア配信は Capacitor**（D-2） | 設計は [03_frontend-architecture.md](03_frontend-architecture.md)。iOS は Mac が無いのでクラウドでビルドする |
-| バトルのルール | フロントとサーバで別々に実装し、ゴールデンテストで一致を保証（D-1） | `spec/battle/` |
+| バトルのルール | サーバだけで計算し、ゴールデンテストで確かめる。敵の行動は先に渡さない（D-8。D-1 から変更） | `spec/battle/` |
 | マスタデータ | `spec/master/*.json` が正。api が DB に投入して配信（D-6） | [02_requirements.md](02_requirements.md) §10 |
 | API 仕様 | OpenAPI（`spec/openapi/openapi.yaml`） | 実装を始める API から順に書き足す |
 
