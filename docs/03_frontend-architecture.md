@@ -296,18 +296,17 @@ export default BattleStoreProvider;
 - 1 行の `if (...) return ...;` は波括弧を付けない（early return）。
 - ゲームのルールは domain に置く。それ以外の画面の処理は、コンポーネントの中に上から順に書く。フックに切り出すのは複数の部品で使う場合だけ。
 - 1 ファイル 1 コンポーネント。分けるのは**画面の区切り（見た目のまとまり）**で行い、ロジックを細かい関数やフックに切り出して行数を減らすことはしない（§5.0）。
-- **分割の粒度は shackw と同じ**。画面（page）は「セクション」単位の部品を並べるだけにする。セクションに子部品があるときはフォルダにし、`index.tsx` と、親の名前を頭に付けた子部品を置く。
+- **分割の粒度は shackw と同じ**。画面（page）は「セクション」単位の部品を並べるだけにする。セクションに子部品があるときは、親の名前を頭に付けた子部品を同じ `components/` に並べる。
   ```
   features/battle/components/
-  ├── EnemyPanel/
-  │   ├── index.tsx              ← セクション本体
-  │   ├── EnemyPanelHpBar.tsx    ← 子部品は親の名前を頭に付ける
-  │   └── EnemyPanelImage.tsx
-  ├── CommandPanel/
-  │   ├── index.tsx
-  │   └── CommandPanelButton.tsx
-  └── MessageBox.tsx             ← 子部品が無ければファイル 1 つ
+  ├── EnemyPanel.tsx             ← セクション本体
+  ├── EnemyPanelHpBar.tsx        ← 子部品は親の名前を頭に付ける
+  ├── EnemyPanelImage.tsx
+  ├── CommandPanel.tsx
+  ├── CommandPanelButton.tsx
+  └── MessageBox.tsx
   ```
+- `components/` の中にフォルダは作らない（shackw と違う点）。フォルダの中からは feature の `messages.ts` などを import できないため（lint で、2 階層以上さかのぼる相対 import と、`@/features/*/*` を禁止している）。
 - `useEffect` はブラウザや外部との同期（音・タイマー・購読）にだけ使う。データ取得は TanStack Query、値の計算は描画中に行う。
 - props のバケツリレーが 3 段を超えたら、構成を見直すかストアを使う。
 
@@ -315,7 +314,6 @@ export default BattleStoreProvider;
 | 対象 | 規則 | 例 |
 |---|---|---|
 | feature のディレクトリ | kebab-case | `quest-list/` |
-| コンポーネントのフォルダ | PascalCase（`index.tsx` を置く） | `EnemyPanel/` |
 | コンポーネント | PascalCase.tsx | `CommandPanel.tsx` |
 | フック | `use` + camelCase.ts | `useEventPlayer.ts` |
 | その他の TS | camelCase.ts | `enemyActions.ts` |
