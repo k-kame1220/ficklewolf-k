@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: K API
-  version: 0.1.0
+  version: 0.2.0
   description: |
     K（リメイク）の API。web と api の約束事で、ここに書かれたものが正。
     エラーは RFC 9457（Problem Details）の形で返し、機械で見分けるための `code` を付ける。
@@ -15,8 +15,14 @@ tags:
     description: アカウント・認証
   - name: me
     description: 自分のプレイヤー情報
+  - name: app
+    description: アプリのバージョン
+  - name: characters
+    description: 所持キャラ
+  - name: quests
+    description: クエストとバトル（バトルは api が計算する）
   - name: master
-    description: マスタデータ（キャラ・クエスト・天気・アイテム・設定）
+    description: （廃止予定）マスタデータ一式の配信
 paths:
   /auth/guest:
     post:
@@ -84,12 +90,235 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "500":
           $ref: "#/components/responses/InternalError"
+  /app/version:
+    get:
+      tags: [app]
+      operationId: getAppVersion
+      summary: 必要なアプリの最低バージョンを取る
+      description: |
+        起動時に最初に呼ぶ。アプリのバージョンが `minAppVersion` より古ければ、アップデートを促す画面を出してそれ以上進まない。
+      security: []
+      responses:
+        "200":
+          description: 取れた
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                examples: [no-store]
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppVersion"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /me/characters:
+    get:
+      tags: [characters]
+      operationId: listMyCharacters
+      summary: 所持キャラの一覧を取る
+      description: 持っているキャラだけを返す（持っていないキャラの情報は返さない）。並びは図鑑の番号順。
+      responses:
+        "200":
+          description: 取れた
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MyCharacterList"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /me/quests:
+    get:
+      tags: [quests]
+      operationId: listMyQuests
+      summary: 挑戦できるクエストの一覧を取る
+      description: |
+        解放済みのメインクエストと、今日の天気のお天気クエストを返す。まだ解放されていないクエストは返さない。
+        **敵の行動は返さない**（バトル中にそのつど返す。docs/02 §4）。
+      responses:
+        "200":
+          description: 取れた
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MyQuestList"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /quests/{questId}/sessions:
+    post:
+      tags: [quests]
+      operationId: startQuest
+      summary: クエストを始める（バトルを作る）
+      description: |
+        出撃キャラ（`/me` の `selectedCharacterId`）でバトルを作る。プレイヤーのステータス（強化・天気込み）と敵のステータスはこの時点で確定する。
+        進行中のバトルがあれば、それは無効になる（1 人 1 つ）。有効期限は 24 時間。
+      parameters:
+        - $ref: "#/components/parameters/QuestId"
+      responses:
+        "201":
+          description: 作った
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Battle"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/QuestNotAvailable"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /quest-sessions/current:
+    get:
+      tags: [quests]
+      operationId: getCurrentBattle
+      summary: 進行中のバトルを取る
+      description: |
+        アプリを閉じた・通信が切れたあとに、続きから再開するために使う。決着がついたバトル・期限切れのバトルは返さない。
+        送ったコマンドの結果が分からなくなったとき（`STALE_SEQUENCE` を受け取ったときなど）も、これで今の状態を取り直す。
+      responses:
+        "200":
+          description: 進行中のバトルがある
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Battle"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NoActiveBattle"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /quest-sessions/{sessionId}/commands:
+    post:
+      tags: [quests]
+      operationId: sendBattleCommand
+      summary: コマンドを 1 つ実行する
+      description: |
+        api がそのコマンドを計算し（`spec/battle/README.md` のルール）、起きたこと（`events`）と新しい状態を返す。
+        **次のターン以降の敵の行動は返さない。** 返すのは、このコマンドで実際に起きた敵の行動だけ。
+        `seq` には手元の `Battle.seq` をそのまま入れる。api の `seq` と違えば実行せずに `STALE_SEQUENCE` を返す（通信が切れて送り直したときに 2 回実行されないように）。
+        勝ったときは、このレスポンスで報酬も付与済み（`battle.reward`）。
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BattleCommandRequest"
+      responses:
+        "200":
+          description: 実行した
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BattleStepResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/BattleNotFound"
+        "409":
+          $ref: "#/components/responses/BattleConflict"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /quest-sessions/{sessionId}/reveal:
+    post:
+      tags: [quests]
+      operationId: revealEnemyActions
+      summary: みえーるみえーる（今の敵の全行動を見る）
+      description: |
+        今の敵（連戦なら今のステージ）の全ターンの行動を返し、残り回数（`revealRemaining`）を 1 減らす。回数はクエストごと（`revealCount`）。
+        必殺技で書き換えた行動は書き換え後の値。画面は 10 秒間だけ表示する（旧作どおり。表示の時間は画面の決まり）。
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SequenceRequest"
+      responses:
+        "200":
+          description: 見せた
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RevealResult"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/BattleNotFound"
+        "409":
+          $ref: "#/components/responses/BattleConflict"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /quest-sessions/{sessionId}/special:
+    post:
+      tags: [quests]
+      operationId: openSpecial
+      summary: 必殺技を使う（書き換えられる敵の行動を見る）
+      description: |
+        必殺技の条件を満たしていれば、`turn − 2` 〜 `turn + 2` の敵の行動（存在するターンだけ）を返す。
+        **この時点で必殺技の回数を 1 使い**、バトルは書き換えを選ぶ状態（`phase: choosingSpecial`）になる。
+        その状態では `special` コマンド（書き換え）以外は受け付けない（行動を見てからやめることはできない）。
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SequenceRequest"
+      responses:
+        "200":
+          description: 書き換えを選ぶ状態になった
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialChoices"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/BattleNotFound"
+        "409":
+          $ref: "#/components/responses/BattleConflict"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /quest-sessions/{sessionId}/retire:
+    post:
+      tags: [quests]
+      operationId: retireBattle
+      summary: リタイアする
+      description: 負けと同じ扱い（報酬なし）でバトルを終える。
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      responses:
+        "200":
+          description: 終えた
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Battle"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/BattleNotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
   /master/version:
     get:
       tags: [master]
       operationId: getMasterVersion
-      summary: マスタのバージョンと、必要なアプリの最低バージョンを取る
+      summary: （廃止予定）マスタのバージョンと、必要なアプリの最低バージョンを取る
+      deprecated: true
       description: |
+        **廃止予定。** `GET /app/version` に置き換える（マスタはまとめて配信しないため。docs/02 §10）。
         起動時に最初に呼ぶ。アプリのバージョンが `minAppVersion` より古ければ、アップデートを促す画面を出してそれ以上進まない。
       security: []
       responses:
@@ -110,8 +339,10 @@ paths:
     get:
       tags: [master]
       operationId: getMaster
-      summary: マスタデータ一式を取る
+      summary: （廃止予定）マスタデータ一式を取る
+      deprecated: true
       description: |
+        **廃止予定。** 敵の行動などがすべて見えてしまうため、まとめて配信するのをやめる。画面ごとの API（`/me/characters`・`/me/quests`・バトル）で必要な分だけ返す（docs/02 §10）。
         中身は `spec/master/*.json` と同じ（api がデプロイ時に DB へ投入したもの）。素材はパスではなくキーで書かれている。
         **HTTP キャッシュで配信する。** api は `ETag`（マスタのバージョン）と `Cache-Control: no-cache` を付け、
         リクエストの `If-None-Match` がバージョンと一致すれば本文なしの 304 を返す。
@@ -145,6 +376,20 @@ paths:
         "500":
           $ref: "#/components/responses/InternalError"
 components:
+  parameters:
+    QuestId:
+      name: questId
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/QuestId"
+    SessionId:
+      name: sessionId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
   securitySchemes:
     bearerAuth:
       type: http
@@ -247,6 +492,498 @@ components:
           $ref: "../master/schema/items.schema.json"
         settings:
           $ref: "../master/schema/settings.schema.json"
+    AppVersion:
+      type: object
+      required: [minAppVersion]
+      additionalProperties: false
+      properties:
+        minAppVersion:
+          type: string
+          pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+          description: 必要なアプリの最低バージョン（`settings.minAppVersion`）
+    QuestId:
+      type: string
+      pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+      description: "`spec/master/quests.json` の `id`"
+      examples: [main-a]
+    Attribute:
+      type: string
+      enum: [yang, note, moon]
+      description: 属性（陽 / 音 / 月）
+    CharacterAssets:
+      type: object
+      required: [main, icon, home]
+      additionalProperties: false
+      description: 素材のキー（`characters/zero/home` など。URL は web が基点 URL と組み立てる）
+      properties:
+        main:
+          type: string
+        icon:
+          type: string
+        home:
+          type: string
+    MyCharacter:
+      type: object
+      required: [id, name, attribute, description, assets]
+      additionalProperties: false
+      description: 所持キャラ。ステータスの内訳・強化の回数は F-06 / F-07 を作るときに足す
+      properties:
+        id:
+          $ref: "#/components/schemas/CharacterId"
+        name:
+          type: string
+        attribute:
+          $ref: "#/components/schemas/Attribute"
+        description:
+          type: string
+        assets:
+          $ref: "#/components/schemas/CharacterAssets"
+    MyCharacterList:
+      type: object
+      required: [characters]
+      additionalProperties: false
+      properties:
+        characters:
+          type: array
+          items:
+            $ref: "#/components/schemas/MyCharacter"
+    MyQuest:
+      type: object
+      required: [id, kind, name, imageKey, attribute, stageCount, turnCount, revealCount, isCleared]
+      additionalProperties: false
+      description: クエスト一覧の 1 件。敵の行動・ステータスは含めない
+      properties:
+        id:
+          $ref: "#/components/schemas/QuestId"
+        kind:
+          type: string
+          enum: [main, weather]
+        name:
+          type: string
+        imageKey:
+          type: string
+          description: 敵の画像のキー（最初のステージ）
+        attribute:
+          $ref: "#/components/schemas/Attribute"
+        stageCount:
+          type: integer
+          minimum: 1
+          description: 敵の数（2 以上なら連戦）
+        turnCount:
+          type: integer
+          minimum: 1
+          description: 最初の敵のターン数（最終ターンに敵の必殺技が来る）
+        revealCount:
+          type: integer
+          minimum: 0
+          description: みえーるみえーるを使える回数
+        isCleared:
+          type: boolean
+    MyQuestList:
+      type: object
+      required: [quests]
+      additionalProperties: false
+      properties:
+        quests:
+          type: array
+          items:
+            $ref: "#/components/schemas/MyQuest"
+    EnemyAction:
+      type: string
+      enum:
+        [attack, defend, attackBuff, defenceBuff, fixedAttack, strongAttack, concentration, deathblow, provocation, fullRecovery, rateRecovery, changeAttribute, numbness, attackDebuff, defenceDebuff]
+      description: 敵の行動（`spec/battle/README.md` の名前）
+    SpecialAction:
+      type: string
+      enum: [attack, defend, attackBuff, defenceBuff, provocation]
+      description: 必殺技で書き換えられる行動
+    BattleCommand:
+      oneOf:
+        - type: object
+          required: [type]
+          additionalProperties: false
+          properties:
+            type:
+              type: string
+              enum: [attack, defend, attackBuff, defenceBuff, check]
+        - type: object
+          required: [type, to]
+          additionalProperties: false
+          properties:
+            type:
+              const: rewind
+            to:
+              type: integer
+              minimum: 1
+              description: 戻るチェックポイントのターン
+        - type: object
+          required: [type, turn, action]
+          additionalProperties: false
+          description: 必殺技の書き換え。`POST /quest-sessions/{sessionId}/special` のあとにだけ送れる
+          properties:
+            type:
+              const: special
+            turn:
+              type: integer
+              minimum: 1
+              description: 書き換えるターン
+            action:
+              $ref: "#/components/schemas/SpecialAction"
+    SequenceRequest:
+      type: object
+      required: [seq]
+      additionalProperties: false
+      properties:
+        seq:
+          type: integer
+          minimum: 0
+          description: 手元の `Battle.seq`（api の値と違えば `STALE_SEQUENCE`）
+    BattleCommandRequest:
+      type: object
+      required: [seq, command]
+      additionalProperties: false
+      properties:
+        seq:
+          type: integer
+          minimum: 0
+          description: 手元の `Battle.seq`（api の値と違えば `STALE_SEQUENCE`）
+        command:
+          $ref: "#/components/schemas/BattleCommand"
+    BattlePlayer:
+      type: object
+      required: [characterId, name, attribute, assets, hp, maxHp, attack, defence, attackRate, numbnessTurns, checkRemaining, rewindRemaining, specialRemaining, isSpecialAvailable]
+      additionalProperties: false
+      properties:
+        characterId:
+          $ref: "#/components/schemas/CharacterId"
+        name:
+          type: string
+        attribute:
+          $ref: "#/components/schemas/Attribute"
+        assets:
+          $ref: "#/components/schemas/CharacterAssets"
+        hp:
+          type: integer
+          minimum: 0
+        maxHp:
+          type: integer
+          minimum: 1
+        attack:
+          type: number
+          description: 今の攻撃力（属性の倍率込み。攻撃倍率は含まない）
+        defence:
+          type: number
+          description: 今の防御力（防御バフ込み）
+        attackRate:
+          type: number
+          description: 攻撃倍率（1 から始まり、攻撃バフで増える）
+        numbnessTurns:
+          type: integer
+          minimum: 0
+          description: ビリビリの残りターン数
+        checkRemaining:
+          type: integer
+          minimum: 0
+        rewindRemaining:
+          type: integer
+          minimum: 0
+        specialRemaining:
+          type: integer
+          minimum: 0
+        isSpecialAvailable:
+          type: boolean
+          description: 今、必殺技の条件を満たしているか（ボタンを押せるか）
+    BattleEnemy:
+      type: object
+      required: [name, imageKey, attribute, hp, maxHp]
+      additionalProperties: false
+      description: 今の敵。行動の並びは含めない
+      properties:
+        name:
+          type: string
+        imageKey:
+          type: string
+        attribute:
+          $ref: "#/components/schemas/Attribute"
+        hp:
+          type: integer
+          minimum: 0
+        maxHp:
+          type: integer
+          minimum: 1
+    BattleHistoryEntry:
+      type: object
+      required: [stage, turn, enemyAction]
+      additionalProperties: false
+      description: 済んだターンの記録（ログの画面）。済んだターンの敵の行動だけを含む
+      properties:
+        stage:
+          type: integer
+          minimum: 1
+        turn:
+          type: integer
+          minimum: 1
+        command:
+          type: string
+          enum: [attack, defend, attackBuff, defenceBuff]
+        isParalyzed:
+          type: boolean
+          description: プレイヤーの行動がしびれて失敗したか
+        enemyAction:
+          $ref: "#/components/schemas/EnemyAction"
+    Reward:
+      type: object
+      required: [level, isLevelUp, fudaGained, recruitedCharacterId, duplicate, items]
+      additionalProperties: false
+      description: 勝ったときの報酬（api が付与済み。docs/02 F-05）
+      properties:
+        level:
+          type: integer
+          minimum: 1
+          description: 報酬を受け取ったあとの Lv
+        isLevelUp:
+          type: boolean
+        fudaGained:
+          type: integer
+          minimum: 0
+        recruitedCharacterId:
+          oneOf:
+            - $ref: "#/components/schemas/CharacterId"
+            - type: "null"
+          description: 仲間になったキャラ（初めて仲間になったとき）
+        duplicate:
+          oneOf:
+            - type: object
+              required: [characterId, stat]
+              additionalProperties: false
+              properties:
+                characterId:
+                  $ref: "#/components/schemas/CharacterId"
+                stat:
+                  type: string
+                  enum: [hp, attack, defence]
+            - type: "null"
+          description: 被りで上がったステータス
+        items:
+          type: array
+          description: もらった強化アイテム（お天気クエスト）
+          items:
+            type: object
+            required: [itemId, count]
+            additionalProperties: false
+            properties:
+              itemId:
+                type: string
+              count:
+                type: integer
+                minimum: 1
+    Battle:
+      type: object
+      required: [id, questId, seq, phase, outcome, stage, stageCount, turn, turnCount, player, enemy, checkpoints, revealRemaining, history, reward, expiresAt]
+      additionalProperties: false
+      description: |
+        バトルの今の状態。**先のターンの敵の行動は含めない。**
+        画面はこれを表示するだけで、計算はしない（計算は api。docs/02 §4）。
+      properties:
+        id:
+          type: string
+          format: uuid
+        questId:
+          $ref: "#/components/schemas/QuestId"
+        seq:
+          type: integer
+          minimum: 0
+          description: 状態の番号。コマンド・みえーる・必殺技を受け付けるたびに 1 増える
+        phase:
+          type: string
+          enum: [command, choosingSpecial, finished]
+          description: "`command`: コマンドを待っている / `choosingSpecial`: 必殺技の書き換えを待っている / `finished`: 決着がついた"
+        outcome:
+          type: string
+          enum: [ongoing, win, lose]
+        stage:
+          type: integer
+          minimum: 1
+          description: 何体目の敵か
+        stageCount:
+          type: integer
+          minimum: 1
+        turn:
+          type: integer
+          minimum: 1
+          description: これから行うターンの番号
+        turnCount:
+          type: integer
+          minimum: 1
+          description: 今の敵のターン数（最終ターンに敵の必殺技が来る）
+        player:
+          $ref: "#/components/schemas/BattlePlayer"
+        enemy:
+          $ref: "#/components/schemas/BattleEnemy"
+        checkpoints:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+        revealRemaining:
+          type: integer
+          minimum: 0
+        history:
+          type: array
+          items:
+            $ref: "#/components/schemas/BattleHistoryEntry"
+        reward:
+          oneOf:
+            - $ref: "#/components/schemas/Reward"
+            - type: "null"
+          description: 勝ったときだけ入る
+        expiresAt:
+          type: string
+          format: date-time
+    BattleEvent:
+      description: コマンドで起きたこと。web はこれを順に演出する（HP は演出のあとの値）
+      oneOf:
+        - type: object
+          required: [type, command, isParalyzed, damage, playerHp, enemyHp]
+          additionalProperties: false
+          properties:
+            type:
+              const: playerAction
+            command:
+              type: string
+              enum: [attack, defend, attackBuff, defenceBuff]
+            isParalyzed:
+              type: boolean
+            damage:
+              type: integer
+              minimum: 0
+              description: 敵に与えたダメージ（攻撃以外は 0）
+            playerHp:
+              type: integer
+              minimum: 0
+            enemyHp:
+              type: integer
+              minimum: 0
+        - type: object
+          required: [type, action, damage, playerHp, enemyHp]
+          additionalProperties: false
+          properties:
+            type:
+              const: enemyAction
+            action:
+              $ref: "#/components/schemas/EnemyAction"
+            damage:
+              type: integer
+              minimum: 0
+              description: プレイヤーが受けたダメージ（攻撃系以外は 0）
+            playerHp:
+              type: integer
+              minimum: 0
+            enemyHp:
+              type: integer
+              minimum: 0
+        - type: object
+          required: [type, nextStage]
+          additionalProperties: false
+          description: 敵を倒して次の敵に入れ替わった（連戦）
+          properties:
+            type:
+              const: stageCleared
+            nextStage:
+              type: integer
+              minimum: 2
+        - type: object
+          required: [type, turn]
+          additionalProperties: false
+          properties:
+            type:
+              const: checked
+            turn:
+              type: integer
+              minimum: 1
+        - type: object
+          required: [type, to]
+          additionalProperties: false
+          properties:
+            type:
+              const: rewound
+            to:
+              type: integer
+              minimum: 1
+        - type: object
+          required: [type, turn, action]
+          additionalProperties: false
+          properties:
+            type:
+              const: specialApplied
+            turn:
+              type: integer
+              minimum: 1
+            action:
+              $ref: "#/components/schemas/SpecialAction"
+        - type: object
+          required: [type, outcome]
+          additionalProperties: false
+          properties:
+            type:
+              const: finished
+            outcome:
+              type: string
+              enum: [win, lose]
+    BattleStepResult:
+      type: object
+      required: [events, battle]
+      additionalProperties: false
+      properties:
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/BattleEvent"
+        battle:
+          $ref: "#/components/schemas/Battle"
+    TurnAction:
+      type: object
+      required: [turn, action]
+      additionalProperties: false
+      properties:
+        turn:
+          type: integer
+          minimum: 1
+        action:
+          $ref: "#/components/schemas/EnemyAction"
+    RevealResult:
+      type: object
+      required: [turns, battle]
+      additionalProperties: false
+      properties:
+        turns:
+          type: array
+          description: 今の敵の全ターンの行動（1 ターン目から）
+          items:
+            $ref: "#/components/schemas/TurnAction"
+        battle:
+          $ref: "#/components/schemas/Battle"
+    SpecialChoices:
+      type: object
+      required: [turns, battle]
+      additionalProperties: false
+      properties:
+        turns:
+          type: array
+          description: 書き換えられるターン（`turn − 2` 〜 `turn + 2` のうち存在するもの）の敵の行動
+          items:
+            $ref: "#/components/schemas/TurnAction"
+        battle:
+          $ref: "#/components/schemas/Battle"
+    BattleRejectReason:
+      type: string
+      enum:
+        [BATTLE_FINISHED, CANNOT_CHECK_FIRST_TURN, ALREADY_CHECKED, CHECK_LIMIT, NO_CHECKPOINT, REWIND_LIMIT, CANNOT_REWIND_HERE, INVALID_REWIND_TARGET, SPECIAL_UNAVAILABLE, INVALID_SPECIAL_TARGET, REVEAL_LIMIT, SPECIAL_PENDING, SPECIAL_NOT_OPENED]
+      description: |
+        実行できなかった理由。`REVEAL_LIMIT` より上は `spec/battle/README.md` の理由コード（判定の順番も同じ）。
+        - `REVEAL_LIMIT`: みえーるみえーるの回数を使い切っている
+        - `SPECIAL_PENDING`: 必殺技の書き換えを選ぶ状態なので、書き換え以外は受け付けない
+        - `SPECIAL_NOT_OPENED`: 必殺技を使っていない（`POST .../special` の前）のに書き換えを送った
     ErrorCode:
       type: string
       enum:
@@ -254,12 +991,22 @@ components:
         - INVALID_NAME
         - CHARACTER_NOT_OWNED
         - UNAUTHORIZED
+        - QUEST_NOT_AVAILABLE
+        - BATTLE_NOT_FOUND
+        - NO_ACTIVE_BATTLE
+        - STALE_SEQUENCE
+        - COMMAND_REJECTED
         - INTERNAL_ERROR
       description: |
         - `VALIDATION_FAILED`: リクエストの形が違う（JSON が壊れている・必須項目がない・余計な項目がある・PATCH の項目が 0 個）
         - `INVALID_NAME`: 名前が空・7 文字以上・制御文字を含む
         - `CHARACTER_NOT_OWNED`: 持っていない（または存在しない）キャラを出撃させようとした
         - `UNAUTHORIZED`: トークンがない・正しくない
+        - `QUEST_NOT_AVAILABLE`: そのクエストは存在しない・まだ解放されていない・今日の天気ではない
+        - `BATTLE_NOT_FOUND`: そのバトルは無い（自分のものでない・期限切れ・新しいバトルで無効になった）
+        - `NO_ACTIVE_BATTLE`: 進行中のバトルが無い
+        - `STALE_SEQUENCE`: 送った `seq` が今の状態と違う（`GET /quest-sessions/current` で取り直す）
+        - `COMMAND_REJECTED`: そのコマンドは今は実行できない（理由は `reason`）
         - `INTERNAL_ERROR`: api の予期しないエラー（バグなど）。原因はレスポンスに出さず、api のログにだけ残す
     Problem:
       type: object
@@ -281,7 +1028,55 @@ components:
           format: uri-reference
         code:
           $ref: "#/components/schemas/ErrorCode"
+        reason:
+          $ref: "#/components/schemas/BattleRejectReason"
+          description: "`COMMAND_REJECTED` のときだけ入る"
   responses:
+    QuestNotAvailable:
+      description: そのクエストは始められない（`QUEST_NOT_AVAILABLE`）
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          example:
+            type: about:blank
+            title: Not Found
+            status: 404
+            code: QUEST_NOT_AVAILABLE
+    BattleNotFound:
+      description: そのバトルは無い（`BATTLE_NOT_FOUND`）
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          example:
+            type: about:blank
+            title: Not Found
+            status: 404
+            code: BATTLE_NOT_FOUND
+    NoActiveBattle:
+      description: 進行中のバトルが無い（`NO_ACTIVE_BATTLE`）
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          example:
+            type: about:blank
+            title: Not Found
+            status: 404
+            code: NO_ACTIVE_BATTLE
+    BattleConflict:
+      description: 今の状態では実行できない（`STALE_SEQUENCE` / `COMMAND_REJECTED`）
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          example:
+            type: about:blank
+            title: Conflict
+            status: 409
+            code: COMMAND_REJECTED
+            reason: CHECK_LIMIT
     InternalError:
       description: api の予期しないエラー（`INTERNAL_ERROR`）。どの API でも起こりうる
       content:

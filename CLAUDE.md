@@ -18,7 +18,7 @@ GitHub: https://github.com/k-kame1220/ficklewolf-k （公開・既定のブラ�
 - `main` / `staging` / `develop` には直接コミットしない。マージはオーナーが行う。
 - コミット前に pre-commit フックが format・lint・test・build を確認する。作業ブランチには AI が自由にコミットしてよい。
 - タスクは GitHub Issues。新しい画面や設計に影響する作業は、実装前に計画を出して承認をもらう。
-- 完了条件: `pnpm check` とゴールデンテストが全部通ること。画面を変えたらスクリーンショットを PR に貼る。
+- 完了条件: `pnpm check` が全部通ること（ゴールデンテストは api が通す。docs/02 D-8）。画面を変えたらスクリーンショットを PR に貼る。
 - ライブラリの追加は事前にオーナーに聞く（`docs/03` で予定済みのものを除く）。
 - 設計・仕様に関わる判断は同じ PR で `docs/` を更新する。文章は日本語、コード上の名前は英語。
 - コミットメッセージは Conventional Commits（`feat(web): ...`）。
