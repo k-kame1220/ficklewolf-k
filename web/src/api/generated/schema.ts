@@ -301,11 +301,14 @@ export type components = {
         readonly MyCharacterList: {
             readonly characters: readonly components["schemas"]["MyCharacter"][];
         };
-        /** @description クエスト一覧の 1 件。敵の行動・ステータスは含めない */
+        /** @description クエスト一覧の 1 件 */
         readonly MyQuest: {
             readonly id: components["schemas"]["QuestId"];
-            /** @enum {string} */
-            readonly kind: "main" | "weather";
+            /**
+             * @description `event` はフェーズ 1.5 から返す
+             * @enum {string}
+             */
+            readonly kind: "main" | "event" | "weather";
             readonly name: string;
             /** @description 敵の画像のキー（最初のステージ） */
             readonly imageKey: string;

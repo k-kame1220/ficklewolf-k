@@ -9,7 +9,7 @@ info:
     ## 変更履歴
     | 日付 | 版 | 変更 |
     |---|---|---|
-    | 2026-10-10 | 0.3.0 | `/master`・`/master/version` を消した。`Battle.reward` を消し、`BattleStepResult.reward`（commands のレスポンス）に移した |
+    | 2026-10-10 | 0.3.0 | `/master`・`/master/version` を消した。`Battle.reward` を消し、`BattleStepResult.reward`（commands のレスポンス）に移した。`MyQuest.kind` に `event` を足した |
     | 2026-10-10 | 0.2.0 | バトルを api で計算する形にした（docs/02 D-8）。`/app/version`・`/me/characters`・`/me/quests`・`/quests/{questId}/sessions`・`/quest-sessions/*` を足した |
     | 2026-10-04 | 0.1.0 | `/master/version`・`/master` を足した。エラーの種類に `INTERNAL_ERROR` を足し、全 API に 500 を書いた |
     | 2026-09-26 | 0.1.0 | 最初の版。`/auth/guest`・`GET /me`・`PATCH /me` |
@@ -457,13 +457,14 @@ components:
       type: object
       required: [id, kind, name, imageKey, attribute, stageCount, turnCount, revealCount, isCleared]
       additionalProperties: false
-      description: クエスト一覧の 1 件。敵の行動・ステータスは含めない
+      description: クエスト一覧の 1 件
       properties:
         id:
           $ref: "#/components/schemas/QuestId"
         kind:
           type: string
-          enum: [main, weather]
+          enum: [main, event, weather]
+          description: "`event` はフェーズ 1.5 から返す"
         name:
           type: string
         imageKey:
