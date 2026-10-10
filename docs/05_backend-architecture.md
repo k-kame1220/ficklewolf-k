@@ -43,7 +43,8 @@ api/
 | `auth` | トークンの発行と照合。外に出すのは「トークン → PlayerId」 | 作成済み（`POST /auth/guest`） |
 | `player` | プロフィール（名前・Lv・お札・出撃キャラ）。`/me` | 作成済み（出撃キャラの変更は character の後） |
 | `app` | 必要なアプリの最低バージョン（`/app/version`。`settings.json` の `minAppVersion`） | 予定 |
-| `character` | キャラのマスタ（`characters.json`）・所持キャラ・強化。`/me/characters` | 予定 |
+| `character` | キャラのマスタ（`characters.json`）・所持キャラ・強化（育成の決まり `growth`）。`/me/characters` | 予定 |
+| `item` | アイテムのマスタ（`items.json`）と所持数。`/me/items`。使う（減らす）・渡す（増やす）は `ItemApi` で受ける | 予定 |
 | `quest` | クエストのマスタ（`quests.json`。敵のステータスと行動）・解放とクリア状況・報酬。`/me/quests` | 予定 |
 | `battle` | バトルのエンジン（ゴールデンテスト）とバトルのセッション。`/quests/{id}/sessions`・`/quest-sessions/*`（docs/02 D-8） | 予定 |
 | `weather` | 天気のマスタ（`weathers.json`）と日替わりの天気 | 予定 |
@@ -232,13 +233,13 @@ D-8（docs/02）でマスタをまとめて配信するのをやめ、マスタ�
 | `characters.json` | character |
 | `quests.json`（敵のステータス・行動） | quest |
 | `weathers.json` | weather |
-| `items.json` | character（強化で使う） |
+| `items.json` | item（所持数も item が持つ。強化する character・報酬を渡す quest は `ItemApi` に頼む） |
 | `attributes.json` | 相性はバトルのルール（battle）。名前・絵のキーは表示する側 |
-| `settings.json` | 項目ごとに持ち主が違う。`minAppVersion` → app、`starterCharacterId`・`growth` → character、`rewards` → quest。各モジュールが自分の項目だけを読む |
+| `settings.json` | 項目ごとに持ち主が違う。`minAppVersion` → app、`starterCharacterId`・`growth`（強化の上限・1 個あたりの上昇量）→ character、`rewards` → quest。各モジュールが自分の項目だけを読む |
 
 - **正は `spec/master/*.json`。** 各モジュールの adapter が、ビルド時に `processResources` で**自分のファイルだけ**を jar に同梱し、起動時に 1 回だけ読む（ファイルがない・壊れているときは起動に失敗する）。リポジトリにはコピーを置かない。
 - マスタの読み込みも port（`<対象>MasterRepository` など）にし、実装は adapter に置く。JSON を型に変えるのは adapter の仕事で、core は JSON を知らない。**DB ができたら**、デプロイ時に各モジュールが自分のテーブルへ投入し、差し替えるのは実装だけ。
-- 他のモジュールのマスタが要るときは、持ち主の api に聞く（例: battle はキャラの基礎ステータスを `CharacterApi`、敵を `QuestApi` から）。マスタを丸ごと渡さず、要る形で返す。
+- 他のモジュールのマスタやデータが要るときは、持ち主の api に聞く（例: battle はキャラの基礎ステータスを `CharacterApi`、敵を `QuestApi` から。character の強化は `ItemApi` でアイテムを減らしてから自分のステータスを上げる。quest の報酬は `ItemApi` でアイテムを渡す）。マスタを丸ごと渡さず、要る形で返す。
 - `settings.json` は 1 つのファイルに持ち主の違う値が混ざっている。気になったら spec のファイルを分けることを相談する（spec の変更なのでオーナーが決める）。
 
 ### 今ある master モジュール（廃止予定）
@@ -293,7 +294,7 @@ com.ficklewolf.k.<モジュール>.adapter.web / .adapter.persistence
 | 2026-10-08 | リクエストの JSON は厳しく読む（知らない項目・数字や真偽値から文字列への変換は 400 `VALIDATION_FAILED`） |
 | 2026-10-08 | CORS は `platform:web` で Security に組み込み、許可するオリジンは設定で決める |
 | 2026-10-08 | master は api・core・adapter の 3 つ。DB ができるまでは spec/master をビルド時に jar へ同梱し、起動時に読んで JSON のまま配信する（→ 2026-10-10 に変更） |
-| 2026-10-10 | **マスタは持ち主のモジュールが持つ**（character・quest・weather・app など。§7）。中央の master モジュールは作らず、今あるものは `/master` を消すときに一緒に消す。他のモジュールのマスタは持ち主の api に聞く |
+| 2026-10-10 | **マスタは持ち主のモジュールが持つ**（character・item・quest・weather・app など。§7）。item はアイテムのマスタと所持数を持つ別のモジュールにし、強化・報酬は `ItemApi` を通す。中央の master モジュールは作らず、今あるものは `/master` を消すときに一緒に消す。他のモジュールのマスタは持ち主の api に聞く |
 
 ### 不採用にした案
 - **外側（presentation・infrastructure）を全モジュールで共通にする**: Gradle のモジュールは少なく済むが、外側では境界をコンパイラで守れない（特に DB で他モジュールのテーブルを触れてしまう）。モジュール数はほぼ変わらないので、境界を守れる core + adapter にした。
