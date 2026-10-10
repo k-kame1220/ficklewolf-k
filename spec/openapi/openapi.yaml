@@ -21,8 +21,6 @@ tags:
     description: 所持キャラ
   - name: quests
     description: クエストとバトル（バトルは api が計算する）
-  - name: master
-    description: （廃止予定）マスタデータ一式の配信
 paths:
   /auth/guest:
     post:
@@ -311,70 +309,7 @@ paths:
           $ref: "#/components/responses/BattleNotFound"
         "500":
           $ref: "#/components/responses/InternalError"
-  /master/version:
-    get:
-      tags: [master]
-      operationId: getMasterVersion
-      summary: （廃止予定）マスタのバージョンと、必要なアプリの最低バージョンを取る
-      deprecated: true
-      description: |
-        **廃止予定。** `GET /app/version` に置き換える（マスタはまとめて配信しないため。docs/02 §10）。
-        起動時に最初に呼ぶ。アプリのバージョンが `minAppVersion` より古ければ、アップデートを促す画面を出してそれ以上進まない。
-      security: []
-      responses:
-        "200":
-          description: 取れた
-          headers:
-            Cache-Control:
-              schema:
-                type: string
-                examples: [no-store]
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MasterVersion"
-        "500":
-          $ref: "#/components/responses/InternalError"
-  /master:
-    get:
-      tags: [master]
-      operationId: getMaster
-      summary: （廃止予定）マスタデータ一式を取る
-      deprecated: true
-      description: |
-        **廃止予定。** 敵の行動などがすべて見えてしまうため、まとめて配信するのをやめる。画面ごとの API（`/me/characters`・`/me/quests`・バトル）で必要な分だけ返す（docs/02 §10）。
-        中身は `spec/master/*.json` と同じ（api がデプロイ時に DB へ投入したもの）。素材はパスではなくキーで書かれている。
-        **HTTP キャッシュで配信する。** api は `ETag`（マスタのバージョン）と `Cache-Control: no-cache` を付け、
-        リクエストの `If-None-Match` がバージョンと一致すれば本文なしの 304 を返す。
-        `If-None-Match` はブラウザ・アプリの HTTP キャッシュが自動で付けるので、クライアントのコードは意識しない。
-      security: []
-      parameters:
-        - name: If-None-Match
-          in: header
-          required: false
-          description: 手元のキャッシュの ETag（ブラウザが自動で付ける）
-          schema:
-            type: string
-      responses:
-        "200":
-          description: 取れた
-          headers:
-            ETag:
-              description: マスタのバージョンを引用符で囲んだもの（例 `"2128ee46b22b6a58"`）
-              schema:
-                type: string
-            Cache-Control:
-              schema:
-                type: string
-                examples: [no-cache]
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Master"
-        "304":
-          description: 手元のキャッシュと同じ（本文なし）
-        "500":
-          $ref: "#/components/responses/InternalError"
+
 components:
   parameters:
     QuestId:
@@ -457,41 +392,6 @@ components:
           description: 所持しているお札の数
         selectedCharacterId:
           $ref: "#/components/schemas/CharacterId"
-    MasterVersion:
-      type: object
-      required: [masterVersion, minAppVersion]
-      additionalProperties: false
-      properties:
-        masterVersion:
-          type: string
-          pattern: "^[0-9a-f]{16}$"
-          description: マスタのバージョン（`spec/master/README.md` の計算方法。中身が変わると変わる）
-        minAppVersion:
-          type: string
-          pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
-          description: 必要なアプリの最低バージョン（`settings.minAppVersion`）
-    Master:
-      type: object
-      required: [version, attributes, characters, quests, weathers, items, settings]
-      additionalProperties: false
-      description: 各項目の形は `spec/master/schema/*.schema.json` が正
-      properties:
-        version:
-          type: string
-          pattern: "^[0-9a-f]{16}$"
-          description: マスタのバージョン（`GET /master/version` の `masterVersion` と同じ）
-        attributes:
-          $ref: "../master/schema/attributes.schema.json"
-        characters:
-          $ref: "../master/schema/characters.schema.json"
-        quests:
-          $ref: "../master/schema/quests.schema.json"
-        weathers:
-          $ref: "../master/schema/weathers.schema.json"
-        items:
-          $ref: "../master/schema/items.schema.json"
-        settings:
-          $ref: "../master/schema/settings.schema.json"
     AppVersion:
       type: object
       required: [minAppVersion]

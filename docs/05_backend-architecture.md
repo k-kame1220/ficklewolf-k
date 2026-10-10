@@ -48,7 +48,7 @@ api/
 | `quest` | クエストのマスタ（`quests.json`。敵のステータスと行動）・解放とクリア状況・報酬。`/me/quests` | 予定 |
 | `battle` | バトルのエンジン（ゴールデンテスト）とバトルのセッション。`/quests/{id}/sessions`・`/quest-sessions/*`（docs/02 D-8） | 予定 |
 | `weather` | 天気のマスタ（`weathers.json`）と日替わりの天気 | 予定 |
-| `master` | （**なくす**）マスタをまとめて配信していた。D-8 で配信をやめ、マスタは各モジュールが持つことにしたので、`/master` を消すときに一緒に消す（§7） | 廃止予定 |
+| `master` | マスタをまとめて配信していた。D-8 で配信をやめ、マスタは各モジュールが持つことにしたので消した（§7） | 削除済み（2026-10-10） |
 
 ---
 
@@ -242,9 +242,8 @@ D-8（docs/02）でマスタをまとめて配信するのをやめ、マスタ�
 - 他のモジュールのマスタやデータが要るときは、持ち主の api に聞く（例: battle はキャラの基礎ステータスを `CharacterApi`、敵を `QuestApi` から。character の強化は `ItemApi` でアイテムを減らしてから自分のステータスを上げる。quest の報酬は `ItemApi` でアイテムを渡す）。マスタを丸ごと渡さず、要る形で返す。
 - `settings.json` は 1 つのファイルに持ち主の違う値が混ざっている。気になったら spec のファイルを分けることを相談する（spec の変更なのでオーナーが決める）。
 
-### 今ある master モジュール（廃止予定）
-- `GET /master`・`GET /master/version`・`MasterVersion`（ETag と 304 のためのバージョン計算）・`ClasspathMasterRepository` は、web が `/app/version` と画面ごとの API に移ったら**モジュールごと消す**。
-- それまでは残す（今の web が起動時に使っているため）。
+### master モジュールは消した（2026-10-10）
+- `GET /master`・`GET /master/version`・`MasterVersion`（ETag と 304 のためのバージョン計算）・`ClasspathMasterRepository` は、web が `/app/version` と画面ごとの API に移ったので、モジュールごと消した。
 
 ---
 

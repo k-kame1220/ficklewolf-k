@@ -158,7 +158,7 @@
 | GET | `/me` | プロフィール（名前・Lv・お札・出撃キャラ） |
 | PATCH | `/me` | 名前変更・出撃キャラ設定 |
 | GET | `/app/version` | 必要なアプリの最低バージョン（起動時に確認） |
-| ~~GET~~ | ~~`/master/version`・`/master`~~ | **廃止予定**（D-8。マスタはまとめて配信しない） |
+| ~~GET~~ | ~~`/master/version`・`/master`~~ | **削除した**（D-8。マスタはまとめて配信しない） |
 | GET | `/weather/today` | 今日の天気 |
 | GET | `/me/characters` | 所持キャラ（名前・属性・説明・素材のキー。育成値は F-06 で足す） |
 | GET | `/me/items` | 所持アイテム |
