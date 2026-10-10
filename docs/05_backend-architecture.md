@@ -1,6 +1,6 @@
 # バックエンド設計（モジュラーモノリスとレイヤー構成）
 
-> 版: v0.5（2026-10-10、マスタは各モジュールが持つ。中央の master モジュールはなくす）/ 対象: `api/`。バックエンドはオーナーが書く。この文書はオーナーと AI の相談で決めたことの記録。
+> 版: v0.6（2026-10-10、メソッド名の決まり（find と get・層ごとの付け方）を足す）/ 対象: `api/`。バックエンドはオーナーが書く。この文書はオーナーと AI の相談で決めたことの記録。
 > 前提: [00_project-context.md](00_project-context.md)（Kotlin + Spring Boot は必須）、[02_requirements.md](02_requirements.md) §6（API 一覧）
 
 ---
@@ -118,7 +118,7 @@ player:core
 ```kotlin
 // player:api（domain の型を使わない）
 interface PlayerApi {
-    fun createPlayer(name: String): CreatePlayerResult
+    fun create(name: String): CreatePlayerResult
 
     fun find(id: PlayerId): PlayerSummary?
 }
@@ -127,7 +127,7 @@ interface PlayerApi {
 interface PlayerService {
     fun createPlayer(name: PlayerName): Player
 
-    fun find(id: PlayerId): Player?
+    fun findPlayer(id: PlayerId): Player?
 }
 
 fun playerService(
@@ -141,19 +141,43 @@ fun playerApi(playerService: PlayerService): PlayerApi = DefaultPlayerApi(player
 internal class DefaultPlayerApi(
     private val playerService: PlayerService,
 ) : PlayerApi {
-    override fun createPlayer(name: String): CreatePlayerResult {
+    override fun create(name: String): CreatePlayerResult {
         val playerName = PlayerName.of(name) ?: return CreatePlayerResult.InvalidName
         return CreatePlayerResult.Created(playerService.createPlayer(playerName).toSummary())
     }
 
-    override fun find(id: PlayerId): PlayerSummary? = playerService.find(id)?.toSummary()
+    override fun find(id: PlayerId): PlayerSummary? = playerService.findPlayer(id)?.toSummary()
 }
 ```
 
+### メソッド名の付け方
+Api・Service・Repository は似た形のメソッドが並ぶので、層ごとに付け方を決めて迷わないようにする。
+
+**find と get は「なかったときに何を返すか」で分ける。**
+
+| 動詞 | 意味 | 戻り値 |
+|---|---|---|
+| `find` | ないかもしれないものを取る | `T?`（一覧なら空のリスト） |
+| `get` | 必ずあるものを取る（ないのはバグ） | `T`。なければ例外 |
+
+- 「見つからない」が普通に起こるもの（ID で引くプレイヤー・キャラなど）は `find`。`get` は、起動時に読んだマスタのように、なければ設定やデータの誤りになるものにだけ使う。
+- 一覧は、Repository では `findAllBy〇〇`、Service では `list〇〇s` にする。
+
+**層ごとの付け方**
+
+| 層 | 決まり | 例 |
+|---|---|---|
+| Repository（データの出し入れ） | 保存の言葉だけを使う（`findById`・`findAllBy〇〇`・`save`・`delete`）。リソース名は入れない（型の名前に入っている） | `PlayerRepository.findById(id)`・`OwnedCharacterRepository.findAllByPlayerId(playerId)` |
+| Service（処理の本体） | **動詞＋リソース名**。動詞はゲームの言葉（`rename`・`acquire` など。domain のエンティティの関数と揃える）。引数が自分の ID なら `ById` を付けない（型で分かる）。ID 以外で引くときだけ `By〇〇` を付ける | `createPlayer`・`findPlayer(id)`・`renamePlayer(id, name)`・`acquireCharacter(playerId, characterId)`・`listOwnedCharacters(playerId)` |
+| Api（他モジュールへの窓口） | **動詞だけ**（`playerApi.find(id)` と読めば分かるので、リソース名は入れない）。失敗しうる操作は `<操作>Result` で返す | `PlayerApi.create(name)`・`PlayerApi.find(id)`・`CharacterApi.acquire(playerId, characterId)` → `AcquireCharacterResult` |
+
+- Service だけリソース名を入れるのは、1 つの Service が複数のリソース（例: character のマスタと、持っているキャラ）を扱うことがあるから。Api は呼ぶ側が `characterApi.` と書くので、リソース名は重ねない。
+- `update〇〇` のような汎用の動詞より、何を変えるかが分かるゲームの言葉を使う（`updatePlayerName` ではなく `renamePlayer`）。
+
 ### 入力の検証
-- **Service は domain の型（検証済みの値）を受け取る。** 例: `createPlayer(name: PlayerName)`・`rename(id, name: PlayerName)`。不正な値は型の上で渡せないので、Service は「名前が不正なら？」を考えなくてよい。
+- **Service は domain の型（検証済みの値）を受け取る。** 例: `createPlayer(name: PlayerName)`・`renamePlayer(id, name: PlayerName)`。不正な値は型の上で渡せないので、Service は「名前が不正なら？」を考えなくてよい。
 - **外から来た値を domain の型にするのは入口の仕事。** HTTP からはコントローラ、他モジュールからは `Default<モジュール>Api` が `PlayerName.of(...)` を呼び、だめなら 400 や `InvalidName` を返す。ルール（1〜6 文字など）は domain の 1 か所にあり、入口はそれを呼ぶだけ。
-- Service の失敗が「見つからない」だけなら `null` で返す（例: `rename(...): Player?`）。失敗の種類が 2 つ以上になったら `sealed interface` の結果の型にする。結果の型の名前に Web の言葉（`Me` など）を入れない。
+- Service の失敗が「見つからない」だけなら `null` で返す（例: `renamePlayer(...): Player?`）。失敗の種類が 2 つ以上になったら `sealed interface` の結果の型にする。結果の型の名前に Web の言葉（`Me` など）を入れない。
 - domain のエンティティを変える操作は、エンティティ自身の関数にする（例: `player.rename(name)` は `copy(name = name)` を返す）。companion には「まだないものを作る」関数（`Player.createGuest`）だけを置く。
 
 ### トランザクション
@@ -294,6 +318,7 @@ com.ficklewolf.k.<モジュール>.adapter.web / .adapter.persistence
 | 2026-10-08 | CORS は `platform:web` で Security に組み込み、許可するオリジンは設定で決める |
 | 2026-10-08 | master は api・core・adapter の 3 つ。DB ができるまでは spec/master をビルド時に jar へ同梱し、起動時に読んで JSON のまま配信する（→ 2026-10-10 に変更） |
 | 2026-10-10 | **マスタは持ち主のモジュールが持つ**（character・item・quest・weather・app など。§7）。item はアイテムのマスタと所持数を持つ別のモジュールにし、強化・報酬は `ItemApi` を通す。中央の master モジュールは作らず、今あるものは `/master` を消すときに一緒に消す。他のモジュールのマスタは持ち主の api に聞く |
+| 2026-10-10 | メソッド名の決まり: `find` はないかもしれないもの（`T?`）、`get` は必ずあるもの（ないのはバグ）。Repository は保存の言葉（`findById`・`save`）、Service は動詞＋リソース名（`findPlayer`・`renamePlayer`）、Api は動詞だけ（`PlayerApi.find`・`create`）（§4「メソッド名の付け方」） |
 
 ### 不採用にした案
 - **外側（presentation・infrastructure）を全モジュールで共通にする**: Gradle のモジュールは少なく済むが、外側では境界をコンパイラで守れない（特に DB で他モジュールのテーブルを触れてしまう）。モジュール数はほぼ変わらないので、境界を守れる core + adapter にした。
