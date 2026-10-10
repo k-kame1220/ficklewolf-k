@@ -1,6 +1,6 @@
 # バックエンド設計（モジュラーモノリスとレイヤー構成）
 
-> 版: v0.7（2026-10-10、複数を取るメソッドは `list` にする）/ 対象: `api/`。バックエンドはオーナーが書く。この文書はオーナーと AI の相談で決めたことの記録。
+> 版: v0.8（2026-10-11、コントローラの名前と URL の書き方を OpenAPI から決める）/ 対象: `api/`。バックエンドはオーナーが書く。この文書はオーナーと AI の相談で決めたことの記録。
 > 前提: [00_project-context.md](00_project-context.md)（Kotlin + Spring Boot は必須）、[02_requirements.md](02_requirements.md) §6（API 一覧）
 
 ---
@@ -213,6 +213,36 @@ class PlayerConfiguration {
 }
 ```
 
+### コントローラ
+名前は全部 OpenAPI（`spec/openapi/openapi.yaml`）から機械的に決める。spec にもう名前があるので、新しく考えない。
+
+| 対象 | 決まり | 例 |
+|---|---|---|
+| メソッド名 | OpenAPI の **`operationId` と同じ** | `createGuest`・`getMe`・`updateMe`・`getAppVersion`・`listMyCharacters`・`startQuest` |
+| リクエスト・レスポンスの型 | OpenAPI の **スキーマ名と同じ**。`〜Request` で終わるものはそのまま、それ以外は後ろに `Response` を付ける。入れ子の 1 件も同じ | `CreateGuestRequest`・`MeResponse`・`MyCharacterListResponse`・`MyCharacterResponse` |
+| URL | クラスに `@RequestMapping` を付けず、**メソッドに OpenAPI のパスをそのまま全部書く** | `@GetMapping("/me/characters")`・`@PostMapping("/quest-sessions/{sessionId}/commands")` |
+| クラス名 | **モジュールの名前（扱うリソース）+ `Controller`**。URL の形ではなく、データの持ち主で決める | `/me` → `PlayerController`（player）、`/me/characters` → `CharacterController`（character）、`/quests/{questId}/sessions`・`/quest-sessions/*` → `BattleController`（battle） |
+| 戻り値の型 | 返すものが 1 種類なら型を書く（`ResponseEntity<AppVersionResponse>`）。エラー（Problem）も返すときだけ `ResponseEntity<*>` | `AppController` は前者、`PlayerController` は後者 |
+
+- メソッド名を `operationId` に揃えるのは、web が OpenAPI から作る型・関数の名前の元にもなっているから。spec・web・api を同じ名前で grep できる。1 件は `get`、複数は `list` の使い分けも spec の側で済んでいる。
+- URL を全部書くのは、ログに出たパスなどで探したときに、spec と同じ文字列でコントローラが見つかるようにするため（クラスとメソッドに分けると、つなげた形で探せない）。
+- パスでは URL の文字列で探せるので、クラス名はパスに合わせず、どのモジュールのものかが分かる名前にする。1 つのモジュールが扱うリソースが増えて大きくなったら、そのとき `<リソース>Controller` に分ける。
+
+```kotlin
+@RestController
+class CharacterController(
+    private val characterService: CharacterService,
+) {
+    @GetMapping("/me/characters")
+    fun listMyCharacters(
+        @CurrentPlayer player: AuthenticatedPlayer,
+    ): ResponseEntity<MyCharacterListResponse> {
+        val characters = characterService.listOwnedCharacters(player.playerId)
+        return ResponseEntity.ok(MyCharacterListResponse(characters.map { it.toResponse() }))
+    }
+}
+```
+
 ### 認証
 - `platform:web` に、Security の設定・トークンのフィルタ・`TokenAuthenticator`（インターフェース）・`AuthenticatedPlayer(playerId)`・`@CurrentPlayer` を置く。
 - `auth:adapter` が `TokenAuthenticator` を実装する（`auth:core` の照合のユースケースを使う）。
@@ -323,6 +353,7 @@ com.ficklewolf.k.<モジュール>.adapter.web / .adapter.persistence
 | 2026-10-10 | **マスタは持ち主のモジュールが持つ**（character・item・quest・weather・app など。§7）。item はアイテムのマスタと所持数を持つ別のモジュールにし、強化・報酬は `ItemApi` を通す。中央の master モジュールは作らず、今あるものは `/master` を消すときに一緒に消す。他のモジュールのマスタは持ち主の api に聞く |
 | 2026-10-10 | メソッド名の決まり: `find` はないかもしれないもの（`T?`）、`get` は必ずあるもの（ないのはバグ）。Repository は保存の言葉（`findById`・`save`）、Service は動詞＋リソース名（`findPlayer`・`renamePlayer`）、Api は動詞だけ（`PlayerApi.find`・`create`）（§4「メソッド名の付け方」） |
 | 2026-10-10 | 複数を取るメソッドは、どの層でも `list` にする（Repository は `listBy〇〇`・`listAll`、Service は `list〇〇s`）。`findAll` は使わない。`find` は 1 件（`T?`）だけ |
+| 2026-10-11 | コントローラの名前は OpenAPI から決める: メソッド名は `operationId`、リクエスト・レスポンスの型はスキーマ名（`〜Request` 以外は `Response` を付ける）、URL はクラスに分けずメソッドに全部書く、クラス名はモジュールの名前 + `Controller`、戻り値は 1 種類なら型を書く（§5「コントローラ」） |
 
 ### 不採用にした案
 - **外側（presentation・infrastructure）を全モジュールで共通にする**: Gradle のモジュールは少なく済むが、外側では境界をコンパイラで守れない（特に DB で他モジュールのテーブルを触れてしまう）。モジュール数はほぼ変わらないので、境界を守れる core + adapter にした。
