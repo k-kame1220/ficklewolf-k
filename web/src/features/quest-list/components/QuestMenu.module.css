@@ -1,0 +1,11 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  width: var(--quest-menu-width);
+}
+
+.root button {
+  min-height: var(--quest-menu-button-height);
+  font-size: var(--font-size-lg);
+}

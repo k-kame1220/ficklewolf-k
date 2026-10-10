@@ -7,7 +7,7 @@ export type MenuTabId = "quest" | "monster" | "home" | "gacha" | "other";
 
 const MENU_TAB_IDS = ["quest", "monster", "home", "gacha", "other"] as const satisfies readonly MenuTabId[];
 
-const AVAILABLE_TAB_IDS: ReadonlySet<MenuTabId> = new Set(["home"]);
+const AVAILABLE_TAB_IDS: ReadonlySet<MenuTabId> = new Set(["quest", "home"]);
 
 type MenuTabsProps = {
   /** 今いる画面のタブ */

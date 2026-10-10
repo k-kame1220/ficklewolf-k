@@ -17,7 +17,7 @@ describe("MenuTabs", () => {
     const onSelect = vi.fn();
     render(<MenuTabs current="home" onSelect={onSelect} />);
 
-    expect(screen.getByRole("button", { name: "クエスト" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "モンスター" })).toBeDisabled();
     await userEvent.click(screen.getByRole("button", { name: "ホーム" }));
     expect(onSelect).toHaveBeenCalledWith("home");
   });
