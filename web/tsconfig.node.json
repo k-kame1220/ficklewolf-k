@@ -27,5 +27,5 @@
     "allowUnusedLabels": false,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["*.config.ts", "vitest.global-setup.ts", "src/test/vitest.d.ts", "e2e"]
+  "include": ["*.config.ts", "e2e"]
 }

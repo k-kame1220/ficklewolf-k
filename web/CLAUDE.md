@@ -1,7 +1,7 @@
 # web/ — K フロントエンド（AI が実装する）
 
 設計の全体は `../docs/03_frontend-architecture.md`、要件は `../docs/02_requirements.md`。
-バトルのルールの正は `../spec/battle/README.md`、マスタデータの正は `../spec/master/`（旧作の記録は `../docs/01_legacy-analysis.md`）。
+バトルのルールの正は `../spec/battle/README.md`（計算は api。web は持たない）、マスタデータの正は `../spec/master/`（まとめては配信しない。旧作の記録は `../docs/01_legacy-analysis.md`）。
 **`../api/` はオーナー専用。AI はコードを書かない。**
 
 ## API の型
@@ -66,5 +66,5 @@ src/app → src/pages → src/features/* → src/api → src/domain
 - 作業の最後に `pnpm check` を実行し、すべて通してから完了とする。
 - ライブラリは使う時点で追加する（MSW・openapi-fetch は API ができたとき、Howler・Motion はバトルの演出を作るとき）。
 - lint のルールを無効化するときは `// eslint-disable-next-line <rule> -- 理由` と理由を必ず書く。
-- バトルのエンジンは `../spec/battle/cases/` のゴールデンテストを全件通す。ケースが間違っていると思ったら、実装を変える前にオーナーに相談する。
+- **web はバトルを計算しない**（docs/02 D-8）。コマンドを api に送り、返ってきた状態とイベントを演出する。先のターンの敵の行動は手元に持たない。ゴールデンテスト（`../spec/battle/cases/`）は api が通す。
 - 1 つの作業 = 1 つの PR。PR には「何を・なぜ・どう確かめたか」と画面のスクリーンショットを付ける。
