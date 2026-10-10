@@ -5,6 +5,7 @@ import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { describe, expect, it } from "vitest";
 
+import { createGuest } from "@/api/auth/auth.mutate";
 import { API_BASE_URL } from "@/api/core/config";
 import { createMockHandlers } from "@/api/mocks/handlers";
 import { server } from "@/api/mocks/node";
@@ -49,5 +50,26 @@ describe("起動の流れ", () => {
     server.resetHandlers(...createMockHandlers());
     await userEvent.click(screen.getByRole("button", { name: "リトライ" }));
     expect(await screen.findByRole("link", { name: "Tap to Start..." })).toBeInTheDocument();
+  });
+});
+
+describe("クエストを選ぶ流れ", () => {
+  it("ホームの「クエスト」タブから、メインクエストを選んで出撃確認まで進む", async () => {
+    await createGuest({ name: "ゲスト" });
+    const { router } = renderApp("/home");
+
+    await userEvent.click(await screen.findByRole("button", { name: "クエスト" }));
+    await userEvent.click(await screen.findByRole("button", { name: "メインクエスト" }));
+    await userEvent.click(await screen.findByRole("button", { name: "A" }));
+
+    expect(await screen.findByRole("button", { name: "戦う" })).toBeDisabled();
+    expect(router.state.location.pathname).toBe("/quests/main-a");
+  });
+
+  it("トークンが無ければ名前の登録へ移る", async () => {
+    const { router } = renderApp("/quests");
+
+    expect(await screen.findByRole("button", { name: "決定" })).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe("/register");
   });
 });

@@ -1,0 +1,65 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  margin: var(--space-12) 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+  min-height: var(--quest-card-height);
+  padding: var(--space-2) var(--space-4);
+  border: var(--frame-pencil-width) solid transparent;
+  border-image: var(--frame-pencil);
+  background: none;
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: transform var(--duration-fast) ease-out;
+}
+
+.card:active {
+  transform: scale(var(--press-scale));
+}
+
+.mainName {
+  font-size: var(--font-size-xl);
+}
+
+.image {
+  width: var(--quest-card-image-size);
+  height: var(--quest-card-image-size);
+  object-fit: contain;
+}
+
+.silhouette {
+  filter: brightness(0);
+}
+
+.eventCard {
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.eventLabel,
+.eventName {
+  font-size: var(--font-size-lg);
+}
+
+.status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  line-height: var(--line-height-text);
+  text-align: center;
+}
+
+.status p {
+  margin: 0;
+}

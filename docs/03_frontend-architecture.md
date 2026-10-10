@@ -57,6 +57,7 @@ shared → （外部ライブラリのみ）
 ```
 domain/
 ├── character/     所持キャラの型（MyCharacterModel）
+├── quest/         挑戦できるクエストの型（MyQuestModel・QuestKind）
 ├── version/       アプリのバージョンの比較（必要な最低バージョンより古いか）
 ├── attribute/     属性相性（陽 > 音 > 月 > 陽）
 ├── player/        プレイヤーの型（PlayerModel・CreateGuestCommand・UpdatePlayerCommand）と名前のルール
@@ -148,6 +149,7 @@ features/battle/
 
 ### 3.4 pages/ — 画面
 - ルートごとに 1 ファイル（`QuestListPage.tsx` など）。features の部品を並べ、画面遷移を行うだけ。
+- メニューの画面（上にプレイヤーの状態、下にタブ）は `pages/MenuScreen.tsx` で囲む。タブの行き先もここで決める。
 - ルートは TanStack Router でコードに定義し（`app/router.ts`）、各ページは `lazyRouteComponent` で分割して読み込む。
 
 ### 3.5 shared/ — 共通
