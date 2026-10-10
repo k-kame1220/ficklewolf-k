@@ -161,7 +161,7 @@ export type paths = {
          * コマンドを 1 つ実行する
          * @description api がそのコマンドを計算し（`spec/battle/README.md` のルール）、起きたこと（`events`）と新しい状態を返す。
          *     `seq` には手元の `Battle.seq` をそのまま入れる。api の `seq` と違えば実行せずに `STALE_SEQUENCE` を返す（通信が切れて送り直したときに 2 回実行されないように）。
-         *     勝ったときは、このレスポンスで報酬も付与済み（`battle.reward`）。
+         *     勝ったときは、このコマンドで報酬を付与し、`reward` に入れて返す。
          */
         readonly post: operations["sendBattleCommand"];
         readonly delete?: never;
@@ -443,8 +443,6 @@ export type components = {
             readonly checkpoints: readonly number[];
             readonly revealRemaining: number;
             readonly history: readonly components["schemas"]["BattleHistoryEntry"][];
-            /** @description 勝ったときだけ入る */
-            readonly reward: components["schemas"]["Reward"] | null;
             /** Format: date-time */
             readonly expiresAt: string;
         };
@@ -493,6 +491,8 @@ export type components = {
         readonly BattleStepResult: {
             readonly events: readonly components["schemas"]["BattleEvent"][];
             readonly battle: components["schemas"]["Battle"];
+            /** @description このコマンドで勝ったときだけ入る */
+            readonly reward: components["schemas"]["Reward"] | null;
         };
         readonly TurnAction: {
             readonly turn: number;

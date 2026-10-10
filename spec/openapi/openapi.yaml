@@ -197,7 +197,7 @@ paths:
       description: |
         api がそのコマンドを計算し（`spec/battle/README.md` のルール）、起きたこと（`events`）と新しい状態を返す。
         `seq` には手元の `Battle.seq` をそのまま入れる。api の `seq` と違えば実行せずに `STALE_SEQUENCE` を返す（通信が切れて送り直したときに 2 回実行されないように）。
-        勝ったときは、このレスポンスで報酬も付与済み（`battle.reward`）。
+        勝ったときは、このコマンドで報酬を付与し、`reward` に入れて返す。
       parameters:
         - $ref: "#/components/parameters/SessionId"
       requestBody:
@@ -677,7 +677,7 @@ components:
                 minimum: 1
     Battle:
       type: object
-      required: [id, questId, seq, phase, outcome, stage, stageCount, turn, turnCount, player, enemy, checkpoints, revealRemaining, history, reward, expiresAt]
+      required: [id, questId, seq, phase, outcome, stage, stageCount, turn, turnCount, player, enemy, checkpoints, revealRemaining, history, expiresAt]
       additionalProperties: false
       description: |
         バトルの今の状態。
@@ -730,11 +730,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BattleHistoryEntry"
-        reward:
-          oneOf:
-            - $ref: "#/components/schemas/Reward"
-            - type: "null"
-          description: 勝ったときだけ入る
         expiresAt:
           type: string
           format: date-time
@@ -830,7 +825,7 @@ components:
               enum: [win, lose]
     BattleStepResult:
       type: object
-      required: [events, battle]
+      required: [events, battle, reward]
       additionalProperties: false
       properties:
         events:
@@ -839,6 +834,11 @@ components:
             $ref: "#/components/schemas/BattleEvent"
         battle:
           $ref: "#/components/schemas/Battle"
+        reward:
+          oneOf:
+            - $ref: "#/components/schemas/Reward"
+            - type: "null"
+          description: このコマンドで勝ったときだけ入る
     TurnAction:
       type: object
       required: [turn, action]
