@@ -163,7 +163,7 @@
 | GET | `/me/characters` | 所持キャラ（名前・属性・説明・素材のキー。育成値は F-06 で足す） |
 | GET | `/me/items` | 所持アイテム |
 | POST | `/me/characters/{id}/enhance` | アイテム強化 `{hp, atk, def}` の個数 |
-| GET | `/me/quests` | 挑戦できるクエストとクリア状況（敵の行動は含めない） |
+| GET | `/me/quests` | 挑戦できるクエストとクリア状況 |
 | POST | `/quests/{id}/sessions` | クエスト開始（バトルを作り、今の状態を返す） |
 | GET | `/quest-sessions/current` | 進行中のバトル（再開用） |
 | POST | `/quest-sessions/{id}/commands` | コマンドを 1 つ実行 → 起きたことと新しい状態（勝てば報酬を付与） |

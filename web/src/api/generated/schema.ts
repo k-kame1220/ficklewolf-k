@@ -75,7 +75,7 @@ export type paths = {
         };
         /**
          * 所持キャラの一覧を取る
-         * @description 持っているキャラだけを返す（持っていないキャラの情報は返さない）。並びは図鑑の番号順。
+         * @description 持っているキャラを返す。並びは図鑑の番号順。
          */
         readonly get: operations["listMyCharacters"];
         readonly put?: never;
@@ -95,8 +95,7 @@ export type paths = {
         };
         /**
          * 挑戦できるクエストの一覧を取る
-         * @description 解放済みのメインクエストと、今日の天気のお天気クエストを返す。まだ解放されていないクエストは返さない。
-         *     **敵の行動は返さない**（バトル中にそのつど返す。docs/02 §4）。
+         * @description 解放済みのメインクエストと、今日の天気のお天気クエストを返す。
          */
         readonly get: operations["listMyQuests"];
         readonly put?: never;
@@ -161,7 +160,6 @@ export type paths = {
         /**
          * コマンドを 1 つ実行する
          * @description api がそのコマンドを計算し（`spec/battle/README.md` のルール）、起きたこと（`events`）と新しい状態を返す。
-         *     **次のターン以降の敵の行動は返さない。** 返すのは、このコマンドで実際に起きた敵の行動だけ。
          *     `seq` には手元の `Battle.seq` をそのまま入れる。api の `seq` と違えば実行せずに `STALE_SEQUENCE` を返す（通信が切れて送り直したときに 2 回実行されないように）。
          *     勝ったときは、このレスポンスで報酬も付与済み（`battle.reward`）。
          */
@@ -417,7 +415,7 @@ export type components = {
             }[];
         };
         /**
-         * @description バトルの今の状態。**先のターンの敵の行動は含めない。**
+         * @description バトルの今の状態。
          *     画面はこれを表示するだけで、計算はしない（計算は api。docs/02 §4）。
          */
         readonly Battle: {
