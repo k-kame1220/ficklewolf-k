@@ -1,6 +1,6 @@
 # バックエンド設計（モジュラーモノリスとレイヤー構成）
 
-> 版: v0.4（2026-10-08、Web の共通の仕組み・入力の検証・master の配信を追記）/ 対象: `api/`。バックエンドはオーナーが書く。この文書はオーナーと AI の相談で決めたことの記録。
+> 版: v0.5（2026-10-10、マスタは各モジュールが持つ。中央の master モジュールはなくす）/ 対象: `api/`。バックエンドはオーナーが書く。この文書はオーナーと AI の相談で決めたことの記録。
 > 前提: [00_project-context.md](00_project-context.md)（Kotlin + Spring Boot は必須）、[02_requirements.md](02_requirements.md) §6（API 一覧）
 
 ---
@@ -32,10 +32,8 @@ api/
 │   ├── auth/                    他モジュールから使われないので api はない（core・adapter）
 │   │   ├── core/
 │   │   └── adapter/
-│   └── master/
-│       ├── api/
-│       ├── core/
-│       └── adapter/
+│   ├── app/                     アプリのバージョン（`/app/version`）
+│   └── character/ …             自分のマスタ（spec/master の自分の分）と、プレイヤーごとのデータを持つ
 └── bootstrap/                   起動（KApplication）だけ
 ```
 
@@ -44,11 +42,13 @@ api/
 |---|---|---|
 | `auth` | トークンの発行と照合。外に出すのは「トークン → PlayerId」 | 作成済み（`POST /auth/guest`） |
 | `player` | プロフィール（名前・Lv・お札・出撃キャラ）。`/me` | 作成済み（出撃キャラの変更は character の後） |
-| `master` | マスタの投入と配信（`/master/version`・`/master`） | 作成済み（DB の代わりに jar に同梱。§6） |
-| `weather` | 日替わりの天気 | 予定 |
-| `character` | 所持キャラ・アイテム・強化 | 予定 |
-| `battle` | バトルのルール（純粋な Kotlin。ゴールデンテスト）。core だけ | 予定 |
-| `quest` | クエストのセッション・リプレイ検証・報酬 | 予定 |
+| `app` | 必要なアプリの最低バージョン（`/app/version`。`settings.json` の `minAppVersion`） | 予定 |
+| `character` | キャラのマスタ（`characters.json`）・所持キャラ・強化（育成の決まり `growth`）。`/me/characters` | 予定 |
+| `item` | アイテムのマスタ（`items.json`）と所持数。`/me/items`。使う（減らす）・渡す（増やす）は `ItemApi` で受ける | 予定 |
+| `quest` | クエストのマスタ（`quests.json`。敵のステータスと行動）・解放とクリア状況・報酬。`/me/quests` | 予定 |
+| `battle` | バトルのエンジン（ゴールデンテスト）とバトルのセッション。`/quests/{id}/sessions`・`/quest-sessions/*`（docs/02 D-8） | 予定 |
+| `weather` | 天気のマスタ（`weathers.json`）と日替わりの天気 | 予定 |
+| `master` | （**なくす**）マスタをまとめて配信していた。D-8 で配信をやめ、マスタは各モジュールが持つことにしたので、`/master` を消すときに一緒に消す（§7） | 廃止予定 |
 
 ---
 
@@ -72,7 +72,7 @@ bootstrap ─→ modules/*/adapter ─→ modules/*/core ─→ modules/*/api �
 
 - **core は Spring・DB・HTTP に依存しない。**
 - **他モジュールに依存するときは、相手の api だけ。** 相手の core（domain・ports・実装）や adapter には依存しない。他モジュールのデータが欲しいときは、自分の core から相手の api の窓口を呼ぶ。
-- **api は、他モジュールから使われるモジュールに作る。** auth を呼ぶのは `platform:web` の `TokenAuthenticator` だけなので、auth には api がない。master は character などから使う予定なので、窓口（`MasterApi`）だけ先に作り、中身は必要になったものから足す。
+- **api は、他モジュールから使われるモジュールに作る。** auth を呼ぶのは `platform:web` の `TokenAuthenticator` だけなので、auth には api がない。他のモジュールのマスタが要るときは、その持ち主の api（例: battle → `CharacterApi`・`QuestApi`）に聞く。
 - **api は domain の型を出さない。** やり取りは api に置いた外向けの型（例: `PlayerSummary`）で行う。domain を変えても api の約束が変わらなければ、他モジュールに影響しない。
 - **DB のテーブルはモジュールの持ち物。** 他モジュールのテーブルを JOIN・更新しない。
 - **platform は機能を知らない。** 例: トークンの照合は auth の仕事なので、`platform:web` には `TokenAuthenticator`（トークン → PlayerId）のインターフェースだけを置き、実装は `auth:adapter` が提供する。
@@ -225,13 +225,26 @@ spec の `additionalProperties: false` と型を守るため、Jackson の既定
 
 ---
 
-## 7. master の配信
-- **正は `spec/master/*.json`。** ビルド時に `master:adapter` の `processResources` が jar の `master/` に同梱する（リポジトリにはコピーを置かない）。spec を変えたら api を再ビルドする。
-- `ClasspathMasterRepository` が**起動時に 1 回だけ**読む。ファイルがない・JSON が壊れている・`minAppVersion` がないときは起動に失敗する（リクエストの時点ではなく、デプロイの時点で気づく）。
-- バージョンは中身から計算する（`spec/master/README` の決まり。`MasterVersion.of`）。`spec/tools/validate.py` の値と一致することをテストと手元で確かめた。`Master` は作るときにファイルの順番を `require` で確かめる。
-- api はマスタを**配信するだけ**なので、中身を Kotlin の型にせず JSON のまま組み立てて返す。api の中でキャラやクエストを使う必要が出たら、そのときに必要な部分だけ型にする。
-- `GET /master/version` は `Cache-Control: no-store`。`GET /master` は `ETag`（バージョンを引用符で囲んだもの）と `Cache-Control: no-cache` を付け、`WebRequest.checkNotModified` で一致すれば本文を組み立てずに 304 を返す。
-- **DB ができたら**、デプロイ時に DB へ投入して DB から配信する形（`docs/02` §10）に替える。差し替えるのは `MasterRepository` の実装だけ。
+## 7. マスタ（各モジュールが自分の分を持つ）
+D-8（docs/02）でマスタをまとめて配信するのをやめ、マスタを読むのは api の中のモジュールだけになった。そこで、**マスタはデータの持ち主のモジュールが持つ**。中央の master モジュールは作らない。
+
+| spec/master | 持ち主 |
+|---|---|
+| `characters.json` | character |
+| `quests.json`（敵のステータス・行動） | quest |
+| `weathers.json` | weather |
+| `items.json` | item（所持数も item が持つ。強化する character・報酬を渡す quest は `ItemApi` に頼む） |
+| `attributes.json` | 相性はバトルのルール（battle）。名前・絵のキーは表示する側 |
+| `settings.json` | 項目ごとに持ち主が違う。`minAppVersion` → app、`starterCharacterId`・`growth`（強化の上限・1 個あたりの上昇量）→ character、`rewards` → quest。各モジュールが自分の項目だけを読む |
+
+- **正は `spec/master/*.json`。** 各モジュールの adapter が、ビルド時に `processResources` で**自分のファイルだけ**を jar に同梱し、起動時に 1 回だけ読む（ファイルがない・壊れているときは起動に失敗する）。リポジトリにはコピーを置かない。
+- マスタの読み込みも port（`<対象>MasterRepository` など）にし、実装は adapter に置く。JSON を型に変えるのは adapter の仕事で、core は JSON を知らない。**DB ができたら**、デプロイ時に各モジュールが自分のテーブルへ投入し、差し替えるのは実装だけ。
+- 他のモジュールのマスタやデータが要るときは、持ち主の api に聞く（例: battle はキャラの基礎ステータスを `CharacterApi`、敵を `QuestApi` から。character の強化は `ItemApi` でアイテムを減らしてから自分のステータスを上げる。quest の報酬は `ItemApi` でアイテムを渡す）。マスタを丸ごと渡さず、要る形で返す。
+- `settings.json` は 1 つのファイルに持ち主の違う値が混ざっている。気になったら spec のファイルを分けることを相談する（spec の変更なのでオーナーが決める）。
+
+### 今ある master モジュール（廃止予定）
+- `GET /master`・`GET /master/version`・`MasterVersion`（ETag と 304 のためのバージョン計算）・`ClasspathMasterRepository` は、web が `/app/version` と画面ごとの API に移ったら**モジュールごと消す**。
+- それまでは残す（今の web が起動時に使っているため）。
 
 ---
 
@@ -280,13 +293,15 @@ com.ficklewolf.k.<モジュール>.adapter.web / .adapter.persistence
 | 2026-10-08 | コントローラは `@CurrentPlayer player: AuthenticatedPlayer` で今のプレイヤーを受け取る。`/me` は player モジュールが担当する（中身が player のデータだから） |
 | 2026-10-08 | リクエストの JSON は厳しく読む（知らない項目・数字や真偽値から文字列への変換は 400 `VALIDATION_FAILED`） |
 | 2026-10-08 | CORS は `platform:web` で Security に組み込み、許可するオリジンは設定で決める |
-| 2026-10-08 | master は api・core・adapter の 3 つ。DB ができるまでは spec/master をビルド時に jar へ同梱し、起動時に読んで JSON のまま配信する |
+| 2026-10-08 | master は api・core・adapter の 3 つ。DB ができるまでは spec/master をビルド時に jar へ同梱し、起動時に読んで JSON のまま配信する（→ 2026-10-10 に変更） |
+| 2026-10-10 | **マスタは持ち主のモジュールが持つ**（character・item・quest・weather・app など。§7）。item はアイテムのマスタと所持数を持つ別のモジュールにし、強化・報酬は `ItemApi` を通す。中央の master モジュールは作らず、今あるものは `/master` を消すときに一緒に消す。他のモジュールのマスタは持ち主の api に聞く |
 
 ### 不採用にした案
 - **外側（presentation・infrastructure）を全モジュールで共通にする**: Gradle のモジュールは少なく済むが、外側では境界をコンパイラで守れない（特に DB で他モジュールのテーブルを触れてしまう）。モジュール数はほぼ変わらないので、境界を守れる core + adapter にした。
 - **domain と application を別の Gradle モジュールにする**: core の中のパッケージと `internal` で十分に分けられる。
 - **他モジュールの core に直接依存する**: 相手の domain・ports まで見えてしまい、domain の変更が他モジュールに広がる。api（契約）を挟む形にした。
 - **使う側がインターフェースを持つ（依存性の逆転）**: 使う側ごとにつなぎ役のクラスが要る。モジュラーモノリスの標準である api（契約）の形にした。
+- **マスタを中央の master モジュールで持ち、`MasterApi` で各モジュールに配る**（2026-10-10）: みんなが master に依存して何でも知っているモジュールになり、クエストの形を変えるだけでも影響が広がる。「キャラの基礎ステータスは誰のものか」もあいまいになり、DB にしたときの「テーブルはモジュールの持ち物」とも合わない。
 - **master の JSON を起動時にフォルダから読む**: 再ビルドは要らないが、デプロイ時に jar と一緒に JSON を置く必要がある。jar だけで動くよう、ビルド時に同梱する形にした。
 - **master の中身を Kotlin の型にして返す**: 配信するだけなら型にする利点がなく、spec のスキーマと二重に管理することになる。
 - **`/players/me` にする**: 他のプレイヤーを `/players/{id}` で見る予定がない。URL にモジュールの分け方を出さない。
