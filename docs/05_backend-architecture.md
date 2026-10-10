@@ -1,6 +1,6 @@
 # バックエンド設計（モジュラーモノリスとレイヤー構成）
 
-> 版: v0.6（2026-10-10、メソッド名の決まり（find と get・層ごとの付け方）を足す）/ 対象: `api/`。バックエンドはオーナーが書く。この文書はオーナーと AI の相談で決めたことの記録。
+> 版: v0.7（2026-10-10、複数を取るメソッドは `list` にする）/ 対象: `api/`。バックエンドはオーナーが書く。この文書はオーナーと AI の相談で決めたことの記録。
 > 前提: [00_project-context.md](00_project-context.md)（Kotlin + Spring Boot は必須）、[02_requirements.md](02_requirements.md) §6（API 一覧）
 
 ---
@@ -153,21 +153,23 @@ internal class DefaultPlayerApi(
 ### メソッド名の付け方
 Api・Service・Repository は似た形のメソッドが並ぶので、層ごとに付け方を決めて迷わないようにする。
 
-**find と get は「なかったときに何を返すか」で分ける。**
+**取る動詞は、取る数と「なかったときに何を返すか」で分ける。**
 
 | 動詞 | 意味 | 戻り値 |
 |---|---|---|
-| `find` | ないかもしれないものを取る | `T?`（一覧なら空のリスト） |
-| `get` | 必ずあるものを取る（ないのはバグ） | `T`。なければ例外 |
+| `find` | 1 件。ないかもしれないものを取る | `T?` |
+| `get` | 1 件。必ずあるものを取る（ないのはバグ） | `T`。なければ例外 |
+| `list` | 複数 | `List<T>`（なければ空のリスト） |
 
 - 「見つからない」が普通に起こるもの（ID で引くプレイヤー・キャラなど）は `find`。`get` は、起動時に読んだマスタのように、なければ設定やデータの誤りになるものにだけ使う。
-- 一覧は、Repository では `findAllBy〇〇`、Service では `list〇〇s` にする。
+- 複数は、どの層でも `list` にする（`findAll` は使わない）。動詞を見れば、1 件（`T?`）か複数（`List<T>`）かが分かるようにするため。`findAllBy〇〇` は Spring Data の付け方で、core の Repository（Spring に依存しない自前の interface）が合わせる理由はない。
+- Repository の `list` には、引く条件を `By〇〇` で必ず付ける（`listByPlayerId`）。全部を取るときは `listAll()`。条件のない `list()` は「全部」と読み違えやすいので使わない。
 
 **層ごとの付け方**
 
 | 層 | 決まり | 例 |
 |---|---|---|
-| Repository（データの出し入れ） | 保存の言葉だけを使う（`findById`・`findAllBy〇〇`・`save`・`delete`）。リソース名は入れない（型の名前に入っている） | `PlayerRepository.findById(id)`・`OwnedCharacterRepository.findAllByPlayerId(playerId)` |
+| Repository（データの出し入れ） | 保存の言葉だけを使う（`findById`・`listBy〇〇`・`listAll`・`save`・`delete`）。リソース名は入れない（型の名前に入っている） | `PlayerRepository.findById(id)`・`OwnedCharacterRepository.listByPlayerId(playerId)`・`CharacterRepository.listAll()` |
 | Service（処理の本体） | **動詞＋リソース名**。動詞はゲームの言葉（`rename`・`acquire` など。domain のエンティティの関数と揃える）。引数が自分の ID なら `ById` を付けない（型で分かる）。ID 以外で引くときだけ `By〇〇` を付ける | `createPlayer`・`findPlayer(id)`・`renamePlayer(id, name)`・`acquireCharacter(playerId, characterId)`・`listOwnedCharacters(playerId)` |
 | Api（他モジュールへの窓口） | **動詞だけ**（`playerApi.find(id)` と読めば分かるので、リソース名は入れない）。失敗しうる操作は `<操作>Result` で返す | `PlayerApi.create(name)`・`PlayerApi.find(id)`・`CharacterApi.acquire(playerId, characterId)` → `AcquireCharacterResult` |
 
@@ -319,6 +321,7 @@ com.ficklewolf.k.<モジュール>.adapter.web / .adapter.persistence
 | 2026-10-08 | master は api・core・adapter の 3 つ。DB ができるまでは spec/master をビルド時に jar へ同梱し、起動時に読んで JSON のまま配信する（→ 2026-10-10 に変更） |
 | 2026-10-10 | **マスタは持ち主のモジュールが持つ**（character・item・quest・weather・app など。§7）。item はアイテムのマスタと所持数を持つ別のモジュールにし、強化・報酬は `ItemApi` を通す。中央の master モジュールは作らず、今あるものは `/master` を消すときに一緒に消す。他のモジュールのマスタは持ち主の api に聞く |
 | 2026-10-10 | メソッド名の決まり: `find` はないかもしれないもの（`T?`）、`get` は必ずあるもの（ないのはバグ）。Repository は保存の言葉（`findById`・`save`）、Service は動詞＋リソース名（`findPlayer`・`renamePlayer`）、Api は動詞だけ（`PlayerApi.find`・`create`）（§4「メソッド名の付け方」） |
+| 2026-10-10 | 複数を取るメソッドは、どの層でも `list` にする（Repository は `listBy〇〇`・`listAll`、Service は `list〇〇s`）。`findAll` は使わない。`find` は 1 件（`T?`）だけ |
 
 ### 不採用にした案
 - **外側（presentation・infrastructure）を全モジュールで共通にする**: Gradle のモジュールは少なく済むが、外側では境界をコンパイラで守れない（特に DB で他モジュールのテーブルを触れてしまう）。モジュール数はほぼ変わらないので、境界を守れる core + adapter にした。
