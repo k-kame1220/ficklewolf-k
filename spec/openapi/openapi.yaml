@@ -1,10 +1,18 @@
 openapi: 3.1.0
 info:
   title: K API
-  version: 0.2.0
+  version: 0.3.0
   description: |
     K（リメイク）の API。web と api の約束事で、ここに書かれたものが正。
     エラーは RFC 9457（Problem Details）の形で返し、機械で見分けるための `code` を付ける。
+
+    ## 変更履歴
+    | 日付 | 版 | 変更 |
+    |---|---|---|
+    | 2026-10-10 | 0.3.0 | `/master`・`/master/version` を消した。`Battle.reward` を消し、`BattleStepResult.reward`（commands のレスポンス）に移した |
+    | 2026-10-10 | 0.2.0 | バトルを api で計算する形にした（docs/02 D-8）。`/app/version`・`/me/characters`・`/me/quests`・`/quests/{questId}/sessions`・`/quest-sessions/*` を足した |
+    | 2026-10-04 | 0.1.0 | `/master/version`・`/master` を足した。エラーの種類に `INTERNAL_ERROR` を足し、全 API に 500 を書いた |
+    | 2026-09-26 | 0.1.0 | 最初の版。`/auth/guest`・`GET /me`・`PATCH /me` |
 servers:
   - url: http://localhost:8080
     description: ローカル開発
