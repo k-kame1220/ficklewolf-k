@@ -9,12 +9,10 @@ include(
     ":bootstrap",
     ":platform:web",
     ":platform:persistence",
-    ":modules:player:api",
-    ":modules:player:core",
-    ":modules:player:adapter",
-    ":modules:auth:adapter",
-    ":modules:auth:core",
-    ":modules:master:api",
-    ":modules:master:core",
-    ":modules:master:adapter",
 )
+
+file("modules").listFiles()?.filter { it.isDirectory }?.sorted()?.forEach { module ->
+    listOf("api", "core", "adapter")
+        .filter { file("modules/${module.name}/$it/build.gradle.kts").exists() }
+        .forEach { include(":modules:${module.name}:$it") }
+}
