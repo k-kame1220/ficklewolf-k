@@ -5,7 +5,7 @@ export type PlayerModel = {
   readonly level: number;
   /** 所持しているお札の数 */
   readonly fuda: number;
-  /** 出撃キャラの ID（spec/master/characters.json の id） */
+  /** 出撃キャラの ID（所持キャラの id） */
   readonly selectedCharacterId: string;
 };
 

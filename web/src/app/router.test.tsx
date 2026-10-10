@@ -24,29 +24,24 @@ const renderApp = (path: string) => {
 };
 
 describe("起動の流れ", () => {
-  it("アプリが古くなければ、マスタを読み込んでから画面を出す", async () => {
+  it("アプリが古くなければ画面を出す（マスタはまとめて読まない）", async () => {
     const { queryClient } = renderApp("/");
 
     expect(await screen.findByRole("link", { name: "Tap to Start..." })).toBeInTheDocument();
-    expect(queryClient.getQueryData(["master"])).toBeDefined();
+    expect(queryClient.getQueryData(["app", "version"])).toBe("0.1.0");
   });
 
-  it("アプリが最低バージョンより古ければ、アップデートを促してマスタは読まない", async () => {
-    server.use(
-      http.get(`${API_BASE_URL}/master/version`, () =>
-        HttpResponse.json({ masterVersion: "0000000000000000", minAppVersion: "99.0.0" })
-      )
-    );
+  it("アプリが最低バージョンより古ければ、アップデートを促す", async () => {
+    server.use(http.get(`${API_BASE_URL}/app/version`, () => HttpResponse.json({ minAppVersion: "99.0.0" })));
 
-    const { router, queryClient } = renderApp("/");
+    const { router } = renderApp("/");
 
     expect(await screen.findByText("最新のアップデートがあります。アップデートしてください。")).toBeInTheDocument();
     expect(router.state.location.pathname).toBe("/update");
-    expect(queryClient.getQueryData(["master"])).toBeUndefined();
   });
 
-  it("マスタの通信に失敗し続けたらリトライの画面を出し、リトライで読み直す", { timeout: 10_000 }, async () => {
-    server.use(http.get(`${API_BASE_URL}/master`, () => HttpResponse.error()));
+  it("版の確認の通信に失敗し続けたらリトライの画面を出し、リトライで読み直す", { timeout: 10_000 }, async () => {
+    server.use(http.get(`${API_BASE_URL}/app/version`, () => HttpResponse.error()));
 
     renderApp("/");
 
