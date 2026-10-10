@@ -29,7 +29,7 @@ GitHub: https://github.com/k-kame1220/ficklewolf-k （公開・既定のブラ�
   - `spec/master/`: マスタデータ（キャラ・クエスト・天気・アイテム・設定）
   - `spec/tools/validate.py`: spec の検証（pre-commit・CI でも実行）
   - `spec/openapi/openapi.yaml`: API の定義（実装を始める API から順に書き足す）
-    - 各 API の説明には今の仕様だけを書く。IF を変えたら `info.version` を上げ、`info.description` の「変更履歴」に 1 行足す
+    - 各 API の説明には今の仕様だけを書く。IF を変えたら `info.version` を上げ、`info.description` の「変更履歴」に版の見出しと箇条書きで足す
 - `docs/`: なぜそうするか・どう感じてほしいか。
 
 ## ドキュメント
