@@ -43,6 +43,7 @@ GitHub: https://github.com/k-kame1220/ficklewolf-k （公開・既定のブラ�
 | `docs/05_backend-architecture.md` | バックエンドの設計（モジュラーモノリス・core / adapter・依存のルール） |
 | `spec/battle/README.md` | バトルの計算ルール（正） |
 | `spec/master/README.md` | マスタデータのルール |
+| `web/README.md` | フロントの準備（取得素材の作り方）・開発サーバー・環境変数 |
 | `web/CLAUDE.md` | フロント実装時に守ること |
 
 ## コマンド
