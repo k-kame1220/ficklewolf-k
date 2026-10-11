@@ -1,16 +1,16 @@
 # フロントエンド設計（レイヤー構成とコーディングルール）
 
-> 版: v0.5（2026-10-08、見た目の方針（旧作の白黒の手描き）と素材の使い方を追記）/ 前提: [02_requirements.md](02_requirements.md) §4・§9（D-1: ルールは別々に実装、D-2: React + TS + Capacitor）
+> 版: v0.6（2026-10-10、D-8: web はバトルを計算せず、マスタをまとめて読まない）/ 前提: [02_requirements.md](02_requirements.md) §4・§9（D-1: ルールは別々に実装、D-2: React + TS + Capacitor）
 > 対象: `web/`。フロントは AI が実装する。このルールは AI が守るものであり、オーナーのレビューの基準にもなる。
 
 ---
 
 ## 1. 設計の考え方
 
-1. **ゲームのルールと画面を分ける。** バトル・ステータス計算は React を知らない純粋な TypeScript にする。ゴールデンテストで検証するのはこの部分。
+1. **ゲームのルールと画面を分ける。** 画面で使うルール（名前の決まり・属性相性の表示など）は React を知らない純粋な TypeScript にする。**バトルの計算は api が行い、web は持たない**（`docs/02` D-8）。
 2. **状態の置き場所を種類ごとに決める。** サーバのデータ / バトルの状態 / 画面だけの状態を混ぜない。
 3. **依存の向きは一方通行。** 上のレイヤーは下のレイヤーを使えるが、逆は禁止。lint で機械的にチェックする。
-4. **演出は「イベントの再生」にする。** エンジンが返したイベント（ダメージ・バフ・属性変化…）を順番に演出する。ルールとアニメーションのタイミングを混ぜない（旧作の `GameDirector` の反省）。
+4. **演出は「イベントの再生」にする。** api が返したイベント（ダメージ・バフ・属性変化…）を順番に演出する。ルールとアニメーションのタイミングを混ぜない（旧作の `GameDirector` の反省）。
 
 ---
 
@@ -56,24 +56,16 @@ shared → （外部ライブラリのみ）
 ### 3.1 domain/ — ゲームのルール
 ```
 domain/
-├── master/        マスタの型（MasterModel など。`spec/master` の形に合わせ、各マスタは ID で引ける Map）
+├── character/     所持キャラの型（MyCharacterModel）
 ├── version/       アプリのバージョンの比較（必要な最低バージョンより古いか）
 ├── attribute/     属性相性（陽 > 音 > 月 > 陽）
 ├── player/        プレイヤーの型（PlayerModel・CreateGuestCommand・UpdatePlayerCommand）と名前のルール
-├── stats/         ステータス計算（HP・攻撃・防御 = 基礎 + アイテム + 被り + 天気。係数は `spec/master/settings.json`）
-├── battle/
-│   ├── types.ts            コマンド・プレイヤーと敵の設定・状態（BattleState）・イベント（BattleEvent）・理由コード
-│   ├── engine.ts           createBattle(setup) と step(state, command) → { ok: true, state, events } | { ok: false, reason }
-│   ├── enemyAction.ts      敵の行動 15 種の処理と、ダメージ・攻撃力の計算
-│   ├── rng.ts              mulberry32（状態を引数と戻り値で受け渡す純粋関数）
-│   ├── engine.golden.test.ts  spec/battle/cases を全件読み込んで 1 手ずつ比べる
-│   └── rng.test.ts         spec/battle/rng のテストベクタ
+└── battle/        バトルの表示に使う型（api の状態・イベントを変換したもの。計算はしない。バトル画面を作るときに足す）
 ```
 - **アプリの中で使う型（`XxxModel`）と操作の入力（`XxxCommand`）は domain に置く**（Shackw の wallet-app と同じ）。API の形（DTO）は domain に持ち込まない。
 - **すべて純粋関数**。入力が同じなら結果も同じ。状態は `readonly` で、書き換えずに新しいオブジェクトを返す。
-- 乱数は状態（`rngState`）として持ち回り、現在時刻は引数で受け取る。
-- 実行できないコマンドは例外にせず、**理由付きの結果**を返す: `{ ok: false, reason: 'NO_CHECKPOINT' }`。画面はこれを見てメッセージを出す（旧作の「チェックポイントがありません。」など）。
-- ゴールデンテスト（`spec/battle/cases/*.json`）は `domain/battle` に対して直接実行する。ルールの正は `spec/battle/README.md`。
+- 失敗しうるルールは例外にせず、**理由付きの結果**を返す: `{ ok: false, reason: 'TOO_LONG' }`。
+- **バトルのエンジンは持たない**（`docs/02` D-8）。ゴールデンテスト（`spec/battle/cases/`）は api が通す。バトルで実行できないコマンドは api が `COMMAND_REJECTED` と `reason`（`NO_CHECKPOINT` など）で返し、画面はそれを見てメッセージを出す（旧作の「チェックポイントがありません。」など）。
 
 ### 3.2 api/ — 通信
 ```
@@ -98,12 +90,8 @@ api/
 │   ├── me.mutate.ts      変更（`updateMe` と `useUpdateMe`）
 │   ├── me.mock.ts        MSW のハンドラ
 │   └── me.test.ts
-├── master/
-│   ├── master.schema.ts  レスポンスの valibot のスキーマ（マスタの形は spec/master/schema が正）
-│   ├── master.mapper.ts  DTO → MasterModel（配列を ID の Map にする）
-│   ├── master.query.ts   fetchMasterVersion / fetchMaster / useMaster
-│   ├── master.mock.ts    spec/master の JSON をそのまま返す（バージョンは validate.py と同じ計算、ETag / 304）
-│   └── master.test.ts
+├── app/                  `GET /app/version`（必要なアプリの最低バージョン）
+├── character/            `GET /me/characters`（所持キャラ。ID で引ける Map にする）
 └── mocks/                MSW の組み立て（`db.ts` = モックの DB と共通の関数、`handlers.ts` = 全 resource のハンドラをまとめる、`browser.ts` = 開発用、`node.ts` = テスト用）
 ```
 - **resource（OpenAPI の tag）ごとにフォルダを分ける。** 1 つの resource に関するもの（取得・変更・変換・キー・モック・テスト）は同じフォルダに置く。features とは分けない（`/me` はホーム・名前変更・キャラなど複数の feature から使うため）。
@@ -129,13 +117,11 @@ api/
 - 本番のビルドにはモックを含めない（`import.meta.env.DEV` のときだけ読み込む）。
 - モック（`mocks/` と `*.mock.ts`）の中だけは、DB の代わりとして `Map` の書き換えを許可している（`eslint.config.ts`）。
 
-#### 起動の流れとマスタ
+#### 起動の流れ
 - どの画面でも最初に、ルートの一番上（`app/router.ts` の root の `beforeLoad`）で次を行う。
-  1. `GET /master/version` で必要なアプリの最低バージョンを確かめる。アプリ（`web/package.json` の version をビルド時に埋め込んだ `APP_VERSION`）が古ければ `/update`（アップデートを促す画面）へ移り、マスタは読まない。
-  2. `GET /master` でマスタを読み込んでから画面を出す。
-  3. 通信に失敗したら、root の `errorComponent`（リトライの画面）を出す。リトライでルートを読み直す。
-- マスタは TanStack Query に `staleTime: "static"` で持つ（起動中は取り直さない）。部品は `useMaster()` で読む（読み込み済みの前提。`useSuspenseQuery`）。
-- **マスタは端末に保存しない。** HTTP キャッシュ（api の ETag と 304）に任せる（`docs/02` §10）。
+  1. `GET /app/version` で必要なアプリの最低バージョンを確かめる。アプリ（`web/package.json` の version をビルド時に埋め込んだ `APP_VERSION`）が古ければ `/update`（アップデートを促す画面）へ移る。
+  2. 通信に失敗したら、root の `errorComponent`（リトライの画面）を出す。リトライでルートを読み直す。待っている間は root の `pendingComponent`（読み込み中の画面）を出す。
+- **マスタはまとめて読まない**（`docs/02` D-8）。各画面が必要な分だけ api から取る（所持キャラ = `/me/characters`、クエスト = `/me/quests`、バトル = バトルの API）。
 - ルーターは `createAppRouter(queryClient)` で作り、`queryClient` をルートの context で渡す。
 - 画面の外枠（スマホの幅で中央に出す）は `shared/ui/ScreenFrame`。エラー時も同じ枠で出す。
 
@@ -155,8 +141,10 @@ features/battle/
 ├── messages.ts        イベント → 表示文言（「A の攻撃。 120 ダメージあたえた。」）
 └── *.module.css
 ```
-- **バトルの流れ**: ボタン → その場で `engine.step` を呼ぶ → 新しい state と events をストアに入れる → `useEventPlayer` がイベントを 1 つずつ演出（揺れ・SE・HP バー・文言）→ 全部終わったら次の入力を受け付ける。
-- 演出の長さや間の取り方は features 側で決める。domain は時間を知らない。
+- **バトルの流れ**: ボタン → `POST /quest-sessions/{id}/commands`（手元の `seq` を付ける）→ 返ってきた状態と events をストアに入れる → `useEventPlayer` がイベントを 1 つずつ演出（揺れ・SE・HP バー・文言）→ 全部終わったら次の入力を受け付ける。
+- **先のターンの敵の行動は手元に無い。** みえーるみえーる・必殺技を押したときに api から取る（`docs/02` D-8）。
+- `STALE_SEQUENCE` が返ったら（送り直しなど）、`GET /quest-sessions/current` で状態を取り直す。アプリを開き直したときも、進行中のバトルがあれば続きから再開する。
+- 演出の長さや間の取り方は features 側で決める。
 
 ### 3.4 pages/ — 画面
 - ルートごとに 1 ファイル（`QuestListPage.tsx` など）。features の部品を並べ、画面遷移を行うだけ。
@@ -179,7 +167,7 @@ shared/
 
 | 種類 | 例 | 置き場所 |
 |---|---|---|
-| サーバのデータ | プロフィール、所持キャラ、マスタ、天気 | TanStack Query |
+| サーバのデータ | プロフィール、所持キャラ、クエスト、天気 | TanStack Query |
 | 画面・機能の中で共有する状態 | バトル中の HP・バフ・イベントの再生状況 | **スコープ付きの Zustand ストア**（下記） |
 | 端末に残す設定 | 音量、認証トークン | `shared/storage`（Web は localStorage、アプリは Capacitor Preferences） |
 | 1 つの部品の中だけの状態 | タブの選択、モーダルの開閉、入力中の値 | `useState` |
@@ -272,7 +260,7 @@ export default BattleStoreProvider;
 
 ### 5.1 TypeScript
 - tsconfig は shackw と同じく `tsconfig.app.json`（src）と `tsconfig.node.json`（設定ファイル）に分ける。`strict` と shackw の設定（`erasableSyntaxOnly`, `noUncheckedSideEffectImports` など）に加えて、`noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noImplicitOverride`, `noImplicitReturns` を有効にする。
-- **`any` は禁止。** 外から来る値（api のレスポンス、端末に保存した値、ゴールデンテストの JSON）は `unknown` で受けて **valibot で検証**する。
+- **`any` は禁止。** 外から来る値（api のレスポンス、端末に保存した値）は `unknown` で受けて **valibot で検証**する。
   - lint: `no-explicit-any`・`no-unsafe-*`（any の代入・引数・呼び出し・メンバー参照・戻り値）・`no-unsafe-type-assertion`。
   - 標準の型で any を返す `JSON.parse` と `Response.json()` は、`src/app/builtins.d.ts` で unknown を返すように上書きしている。
   - tsconfig: `strict` に加えて `noUncheckedIndexedAccess`・`exactOptionalPropertyTypes`・`noImplicitReturns`・`noImplicitOverride`・`allowUnreachableCode: false`・`allowUnusedLabels: false` など。`noPropertyAccessFromIndexSignature` は CSS Modules（`styles.root`）とぶつかるので使わない。
@@ -354,7 +342,7 @@ export default BattleStoreProvider;
 ### 5.5 テスト
 | 対象 | ツール | 基準 |
 |---|---|---|
-| domain（バトル・ステータス） | Vitest | **ゴールデンテストを全件通す**。分岐はすべてテストする |
+| domain（名前・属性・バージョンなどのルール） | Vitest | 分岐はすべてテストする（バトルのゴールデンテストは api が通す） |
 | features のフック・部品 | Vitest + Testing Library + MSW | 主な操作（コマンドを押す → 表示が変わる）を確認する |
 | 画面の通し | Playwright（`web/e2e/`。`pnpm e2e`。ポートは `E2E_PORT` で変えられる。既定は 4100） | ログイン → クエスト → 勝利 → 報酬、の主な流れを数本。スマホの幅（390px）で動かし、スクリーンショットを `web/screenshots/`（git の対象外）に撮る |
 - テストファイルは対象の隣に `*.test.ts(x)` で置く。テストの書き方は `it` に統一し、`describe` で囲む。
@@ -372,7 +360,7 @@ export default BattleStoreProvider;
 ### 5.7 その他
 - 文言は日本語のみ。多言語化はしないが、文言は各 feature の `messages.ts` などにまとめ、コンポーネントに直接書き散らさない。
 - エラー表示: 通信エラーは共通のダイアログ（リトライ / タイトルへ）。旧作の文言を流用する。
-- 素材は 2 種類（`docs/02` §10）。同梱素材は `web/` にコミットし、取得素材はマスタに書かれたキーと基点 URL（設定）から組み立てて取得する。どちらも型付きのマニフェスト・キーから参照し、パスを文字列で直接書かない。
+- 素材は 2 種類（`docs/02` §10）。同梱素材は `web/` にコミットし、取得素材は api が返したキー（`assets.home` など）と基点 URL（設定）から組み立てて取得する。どちらも型付きのマニフェスト・キーから参照し、パスを文字列で直接書かない。
   - 変換は `legacy/tools/convert_assets.py`（Pillow・fonttools。`legacy/README.md`）。同梱素材は `web/src/shared/assets/bundled/`（WebP）と `fonts/`（WOFF2）に出力してコミットする。
   - 同梱素材は、背景・枠なら `tokens.css` の変数（`--image-*`・`--frame-*`）、`<img>` で出すものは `shared/assets/bundledAssets.ts` の `BUNDLED_ASSETS` から使う。Vite がハッシュ付きの名前にする。
   - 取得素材は `web/public/assets/`（git の外）にハッシュ付きの名前で出力し、キー → ファイル名の一覧 `shared/assets/remoteAssets.json` をコミットする。URL は `remoteAssetUrl(key)`（基点は `VITE_ASSET_BASE_URL`。未設定なら同じサーバーの `/assets`）。
@@ -393,7 +381,7 @@ export default BattleStoreProvider;
 | ID | 内容 | 決定（2026-09-25） |
 |---|---|---|
 | F-1 | スタイルの方式 | CSS Modules ＋ CSS 変数（shackw は Tailwind だが、K はゲーム画面なので CSS Modules を維持） |
-| F-2 | リポジトリ構成 | **モノリポ**（git は K/ に 1 つ）。ただし各プロジェクトのツールはそのフォルダの中で完結させ、直下には `.gitignore` 以外を置かない。共有する約束事（OpenAPI・ゴールデンテスト）は `spec/` に置き、`web`・`api` から相対パスで参照する。`web/src` は pages / features 構成（shackw の routes 同居型にはしない） |
+| F-2 | リポジトリ構成 | **モノリポ**（git は K/ に 1 つ）。ただし各プロジェクトのツールはそのフォルダの中で完結させ、直下には `.gitignore` 以外を置かない。共有する約束事（OpenAPI・ゴールデンテスト・マスタ）は `spec/` に置き、`web`・`api` から相対パスで参照する。`web/src` は pages / features 構成（shackw の routes 同居型にはしない） |
 | F-3 | パッケージ管理 | pnpm |
 | F-4 | バリデーション | valibot（zod は lint で禁止） |
 | F-5 | Zustand | スコープ付き（createStore ＋ Context）。グローバルなストアは禁止 |

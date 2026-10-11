@@ -75,7 +75,7 @@ export type paths = {
         };
         /**
          * 所持キャラの一覧を取る
-         * @description 持っているキャラだけを返す（持っていないキャラの情報は返さない）。並びは図鑑の番号順。
+         * @description 持っているキャラを返す。並びは図鑑の番号順。
          */
         readonly get: operations["listMyCharacters"];
         readonly put?: never;
@@ -95,8 +95,7 @@ export type paths = {
         };
         /**
          * 挑戦できるクエストの一覧を取る
-         * @description 解放済みのメインクエストと、今日の天気のお天気クエストを返す。まだ解放されていないクエストは返さない。
-         *     **敵の行動は返さない**（バトル中にそのつど返す。docs/02 §4）。
+         * @description 解放済みのメインクエストと、今日の天気のお天気クエストを返す。
          */
         readonly get: operations["listMyQuests"];
         readonly put?: never;
@@ -161,9 +160,8 @@ export type paths = {
         /**
          * コマンドを 1 つ実行する
          * @description api がそのコマンドを計算し（`spec/battle/README.md` のルール）、起きたこと（`events`）と新しい状態を返す。
-         *     **次のターン以降の敵の行動は返さない。** 返すのは、このコマンドで実際に起きた敵の行動だけ。
          *     `seq` には手元の `Battle.seq` をそのまま入れる。api の `seq` と違えば実行せずに `STALE_SEQUENCE` を返す（通信が切れて送り直したときに 2 回実行されないように）。
-         *     勝ったときは、このレスポンスで報酬も付与済み（`battle.reward`）。
+         *     勝ったときは、このコマンドで報酬を付与し、`reward` に入れて返す。
          */
         readonly post: operations["sendBattleCommand"];
         readonly delete?: never;
@@ -235,53 +233,6 @@ export type paths = {
         readonly patch?: never;
         readonly trace?: never;
     };
-    readonly "/master/version": {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header?: never;
-            readonly path?: never;
-            readonly cookie?: never;
-        };
-        /**
-         * （廃止予定）マスタのバージョンと、必要なアプリの最低バージョンを取る
-         * @deprecated
-         * @description **廃止予定。** `GET /app/version` に置き換える（マスタはまとめて配信しないため。docs/02 §10）。
-         *     起動時に最初に呼ぶ。アプリのバージョンが `minAppVersion` より古ければ、アップデートを促す画面を出してそれ以上進まない。
-         */
-        readonly get: operations["getMasterVersion"];
-        readonly put?: never;
-        readonly post?: never;
-        readonly delete?: never;
-        readonly options?: never;
-        readonly head?: never;
-        readonly patch?: never;
-        readonly trace?: never;
-    };
-    readonly "/master": {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header?: never;
-            readonly path?: never;
-            readonly cookie?: never;
-        };
-        /**
-         * （廃止予定）マスタデータ一式を取る
-         * @deprecated
-         * @description **廃止予定。** 敵の行動などがすべて見えてしまうため、まとめて配信するのをやめる。画面ごとの API（`/me/characters`・`/me/quests`・バトル）で必要な分だけ返す（docs/02 §10）。
-         *     中身は `spec/master/*.json` と同じ（api がデプロイ時に DB へ投入したもの）。素材はパスではなくキーで書かれている。
-         *     **HTTP キャッシュで配信する。** api は `ETag`（マスタのバージョン）と `Cache-Control: no-cache` を付け、
-         *     リクエストの `If-None-Match` がバージョンと一致すれば本文なしの 304 を返す。
-         *     `If-None-Match` はブラウザ・アプリの HTTP キャッシュが自動で付けるので、クライアントのコードは意識しない。
-         */
-        readonly get: operations["getMaster"];
-        readonly put?: never;
-        readonly post?: never;
-        readonly delete?: never;
-        readonly options?: never;
-        readonly head?: never;
-        readonly patch?: never;
-        readonly trace?: never;
-    };
 };
 export type webhooks = Record<string, never>;
 export type components = {
@@ -319,23 +270,6 @@ export type components = {
             readonly fuda: number;
             readonly selectedCharacterId: components["schemas"]["CharacterId"];
         };
-        readonly MasterVersion: {
-            /** @description マスタのバージョン（`spec/master/README.md` の計算方法。中身が変わると変わる） */
-            readonly masterVersion: string;
-            /** @description 必要なアプリの最低バージョン（`settings.minAppVersion`） */
-            readonly minAppVersion: string;
-        };
-        /** @description 各項目の形は `spec/master/schema/*.schema.json` が正 */
-        readonly Master: {
-            /** @description マスタのバージョン（`GET /master/version` の `masterVersion` と同じ） */
-            readonly version: string;
-            readonly attributes: components["schemas"]["attributes.schema"];
-            readonly characters: components["schemas"]["characters.schema"];
-            readonly quests: components["schemas"]["quests.schema"];
-            readonly weathers: components["schemas"]["weathers.schema"];
-            readonly items: components["schemas"]["items.schema"];
-            readonly settings: components["schemas"]["settings.schema"];
-        };
         readonly AppVersion: {
             /** @description 必要なアプリの最低バージョン（`settings.minAppVersion`） */
             readonly minAppVersion: string;
@@ -367,11 +301,14 @@ export type components = {
         readonly MyCharacterList: {
             readonly characters: readonly components["schemas"]["MyCharacter"][];
         };
-        /** @description クエスト一覧の 1 件。敵の行動・ステータスは含めない */
+        /** @description クエスト一覧の 1 件 */
         readonly MyQuest: {
             readonly id: components["schemas"]["QuestId"];
-            /** @enum {string} */
-            readonly kind: "main" | "weather";
+            /**
+             * @description `event` はフェーズ 1.5 から返す
+             * @enum {string}
+             */
+            readonly kind: "main" | "event" | "weather";
             readonly name: string;
             /** @description 敵の画像のキー（最初のステージ） */
             readonly imageKey: string;
@@ -481,7 +418,7 @@ export type components = {
             }[];
         };
         /**
-         * @description バトルの今の状態。**先のターンの敵の行動は含めない。**
+         * @description バトルの今の状態。
          *     画面はこれを表示するだけで、計算はしない（計算は api。docs/02 §4）。
          */
         readonly Battle: {
@@ -509,8 +446,6 @@ export type components = {
             readonly checkpoints: readonly number[];
             readonly revealRemaining: number;
             readonly history: readonly components["schemas"]["BattleHistoryEntry"][];
-            /** @description 勝ったときだけ入る */
-            readonly reward: components["schemas"]["Reward"] | null;
             /** Format: date-time */
             readonly expiresAt: string;
         };
@@ -559,6 +494,8 @@ export type components = {
         readonly BattleStepResult: {
             readonly events: readonly components["schemas"]["BattleEvent"][];
             readonly battle: components["schemas"]["Battle"];
+            /** @description このコマンドで勝ったときだけ入る */
+            readonly reward: components["schemas"]["Reward"] | null;
         };
         readonly TurnAction: {
             readonly turn: number;
@@ -611,119 +548,6 @@ export type components = {
             readonly code: components["schemas"]["ErrorCode"];
             /** @description `COMMAND_REJECTED` のときだけ入る */
             readonly reason?: components["schemas"]["BattleRejectReason"];
-        };
-        /** @enum {unknown} */
-        readonly attribute: "yang" | "note" | "moon";
-        readonly assetKey: string;
-        readonly "attributes.schema": readonly {
-            readonly id: components["schemas"]["attribute"];
-            readonly name: string;
-            readonly strongAgainst: components["schemas"]["attribute"];
-            readonly iconKey: components["schemas"]["assetKey"];
-            readonly bgmKey: components["schemas"]["assetKey"];
-        }[];
-        readonly id: string;
-        readonly stats: {
-            readonly hp: number;
-            readonly attack: number;
-            readonly defence: number;
-        };
-        readonly "characters.schema": readonly {
-            readonly id: components["schemas"]["id"];
-            readonly no: number;
-            readonly name: string;
-            /** @enum {unknown} */
-            readonly category: "main" | "event" | "gacha" | "other";
-            readonly attribute: components["schemas"]["attribute"];
-            readonly description: string;
-            readonly base: {
-                readonly hp: number;
-                readonly attack: number;
-                readonly defence: number;
-                readonly attackBuffRate: number;
-                readonly defenceBuffAmount: number;
-                readonly checkMax: number;
-                readonly rewindMax: number;
-                readonly specialMax: number;
-                readonly numbnessResistant: boolean;
-            };
-            readonly duplicateBonusMax: components["schemas"]["stats"];
-            readonly assets: {
-                readonly main: components["schemas"]["assetKey"];
-                readonly icon: components["schemas"]["assetKey"];
-                readonly home: components["schemas"]["assetKey"];
-            };
-        }[];
-        /** @enum {unknown} */
-        readonly enemyAction: "attack" | "defend" | "attackBuff" | "defenceBuff" | "fixedAttack" | "strongAttack" | "concentration" | "deathblow" | "provocation" | "fullRecovery" | "rateRecovery" | "changeAttribute" | "numbness" | "attackDebuff" | "defenceDebuff";
-        readonly enemy: {
-            readonly hp: number;
-            readonly attack: number;
-            readonly defence: number;
-            readonly attribute: components["schemas"]["attribute"];
-            readonly attackBuffRate: number;
-            readonly defenceBuffAmount: number;
-            readonly fixedAttackPower: number;
-            readonly strongAttackPower: number;
-            readonly recoveryRate: number;
-            readonly changeAttribute: components["schemas"]["attribute"] | null;
-            readonly attackDebuff: number;
-            readonly defenceDebuff: number;
-            readonly turns: readonly components["schemas"]["enemyAction"][];
-        };
-        readonly "quests.schema": readonly {
-            readonly id: components["schemas"]["id"];
-            /** @enum {unknown} */
-            readonly kind: "main" | "event" | "weather";
-            readonly name: string;
-            readonly order: number;
-            readonly weatherId?: components["schemas"]["id"];
-            readonly bannerKey?: components["schemas"]["assetKey"];
-            readonly bgmKey?: components["schemas"]["assetKey"];
-            readonly stages: readonly {
-                readonly name: string;
-                readonly imageKey: components["schemas"]["assetKey"];
-                readonly battle: components["schemas"]["enemy"];
-                readonly revealCount: number;
-            }[];
-            readonly rewards: {
-                readonly recruit: components["schemas"]["id"] | null;
-                readonly weatherItems: boolean;
-            };
-        }[];
-        readonly "weathers.schema": readonly {
-            readonly id: components["schemas"]["id"];
-            readonly name: string;
-            readonly attribute: components["schemas"]["attribute"];
-            readonly weight: number;
-            readonly bonus: components["schemas"]["stats"];
-            readonly questId: components["schemas"]["id"];
-        }[];
-        /** @enum {unknown} */
-        readonly stat: "hp" | "attack" | "defence";
-        readonly "items.schema": readonly {
-            readonly id: components["schemas"]["id"];
-            readonly name: string;
-            readonly attribute: components["schemas"]["attribute"];
-            readonly stat: components["schemas"]["stat"];
-            readonly iconKey: components["schemas"]["assetKey"];
-        }[];
-        readonly rate: number;
-        readonly "settings.schema": {
-            readonly minAppVersion: string;
-            readonly starterCharacterId: components["schemas"]["id"];
-            readonly growth: {
-                readonly itemUseMax: components["schemas"]["stats"];
-                readonly itemBonusPerUse: components["schemas"]["stats"];
-                readonly duplicateBonusPerCount: components["schemas"]["stats"];
-            };
-            readonly rewards: {
-                readonly firstClearRecruitRate: components["schemas"]["rate"];
-                readonly repeatRecruitRate: components["schemas"]["rate"];
-                readonly weatherItemDropMin: number;
-                readonly weatherItemDropMax: number;
-                readonly fudaPerEvenLevel: number;
-            };
         };
     };
     responses: {
@@ -1163,62 +987,6 @@ export interface operations {
             };
             readonly 401: components["responses"]["Unauthorized"];
             readonly 404: components["responses"]["BattleNotFound"];
-            readonly 500: components["responses"]["InternalError"];
-        };
-    };
-    readonly getMasterVersion: {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header?: never;
-            readonly path?: never;
-            readonly cookie?: never;
-        };
-        readonly requestBody?: never;
-        readonly responses: {
-            /** @description 取れた */
-            readonly 200: {
-                headers: {
-                    readonly "Cache-Control"?: string;
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": components["schemas"]["MasterVersion"];
-                };
-            };
-            readonly 500: components["responses"]["InternalError"];
-        };
-    };
-    readonly getMaster: {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header?: {
-                /** @description 手元のキャッシュの ETag（ブラウザが自動で付ける） */
-                readonly "If-None-Match"?: string;
-            };
-            readonly path?: never;
-            readonly cookie?: never;
-        };
-        readonly requestBody?: never;
-        readonly responses: {
-            /** @description 取れた */
-            readonly 200: {
-                headers: {
-                    /** @description マスタのバージョンを引用符で囲んだもの（例 `"2128ee46b22b6a58"`） */
-                    readonly ETag?: string;
-                    readonly "Cache-Control"?: string;
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": components["schemas"]["Master"];
-                };
-            };
-            /** @description 手元のキャッシュと同じ（本文なし） */
-            readonly 304: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content?: never;
-            };
             readonly 500: components["responses"]["InternalError"];
         };
     };

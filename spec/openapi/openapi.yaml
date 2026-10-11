@@ -1,10 +1,28 @@
 openapi: 3.1.0
 info:
   title: K API
-  version: 0.2.0
+  version: 0.3.0
   description: |
     K（リメイク）の API。web と api の約束事で、ここに書かれたものが正。
     エラーは RFC 9457（Problem Details）の形で返し、機械で見分けるための `code` を付ける。
+
+    ## 変更履歴
+    ### 0.3.0（2026-10-10）
+    - `/master`・`/master/version` を消した
+    - `Battle.reward` を消し、`BattleStepResult.reward`（commands のレスポンス）に移した
+    - `MyQuest.kind` に `event` を足した
+
+    ### 0.2.0（2026-10-10）
+    - バトルを api で計算する形にした（docs/02 D-8）
+    - `/app/version`・`/me/characters`・`/me/quests` を足した
+    - `/quests/{questId}/sessions`・`/quest-sessions/*` を足した
+
+    ### 0.1.0（2026-10-04）
+    - `/master/version`・`/master` を足した
+    - エラーの種類に `INTERNAL_ERROR` を足し、全 API に 500 を書いた
+
+    ### 0.1.0（2026-09-26）
+    - 最初の版。`/auth/guest`・`GET /me`・`PATCH /me`
 servers:
   - url: http://localhost:8080
     description: ローカル開発
@@ -21,8 +39,6 @@ tags:
     description: 所持キャラ
   - name: quests
     description: クエストとバトル（バトルは api が計算する）
-  - name: master
-    description: （廃止予定）マスタデータ一式の配信
 paths:
   /auth/guest:
     post:
@@ -117,7 +133,7 @@ paths:
       tags: [characters]
       operationId: listMyCharacters
       summary: 所持キャラの一覧を取る
-      description: 持っているキャラだけを返す（持っていないキャラの情報は返さない）。並びは図鑑の番号順。
+      description: 持っているキャラを返す。並びは図鑑の番号順。
       responses:
         "200":
           description: 取れた
@@ -135,8 +151,7 @@ paths:
       operationId: listMyQuests
       summary: 挑戦できるクエストの一覧を取る
       description: |
-        解放済みのメインクエストと、今日の天気のお天気クエストを返す。まだ解放されていないクエストは返さない。
-        **敵の行動は返さない**（バトル中にそのつど返す。docs/02 §4）。
+        解放済みのメインクエストと、今日の天気のお天気クエストを返す。
       responses:
         "200":
           description: 取れた
@@ -199,9 +214,8 @@ paths:
       summary: コマンドを 1 つ実行する
       description: |
         api がそのコマンドを計算し（`spec/battle/README.md` のルール）、起きたこと（`events`）と新しい状態を返す。
-        **次のターン以降の敵の行動は返さない。** 返すのは、このコマンドで実際に起きた敵の行動だけ。
         `seq` には手元の `Battle.seq` をそのまま入れる。api の `seq` と違えば実行せずに `STALE_SEQUENCE` を返す（通信が切れて送り直したときに 2 回実行されないように）。
-        勝ったときは、このレスポンスで報酬も付与済み（`battle.reward`）。
+        勝ったときは、このコマンドで報酬を付与し、`reward` に入れて返す。
       parameters:
         - $ref: "#/components/parameters/SessionId"
       requestBody:
@@ -311,70 +325,7 @@ paths:
           $ref: "#/components/responses/BattleNotFound"
         "500":
           $ref: "#/components/responses/InternalError"
-  /master/version:
-    get:
-      tags: [master]
-      operationId: getMasterVersion
-      summary: （廃止予定）マスタのバージョンと、必要なアプリの最低バージョンを取る
-      deprecated: true
-      description: |
-        **廃止予定。** `GET /app/version` に置き換える（マスタはまとめて配信しないため。docs/02 §10）。
-        起動時に最初に呼ぶ。アプリのバージョンが `minAppVersion` より古ければ、アップデートを促す画面を出してそれ以上進まない。
-      security: []
-      responses:
-        "200":
-          description: 取れた
-          headers:
-            Cache-Control:
-              schema:
-                type: string
-                examples: [no-store]
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MasterVersion"
-        "500":
-          $ref: "#/components/responses/InternalError"
-  /master:
-    get:
-      tags: [master]
-      operationId: getMaster
-      summary: （廃止予定）マスタデータ一式を取る
-      deprecated: true
-      description: |
-        **廃止予定。** 敵の行動などがすべて見えてしまうため、まとめて配信するのをやめる。画面ごとの API（`/me/characters`・`/me/quests`・バトル）で必要な分だけ返す（docs/02 §10）。
-        中身は `spec/master/*.json` と同じ（api がデプロイ時に DB へ投入したもの）。素材はパスではなくキーで書かれている。
-        **HTTP キャッシュで配信する。** api は `ETag`（マスタのバージョン）と `Cache-Control: no-cache` を付け、
-        リクエストの `If-None-Match` がバージョンと一致すれば本文なしの 304 を返す。
-        `If-None-Match` はブラウザ・アプリの HTTP キャッシュが自動で付けるので、クライアントのコードは意識しない。
-      security: []
-      parameters:
-        - name: If-None-Match
-          in: header
-          required: false
-          description: 手元のキャッシュの ETag（ブラウザが自動で付ける）
-          schema:
-            type: string
-      responses:
-        "200":
-          description: 取れた
-          headers:
-            ETag:
-              description: マスタのバージョンを引用符で囲んだもの（例 `"2128ee46b22b6a58"`）
-              schema:
-                type: string
-            Cache-Control:
-              schema:
-                type: string
-                examples: [no-cache]
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Master"
-        "304":
-          description: 手元のキャッシュと同じ（本文なし）
-        "500":
-          $ref: "#/components/responses/InternalError"
+
 components:
   parameters:
     QuestId:
@@ -457,41 +408,6 @@ components:
           description: 所持しているお札の数
         selectedCharacterId:
           $ref: "#/components/schemas/CharacterId"
-    MasterVersion:
-      type: object
-      required: [masterVersion, minAppVersion]
-      additionalProperties: false
-      properties:
-        masterVersion:
-          type: string
-          pattern: "^[0-9a-f]{16}$"
-          description: マスタのバージョン（`spec/master/README.md` の計算方法。中身が変わると変わる）
-        minAppVersion:
-          type: string
-          pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
-          description: 必要なアプリの最低バージョン（`settings.minAppVersion`）
-    Master:
-      type: object
-      required: [version, attributes, characters, quests, weathers, items, settings]
-      additionalProperties: false
-      description: 各項目の形は `spec/master/schema/*.schema.json` が正
-      properties:
-        version:
-          type: string
-          pattern: "^[0-9a-f]{16}$"
-          description: マスタのバージョン（`GET /master/version` の `masterVersion` と同じ）
-        attributes:
-          $ref: "../master/schema/attributes.schema.json"
-        characters:
-          $ref: "../master/schema/characters.schema.json"
-        quests:
-          $ref: "../master/schema/quests.schema.json"
-        weathers:
-          $ref: "../master/schema/weathers.schema.json"
-        items:
-          $ref: "../master/schema/items.schema.json"
-        settings:
-          $ref: "../master/schema/settings.schema.json"
     AppVersion:
       type: object
       required: [minAppVersion]
@@ -551,13 +467,14 @@ components:
       type: object
       required: [id, kind, name, imageKey, attribute, stageCount, turnCount, revealCount, isCleared]
       additionalProperties: false
-      description: クエスト一覧の 1 件。敵の行動・ステータスは含めない
+      description: クエスト一覧の 1 件
       properties:
         id:
           $ref: "#/components/schemas/QuestId"
         kind:
           type: string
-          enum: [main, weather]
+          enum: [main, event, weather]
+          description: "`event` はフェーズ 1.5 から返す"
         name:
           type: string
         imageKey:
@@ -779,10 +696,10 @@ components:
                 minimum: 1
     Battle:
       type: object
-      required: [id, questId, seq, phase, outcome, stage, stageCount, turn, turnCount, player, enemy, checkpoints, revealRemaining, history, reward, expiresAt]
+      required: [id, questId, seq, phase, outcome, stage, stageCount, turn, turnCount, player, enemy, checkpoints, revealRemaining, history, expiresAt]
       additionalProperties: false
       description: |
-        バトルの今の状態。**先のターンの敵の行動は含めない。**
+        バトルの今の状態。
         画面はこれを表示するだけで、計算はしない（計算は api。docs/02 §4）。
       properties:
         id:
@@ -832,11 +749,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BattleHistoryEntry"
-        reward:
-          oneOf:
-            - $ref: "#/components/schemas/Reward"
-            - type: "null"
-          description: 勝ったときだけ入る
         expiresAt:
           type: string
           format: date-time
@@ -932,7 +844,7 @@ components:
               enum: [win, lose]
     BattleStepResult:
       type: object
-      required: [events, battle]
+      required: [events, battle, reward]
       additionalProperties: false
       properties:
         events:
@@ -941,6 +853,11 @@ components:
             $ref: "#/components/schemas/BattleEvent"
         battle:
           $ref: "#/components/schemas/Battle"
+        reward:
+          oneOf:
+            - $ref: "#/components/schemas/Reward"
+            - type: "null"
+          description: このコマンドで勝ったときだけ入る
     TurnAction:
       type: object
       required: [turn, action]

@@ -8,9 +8,9 @@ import {
 } from "@tanstack/react-router";
 import * as v from "valibot";
 
+import { minAppVersionQueryOptions } from "@/api/app/app.query";
 import { readAuthToken } from "@/api/core/authToken";
 import { APP_VERSION } from "@/api/core/config";
-import { masterQueryOptions, masterVersionQueryOptions } from "@/api/master/master.query";
 import { isUpdateRequired } from "@/domain/version/version";
 import LoadingPage from "@/pages/LoadingPage";
 
@@ -32,11 +32,9 @@ type RouterContext = {
 
 const rootRoute = createRootRouteWithContext<RouterContext>()({
   beforeLoad: async ({ context, location }) => {
-    const version = await context.queryClient.query(masterVersionQueryOptions);
-    const isOutdated = isUpdateRequired(APP_VERSION, version.minAppVersion);
+    const minAppVersion = await context.queryClient.query(minAppVersionQueryOptions);
+    const isOutdated = isUpdateRequired(APP_VERSION, minAppVersion);
     if (isOutdated && location.pathname !== UPDATE_PATH) throw redirect({ to: UPDATE_PATH });
-    if (isOutdated) return;
-    await context.queryClient.query(masterQueryOptions);
   },
   component: RootLayout,
   pendingComponent: LoadingPage,
@@ -78,8 +76,8 @@ const homeRoute = createRoute({
 const routeTree = rootRoute.addChildren([updateRoute, titleRoute, registerRoute, homeRoute]);
 
 /**
- * アプリのルーターを作る。起動時（どのルートでも最初）に、アプリが古くないかを確かめてからマスタを読み込む。
- * 古ければ /update へ移り、マスタは読まない。通信に失敗したらリトライの画面を出す。
+ * アプリのルーターを作る。起動時（どのルートでも最初）に、アプリが古くないかを確かめる。
+ * 古ければ /update へ移る。通信に失敗したらリトライの画面を出す（マスタはまとめて読まない。docs/02 D-8）。
  */
 export const createAppRouter = (queryClient: QueryClient, history: RouterHistory = createBrowserHistory()) =>
   createRouter({ routeTree, context: { queryClient }, history });
