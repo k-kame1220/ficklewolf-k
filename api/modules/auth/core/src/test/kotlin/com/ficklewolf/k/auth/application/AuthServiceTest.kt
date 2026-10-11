@@ -46,6 +46,13 @@ class AuthServiceTest {
                 acquiredCharacters += playerId to characterId
                 return AcquireCharacterResult.Acquired(acquired)
             }
+
+            override fun owns(
+                playerId: PlayerId,
+                characterId: CharacterId,
+            ): Boolean = error("使わない")
+
+            override fun getStarterId(): CharacterId = error("使わない")
         }
 
     private val tokens = mutableMapOf<TokenHash, AuthToken>()
@@ -116,6 +123,13 @@ class AuthServiceTest {
                     playerId: PlayerId,
                     characterId: CharacterId,
                 ): AcquireCharacterResult = AcquireCharacterResult.CharacterNotFound
+
+                override fun owns(
+                    playerId: PlayerId,
+                    characterId: CharacterId,
+                ): Boolean = error("使わない")
+
+                override fun getStarterId(): CharacterId = error("使わない")
             }
         val service = authService(playerApi, missingCharacterApi, tokenRepository, tokenGenerator, transaction, clock)
 
