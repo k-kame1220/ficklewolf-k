@@ -1,5 +1,6 @@
 package com.ficklewolf.k.player.adapter
 
+import com.ficklewolf.k.character.api.CharacterApi
 import com.ficklewolf.k.player.adapter.persistence.InMemoryPlayerRepository
 import com.ficklewolf.k.player.api.PlayerApi
 import com.ficklewolf.k.player.application.PlayerRepository
@@ -17,9 +18,10 @@ class PlayerConfiguration {
 
     @Bean
     fun playerService(
+        characterApi: CharacterApi,
         playerRepository: PlayerRepository,
         transactionRunner: TransactionRunner,
-    ): PlayerService = createPlayerService(playerRepository, transactionRunner)
+    ): PlayerService = createPlayerService(characterApi, playerRepository, transactionRunner)
 
     @Bean
     fun playerApi(playerService: PlayerService): PlayerApi = createPlayerApi(playerService)

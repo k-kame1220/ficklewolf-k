@@ -5,6 +5,7 @@ import com.ficklewolf.k.auth.adapter.security.SecureRandomTokenGenerator
 import com.ficklewolf.k.auth.application.AuthService
 import com.ficklewolf.k.auth.application.AuthTokenRepository
 import com.ficklewolf.k.auth.application.TokenGenerator
+import com.ficklewolf.k.character.api.CharacterApi
 import com.ficklewolf.k.platform.web.security.PublicEndpoint
 import com.ficklewolf.k.platform.web.security.TokenAuthenticator
 import com.ficklewolf.k.player.api.PlayerApi
@@ -26,11 +27,19 @@ class AuthConfiguration {
     @Bean
     fun authService(
         playerApi: PlayerApi,
+        characterApi: CharacterApi,
         authTokenRepository: AuthTokenRepository,
         tokenGenerator: TokenGenerator,
         transactionRunner: TransactionRunner,
     ): AuthService =
-        createAuthService(playerApi, authTokenRepository, tokenGenerator, transactionRunner, Clock.systemUTC())
+        createAuthService(
+            playerApi,
+            characterApi,
+            authTokenRepository,
+            tokenGenerator,
+            transactionRunner,
+            Clock.systemUTC(),
+        )
 
     @Bean
     fun tokenAuthenticator(authService: AuthService): TokenAuthenticator =

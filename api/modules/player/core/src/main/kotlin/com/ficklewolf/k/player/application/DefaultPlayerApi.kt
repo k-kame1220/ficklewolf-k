@@ -12,12 +12,12 @@ fun playerApi(playerService: PlayerService): PlayerApi = DefaultPlayerApi(player
 internal class DefaultPlayerApi(
     private val playerService: PlayerService,
 ) : PlayerApi {
-    override fun createPlayer(name: String): CreatePlayerResult {
+    override fun create(name: String): CreatePlayerResult {
         val playerName = PlayerName.of(name) ?: return CreatePlayerResult.InvalidName
         return CreatePlayerResult.Created(playerService.createPlayer(playerName).toSummary())
     }
 
-    override fun find(id: PlayerId): PlayerSummary? = playerService.find(id)?.toSummary()
+    override fun find(id: PlayerId): PlayerSummary? = playerService.findPlayer(id)?.toSummary()
 }
 
 private fun Player.toSummary(): PlayerSummary = PlayerSummary(id, name.value, level, fuda, selectedCharacterId)

@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 data class CreateGuestRequest(
@@ -29,11 +28,10 @@ data class CreateGuestResponse(
 )
 
 @RestController
-@RequestMapping("/auth")
 class AuthController(
     private val authService: AuthService,
 ) {
-    @PostMapping("/guest")
+    @PostMapping("/auth/guest")
     fun createGuest(
         @RequestBody request: CreateGuestRequest,
     ): ResponseEntity<*> =
@@ -51,4 +49,4 @@ class AuthController(
 }
 
 private fun PlayerSummary.toResponse(): MeResponse =
-    MeResponse(id.value.toString(), name, level, fuda, selectedCharacterId)
+    MeResponse(id.value.toString(), name, level, fuda, selectedCharacterId.value)

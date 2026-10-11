@@ -3,6 +3,7 @@ package com.ficklewolf.k.platform.web
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
+import java.net.URI
 
 object CommonErrorCode {
     const val VALIDATION_FAILED = "VALIDATION_FAILED"
@@ -16,6 +17,7 @@ fun problemDetail(
     detail: String,
 ): ProblemDetail =
     ProblemDetail.forStatusAndDetail(status, detail).apply {
+        type = URI.create("about:blank")
         setProperty("code", code)
     }
 

@@ -2,6 +2,8 @@ package com.ficklewolf.k.auth.application
 
 import com.ficklewolf.k.auth.domain.AuthToken
 import com.ficklewolf.k.auth.domain.TokenHash
+import com.ficklewolf.k.character.api.AcquireCharacterResult
+import com.ficklewolf.k.character.api.CharacterApi
 import com.ficklewolf.k.player.api.CreatePlayerResult
 import com.ficklewolf.k.player.api.PlayerApi
 import com.ficklewolf.k.player.api.PlayerSummary
@@ -26,14 +28,16 @@ interface AuthService {
 
 fun authService(
     playerApi: PlayerApi,
+    characterApi: CharacterApi,
     tokenRepository: AuthTokenRepository,
     tokenGenerator: TokenGenerator,
     transaction: TransactionRunner,
     clock: Clock,
-): AuthService = DefaultAuthService(playerApi, tokenRepository, tokenGenerator, transaction, clock)
+): AuthService = DefaultAuthService(playerApi, characterApi, tokenRepository, tokenGenerator, transaction, clock)
 
 internal class DefaultAuthService(
     private val playerApi: PlayerApi,
+    private val characterApi: CharacterApi,
     private val tokenRepository: AuthTokenRepository,
     private val tokenGenerator: TokenGenerator,
     private val transaction: TransactionRunner,
@@ -41,14 +45,20 @@ internal class DefaultAuthService(
 ) : AuthService {
     override fun registerGuest(name: String): RegisterGuestResult =
         transaction.run {
-            when (val created = playerApi.createPlayer(name)) {
+            when (val created = playerApi.create(name)) {
                 CreatePlayerResult.InvalidName -> {
                     RegisterGuestResult.InvalidName
                 }
 
                 is CreatePlayerResult.Created -> {
+                    val acquired = characterApi.acquire(created.player.id, created.player.selectedCharacterId)
+                    if (acquired is AcquireCharacterResult.CharacterNotFound) {
+                        error("starter character not found: ${created.player.selectedCharacterId.value}")
+                    }
+
                     val rawToken = tokenGenerator.generate()
                     tokenRepository.save(AuthToken(TokenHash.of(rawToken), created.player.id, clock.instant()))
+
                     RegisterGuestResult.Registered(rawToken, created.player)
                 }
             }
