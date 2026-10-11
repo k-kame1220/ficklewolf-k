@@ -1,5 +1,6 @@
 package com.ficklewolf.k.player.domain
 
+import com.ficklewolf.k.shared.kernel.CharacterId
 import com.ficklewolf.k.shared.kernel.PlayerId
 
 data class Player(
@@ -7,17 +8,19 @@ data class Player(
     val name: PlayerName,
     val level: Int,
     val fuda: Int,
-    val selectedCharacterId: String,
+    val selectedCharacterId: CharacterId,
 ) {
     companion object {
         const val FIRST_LEVEL = 1
-        const val STARTER_CHARACTER_ID = "zero"
 
         fun createGuest(
             id: PlayerId,
             name: PlayerName,
-        ): Player = Player(id, name, FIRST_LEVEL, 0, STARTER_CHARACTER_ID)
+            selectedCharacterId: CharacterId,
+        ): Player = Player(id, name, FIRST_LEVEL, 0, selectedCharacterId)
     }
 
     fun rename(newName: PlayerName): Player = copy(name = newName)
+
+    fun selectCharacter(newCharacterId: CharacterId): Player = copy(selectedCharacterId = newCharacterId)
 }

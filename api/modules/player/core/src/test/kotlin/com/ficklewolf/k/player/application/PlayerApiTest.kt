@@ -1,7 +1,10 @@
 package com.ficklewolf.k.player.application
 
+import com.ficklewolf.k.character.api.AcquireCharacterResult
+import com.ficklewolf.k.character.api.CharacterApi
 import com.ficklewolf.k.player.api.CreatePlayerResult
 import com.ficklewolf.k.player.domain.Player
+import com.ficklewolf.k.shared.kernel.CharacterId
 import com.ficklewolf.k.shared.kernel.PlayerId
 import com.ficklewolf.k.shared.kernel.TransactionRunner
 import kotlin.test.Test
@@ -26,19 +29,35 @@ class PlayerApiTest {
             override fun <T> run(block: () -> T): T = block()
         }
 
-    private val api = playerApi(playerService(repository, transaction))
+    private val characterApi =
+        object : CharacterApi {
+            override fun owns(
+                playerId: PlayerId,
+                characterId: CharacterId,
+            ): Boolean = error("使わない")
+
+            override fun acquire(
+                playerId: PlayerId,
+                characterId: CharacterId,
+            ): AcquireCharacterResult = error("使わない")
+
+            override fun getStarterId(): CharacterId = CharacterId("zero")
+        }
+
+    private val api = playerApi(playerService(characterApi, repository, transaction))
 
     @Test
     fun `名前を文字列で受け取り、外向けの形で返す`() {
-        val created = assertIs<CreatePlayerResult.Created>(api.createPlayer("  ゲスト  ")).player
+        val created = assertIs<CreatePlayerResult.Created>(api.create("  ゲスト  ")).player
 
         assertEquals("ゲスト", created.name)
+        assertEquals(CharacterId("zero"), created.selectedCharacterId)
         assertEquals(created, api.find(created.id))
     }
 
     @Test
     fun `名前が使えなければ InvalidName で、保存しない`() {
-        assertEquals(CreatePlayerResult.InvalidName, api.createPlayer("abcdefg"))
+        assertEquals(CreatePlayerResult.InvalidName, api.create("abcdefg"))
         assertTrue(players.isEmpty())
     }
 }
