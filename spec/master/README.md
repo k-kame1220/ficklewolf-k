@@ -19,9 +19,6 @@
 - 連戦のクエスト（`main-i`）は `stages` が 2 つ。
 - 変更したら `python3 spec/tools/validate.py` を通す（CI でも実行する）。
 
-## バージョン
-マスタのバージョンは中身から計算する。`attributes, characters, items, quests, settings, weathers` の順に「`ファイル名.json` と改行」「ファイルのバイト列そのもの」を SHA-256 に入れ、16 進の先頭 16 文字をバージョンにする（`spec/tools/validate.py` の `master_version`）。
-
 ## フェーズ 1 に入れていないもの
 - PvP（15thクノット）だけで使う項目: スピード・スピードバフ・ギミック（フェーズ 2 で足す）。
 - そのため、スピードのアイテム 3 種と、天気のスピードのボーナス（メキシコ・縮地・雷）は入れていない。

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import hashlib
 import json
 import sys
 from collections import Counter
@@ -12,7 +11,6 @@ MASTER_DIR = SPEC_DIR / "master"
 MASTER_SCHEMA_DIR = MASTER_DIR / "schema"
 BATTLE_DIR = SPEC_DIR / "battle"
 MASTER_FILES = ["attributes", "characters", "items", "quests", "settings", "weathers"]
-VERSION_LENGTH = 16
 LAST_TURN_ACTION = "deathblow"
 
 
@@ -32,14 +30,6 @@ def build_validator_factory():
 
         store = {s["$id"]: s for s in schemas}
         return lambda schema: Draft202012Validator(schema, resolver=RefResolver.from_schema(schema, store=store))
-
-
-def master_version() -> str:
-    digest = hashlib.sha256()
-    for name in MASTER_FILES:
-        digest.update(f"{name}.json\n".encode())
-        digest.update((MASTER_DIR / f"{name}.json").read_bytes())
-    return digest.hexdigest()[:VERSION_LENGTH]
 
 
 def main() -> int:
@@ -99,7 +89,6 @@ def main() -> int:
 
     for e in errors:
         print(f"NG {e}")
-    print(f"master version: {master_version()}")
     print("OK" if not errors else f"{len(errors)} errors")
     return 1 if errors else 0
 
