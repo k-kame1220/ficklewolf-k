@@ -18,7 +18,29 @@ const ERROR_CODES = [
   "INTERNAL_ERROR"
 ] as const satisfies readonly ErrorCode[];
 
-const ProblemSchema = v.object({ code: v.picklist(ERROR_CODES) });
+/** バトルのコマンドを実行できなかった理由（spec/openapi の BattleRejectReason） */
+export type BattleRejectReason = components["schemas"]["BattleRejectReason"];
+
+const BATTLE_REJECT_REASONS = [
+  "BATTLE_FINISHED",
+  "CANNOT_CHECK_FIRST_TURN",
+  "ALREADY_CHECKED",
+  "CHECK_LIMIT",
+  "NO_CHECKPOINT",
+  "REWIND_LIMIT",
+  "CANNOT_REWIND_HERE",
+  "INVALID_REWIND_TARGET",
+  "SPECIAL_UNAVAILABLE",
+  "INVALID_SPECIAL_TARGET",
+  "REVEAL_LIMIT",
+  "SPECIAL_PENDING",
+  "SPECIAL_NOT_OPENED"
+] as const satisfies readonly BattleRejectReason[];
+
+const ProblemSchema = v.object({
+  code: v.picklist(ERROR_CODES),
+  reason: v.optional(v.picklist(BATTLE_REJECT_REASONS))
+});
 
 /** api がエラーを返したときの例外。通信そのものの失敗（オフラインなど）はこれにならない */
 export class ApiError extends Error {
@@ -26,12 +48,15 @@ export class ApiError extends Error {
   readonly status: number;
   /** エラーの種類。本文が Problem Details でなかったときは null */
   readonly code: ErrorCode | null;
+  /** `COMMAND_REJECTED` のときの理由。それ以外は null */
+  readonly reason: BattleRejectReason | null;
 
-  constructor(status: number, code: ErrorCode | null) {
+  constructor(status: number, code: ErrorCode | null, reason: BattleRejectReason | null = null) {
     super(`api error: ${String(status)} ${code ?? "UNKNOWN"}`);
     this.name = "ApiError";
     this.status = status;
     this.code = code;
+    this.reason = reason;
   }
 }
 
@@ -53,5 +78,6 @@ export class InvalidResponseError extends Error {
 /** エラーのレスポンスと本文から ApiError を作る */
 export const toApiError = (response: Response, body: unknown): ApiError => {
   const problem = v.safeParse(ProblemSchema, body);
-  return new ApiError(response.status, problem.success ? problem.output.code : null);
+  if (!problem.success) return new ApiError(response.status, null);
+  return new ApiError(response.status, problem.output.code, problem.output.reason ?? null);
 };

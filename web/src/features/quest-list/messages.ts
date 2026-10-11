@@ -15,6 +15,7 @@ export const QUEST_LIST_MESSAGES = {
   disadvantage: "不利",
   neutral: "互角",
   fight: "戦う",
+  startFailed: "クエストを始められませんでした。",
   notFound: "このクエストには挑戦できません。",
   back: "もどる"
 } as const;

@@ -1,0 +1,275 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: 100dvh;
+  padding: var(--space-4) var(--space-2) var(--space-2);
+}
+
+.header {
+  display: grid;
+  grid-template-areas:
+    "menu name turn"
+    "gauge gauge gauge";
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+}
+
+.menuButton {
+  grid-area: menu;
+  padding: var(--space-1) var(--space-3);
+  border: var(--frame-pencil-width) solid transparent;
+  border-image: var(--frame-pencil);
+  background: none;
+  color: var(--color-ink);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.enemyName {
+  display: flex;
+  grid-area: name;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+
+.attribute {
+  font-size: var(--font-size-md);
+}
+
+.stage {
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-sm);
+}
+
+.turn {
+  grid-area: turn;
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+
+.enemyGauge {
+  grid-area: gauge;
+}
+
+.enemy {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+}
+
+.reveal {
+  position: absolute;
+  top: 0;
+  right: var(--space-2);
+  width: var(--battle-reveal-size);
+  height: var(--battle-reveal-size);
+  border: var(--frame-square-width) solid transparent;
+  border-image: var(--frame-square);
+  background: none;
+  color: var(--color-ink);
+  font-size: var(--font-size-lg);
+}
+
+.reveal:disabled {
+  cursor: default;
+}
+
+.enemyImage {
+  width: var(--battle-enemy-size);
+  height: var(--battle-enemy-size);
+  object-fit: contain;
+}
+
+.message {
+  min-height: calc(var(--battle-message-lines) * var(--line-height-text) * var(--font-size-sm));
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-text);
+  white-space: pre-line;
+}
+
+.player {
+  display: grid;
+  grid-template-areas:
+    "gauge gauge"
+    "icon stats"
+    "icon remaining";
+  grid-template-columns: var(--battle-icon-size) 1fr;
+  gap: var(--space-1) var(--space-2);
+}
+
+.playerGauge {
+  display: flex;
+  grid-area: gauge;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.playerHp {
+  flex: none;
+  font-size: var(--font-size-xs);
+}
+
+.playerIcon {
+  grid-area: icon;
+  width: var(--battle-icon-size);
+  height: var(--battle-icon-size);
+  border: var(--frame-square-width) solid transparent;
+  border-image: var(--frame-square);
+}
+
+.playerIconImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.stats {
+  display: grid;
+  grid-area: stats;
+  grid-auto-flow: column;
+  grid-template-rows: auto auto;
+  margin: 0;
+  font-size: var(--font-size-xs);
+}
+
+.stats dd {
+  margin: 0;
+}
+
+.remaining {
+  display: flex;
+  flex-wrap: wrap;
+  grid-area: remaining;
+  gap: 0 var(--space-2);
+  margin: 0;
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-xs);
+}
+
+.commands,
+.buffChoices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-1);
+}
+
+.commands button,
+.buffChoices button {
+  min-width: 0;
+  min-height: var(--battle-command-height);
+  padding: var(--space-1);
+}
+
+.buffChoices {
+  grid-template-columns: 1fr;
+  justify-items: center;
+}
+
+.buffChoices button {
+  width: 70%;
+}
+
+.textButton {
+  border: 0;
+  background: none;
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background: color-mix(in srgb, var(--color-night) 40%, transparent);
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: normal;
+}
+
+.log {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-height: 50dvh;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  font-size: var(--font-size-sm);
+  list-style: none;
+  text-align: left;
+}
+
+.log li {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  justify-content: start;
+  gap: var(--space-3);
+  white-space: nowrap;
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  width: 100%;
+  min-height: 100dvh;
+  border: 0;
+  background: none;
+  color: var(--color-ink);
+  cursor: pointer;
+}
+
+.resultTitle {
+  font-size: var(--font-size-xl);
+}
+
+.resultImage {
+  width: var(--battle-enemy-size);
+  height: var(--battle-enemy-size);
+  object-fit: contain;
+}
+
+.resultText {
+  font-size: var(--font-size-md);
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  min-height: 100dvh;
+  margin: 0;
+  line-height: var(--line-height-text);
+  text-align: center;
+}
+
+.status p {
+  margin: 0;
+}

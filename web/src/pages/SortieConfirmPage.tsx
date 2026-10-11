@@ -17,6 +17,9 @@ const SortieConfirmPage = () => {
         onBack={() => {
           void navigate({ to: "/quests" });
         }}
+        onStarted={() => {
+          void navigate({ to: "/battle" });
+        }}
       />
     </MenuScreen>
   );

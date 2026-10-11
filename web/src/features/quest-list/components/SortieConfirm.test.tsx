@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
@@ -8,24 +8,28 @@ import { renderWithQueryClient } from "@/test/render";
 import SortieConfirm from "./SortieConfirm";
 
 describe("SortieConfirm", () => {
-  it("敵と出撃キャラと相性を出し、「戦う」はまだ押せない", async () => {
+  it("敵と出撃キャラと相性を出し、「戦う」でバトルを作る", async () => {
     await createGuest({ name: "ゲスト" });
+    const onStarted = vi.fn();
 
-    renderWithQueryClient(<SortieConfirm questId="main-a" onBack={vi.fn()} />);
+    renderWithQueryClient(<SortieConfirm questId="main-a" onBack={vi.fn()} onStarted={onStarted} />);
 
     const enemy = await screen.findByRole("region", { name: "敵" });
     expect(enemy).toHaveTextContent("A");
     expect(screen.getByRole("img", { name: "A" }).className).toMatch(/silhouette/u);
     expect(screen.getByRole("region", { name: "あなた" })).toHaveTextContent("ZERO");
     expect(screen.getByText("相性：有利")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "戦う" })).toBeDisabled();
+    await userEvent.click(screen.getByRole("button", { name: "戦う" }));
+    await waitFor(() => {
+      expect(onStarted).toHaveBeenCalled();
+    });
   });
 
   it("挑戦できないクエストなら、そう出して「もどる」で戻る", async () => {
     await createGuest({ name: "ゲスト" });
     const onBack = vi.fn();
 
-    renderWithQueryClient(<SortieConfirm questId="main-z" onBack={onBack} />);
+    renderWithQueryClient(<SortieConfirm questId="main-z" onBack={onBack} onStarted={vi.fn()} />);
 
     expect(await screen.findByText("このクエストには挑戦できません。")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "もどる" }));

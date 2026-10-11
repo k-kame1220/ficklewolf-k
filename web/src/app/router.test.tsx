@@ -54,7 +54,7 @@ describe("起動の流れ", () => {
 });
 
 describe("クエストを選ぶ流れ", () => {
-  it("ホームの「クエスト」タブから、メインクエストを選んで出撃確認まで進む", async () => {
+  it("ホームの「クエスト」タブから、メインクエストを選び、出撃確認の「戦う」でバトルを始める", async () => {
     await createGuest({ name: "ゲスト" });
     const { router } = renderApp("/home");
 
@@ -62,8 +62,10 @@ describe("クエストを選ぶ流れ", () => {
     await userEvent.click(await screen.findByRole("button", { name: "メインクエスト" }));
     await userEvent.click(await screen.findByRole("button", { name: "A" }));
 
-    expect(await screen.findByRole("button", { name: "戦う" })).toBeDisabled();
-    expect(router.state.location.pathname).toBe("/quests/main-a");
+    await userEvent.click(await screen.findByRole("button", { name: "戦う" }));
+
+    expect(await screen.findByText("せんとうをはじめてください")).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe("/battle");
   });
 
   it("トークンが無ければ名前の登録へ移る", async () => {
