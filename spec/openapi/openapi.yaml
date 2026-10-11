@@ -1,12 +1,15 @@
 openapi: 3.1.0
 info:
   title: K API
-  version: 0.3.0
+  version: 0.4.0
   description: |
     K（リメイク）の API。web と api の約束事で、ここに書かれたものが正。
     エラーは RFC 9457（Problem Details）の形で返し、機械で見分けるための `code` を付ける。
 
     ## 変更履歴
+    ### 0.4.0（2026-10-11）
+    - `GET /weather/today` を足した
+
     ### 0.3.0（2026-10-10）
     - `/master`・`/master/version` を消した
     - `Battle.reward` を消し、`BattleStepResult.reward`（commands のレスポンス）に移した
@@ -37,6 +40,8 @@ tags:
     description: アプリのバージョン
   - name: characters
     description: 所持キャラ
+  - name: weather
+    description: 今日の天気（全プレイヤー共通）
   - name: quests
     description: クエストとバトル（バトルは api が計算する）
 paths:
@@ -126,6 +131,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AppVersion"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /weather/today:
+    get:
+      tags: [weather]
+      operationId: getTodayWeather
+      summary: 今日の天気を取る
+      description: |
+        全プレイヤー共通。日付は日本時間（0 時で変わる）。その日の最初の問い合わせで `weathers.json` の `weight` で重み付きに抽選し、その日の間は同じ天気を返す。
+        天気と同じ属性のキャラに、その天気のボーナスが付く（ボーナスの値はキャラのステータスの内訳で返す。F-06）。
+      responses:
+        "200":
+          description: 取れた
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TodayWeather"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "500":
           $ref: "#/components/responses/InternalError"
   /me/characters:
@@ -417,6 +441,29 @@ components:
           type: string
           pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
           description: 必要なアプリの最低バージョン（`settings.minAppVersion`）
+    WeatherId:
+      type: string
+      pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+      description: "`spec/master/weathers.json` の `id`"
+      examples: [rain]
+    TodayWeather:
+      type: object
+      required: [date, id, name, attribute]
+      additionalProperties: false
+      properties:
+        date:
+          type: string
+          format: date
+          description: 日本時間の今日の日付
+          examples: ["2026-10-11"]
+        id:
+          $ref: "#/components/schemas/WeatherId"
+        name:
+          type: string
+          description: 画面に出す天気の名前（`weathers.json` の `name`）
+          examples: [雨]
+        attribute:
+          $ref: "#/components/schemas/Attribute"
     QuestId:
       type: string
       pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"

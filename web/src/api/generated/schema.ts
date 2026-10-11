@@ -66,6 +66,27 @@ export type paths = {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/weather/today": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * 今日の天気を取る
+         * @description 全プレイヤー共通。日付は日本時間（0 時で変わる）。その日の最初の問い合わせで `weathers.json` の `weight` で重み付きに抽選し、その日の間は同じ天気を返す。
+         *     天気と同じ属性のキャラに、その天気のボーナスが付く（ボーナスの値はキャラのステータスの内訳で返す。F-06）。
+         */
+        readonly get: operations["getTodayWeather"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/me/characters": {
         readonly parameters: {
             readonly query?: never;
@@ -273,6 +294,26 @@ export type components = {
         readonly AppVersion: {
             /** @description 必要なアプリの最低バージョン（`settings.minAppVersion`） */
             readonly minAppVersion: string;
+        };
+        /**
+         * @description `spec/master/weathers.json` の `id`
+         * @example rain
+         */
+        readonly WeatherId: string;
+        readonly TodayWeather: {
+            /**
+             * Format: date
+             * @description 日本時間の今日の日付
+             * @example 2026-10-11
+             */
+            readonly date: string;
+            readonly id: components["schemas"]["WeatherId"];
+            /**
+             * @description 画面に出す天気の名前（`weathers.json` の `name`）
+             * @example 雨
+             */
+            readonly name: string;
+            readonly attribute: components["schemas"]["Attribute"];
         };
         /**
          * @description `spec/master/quests.json` の `id`
@@ -779,6 +820,28 @@ export interface operations {
                     readonly "application/json": components["schemas"]["AppVersion"];
                 };
             };
+            readonly 500: components["responses"]["InternalError"];
+        };
+    };
+    readonly getTodayWeather: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description 取れた */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["TodayWeather"];
+                };
+            };
+            readonly 401: components["responses"]["Unauthorized"];
             readonly 500: components["responses"]["InternalError"];
         };
     };
