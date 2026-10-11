@@ -41,9 +41,9 @@ api/
 | モジュール | 担当 | 状態 |
 |---|---|---|
 | `auth` | トークンの発行と照合。外に出すのは「トークン → PlayerId」 | 作成済み（`POST /auth/guest`） |
-| `player` | プロフィール（名前・Lv・お札・出撃キャラ）。`/me` | 作成済み（出撃キャラの変更は character の後） |
-| `app` | 必要なアプリの最低バージョン（`/app/version`。`settings.json` の `minAppVersion`） | 予定 |
-| `character` | キャラのマスタ（`characters.json`）・所持キャラ・強化（育成の決まり `growth`）。`/me/characters` | 予定 |
+| `player` | プロフィール（名前・Lv・お札・出撃キャラ）。`/me` | 作成済み（名前・出撃キャラの変更） |
+| `app` | 必要なアプリの最低バージョン（`/app/version`。`settings.json` の `minAppVersion`） | 作成済み |
+| `character` | キャラのマスタ（`characters.json`）・所持キャラ・強化（育成の決まり `growth`）。`/me/characters` | 作成済み（マスタ・所持キャラ・`/me/characters`。強化は item の後） |
 | `item` | アイテムのマスタ（`items.json`）と所持数。`/me/items`。使う（減らす）・渡す（増やす）は `ItemApi` で受ける | 予定 |
 | `quest` | クエストのマスタ（`quests.json`。敵のステータスと行動）・解放とクリア状況・報酬。`/me/quests` | 予定 |
 | `battle` | バトルのエンジン（ゴールデンテスト）とバトルのセッション。`/quests/{id}/sessions`・`/quest-sessions/*`（docs/02 D-8） | 予定 |
@@ -175,6 +175,7 @@ Api・Service・Repository は似た形のメソッドが並ぶので、層ご�
 
 - Service だけリソース名を入れるのは、1 つの Service が複数のリソース（例: character のマスタと、持っているキャラ）を扱うことがあるから。Api は呼ぶ側が `characterApi.` と書くので、リソース名は重ねない。
 - `update〇〇` のような汎用の動詞より、何を変えるかが分かるゲームの言葉を使う（`updatePlayerName` ではなく `renamePlayer`）。
+- 例外: PATCH のように**複数の項目をまとめて変える**操作は `update〇〇` にする（例: `PlayerService.updatePlayer(id, name?, selectedCharacterId?)`。全部変えるか何も変えないかを 1 つのトランザクションで行う）。1 項目ずつの変更は domain のエンティティの関数（`player.rename`・`player.selectCharacter`）が表す。
 
 ### 入力の検証
 - **Service は domain の型（検証済みの値）を受け取る。** 例: `createPlayer(name: PlayerName)`・`renamePlayer(id, name: PlayerName)`。不正な値は型の上で渡せないので、Service は「名前が不正なら？」を考えなくてよい。

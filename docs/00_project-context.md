@@ -1,6 +1,6 @@
 # K（ケイ）リメイク プロジェクトコンテキスト
 
-> 状態: v0.3（2026-09-26）。旧ソース解析・要件定義・設計・仕様（spec）まで完了し、実装に入る段階。
+> 状態: v0.4（2026-10-11）。web（画面）と api（モジュラーモノリス）を実装中。進み具合は §7。
 
 ## 1. プロジェクトの目的
 
@@ -102,6 +102,8 @@ K/
 | [02_requirements.md](02_requirements.md) | 要件定義（フェーズ・機能・画面・API・マスタと素材の配信・決定事項） |
 | [03_frontend-architecture.md](03_frontend-architecture.md) | フロントの設計とコーディングルール |
 | [04_git-workflow.md](04_git-workflow.md) | Git 運用・AI との作業の進め方・CI |
+| [05_backend-architecture.md](05_backend-architecture.md) | バックエンドの設計（モジュラーモノリス・名前の決まり・コントローラ） |
+| `web/README.md` | フロントの準備（取得素材の作り方）・開発サーバー |
 | `spec/README.md` | spec の位置づけと変更のルール |
 | `spec/battle/README.md` | バトルの計算ルール（正） |
 | `spec/master/README.md` | マスタデータのルール |
@@ -113,4 +115,6 @@ K/
 4. ~~spec: バトルのゴールデンテスト 14 ケース・マスタデータの初版~~
 5. ~~web のバトルエンジン（TDD）~~ → D-8 でバトルは api だけが計算することにし、web のエンジンは消した（2026-10-10）
 6. ~~素材の変換（`legacy/tools`）と画面の見た目の方向性~~
-7. **画面の実装（MSW で API をモック）／ api の実装（オーナー。`/app/version`・所持キャラ・クエスト・バトルのエンジンと API）** ← 今
+7. **画面の実装（MSW で API をモック）／ api の実装（オーナー）** ← 今
+    - web: タイトル・名前登録・ホーム・クエストを選ぶ画面（出撃確認まで）・モンスター（一覧・詳細）は作成済み。次はバトル画面
+    - api: auth・player・app・character（`/me/characters`・出撃キャラの変更）は作成済み。次は weather → item → quest（`/me/quests`）→ battle
