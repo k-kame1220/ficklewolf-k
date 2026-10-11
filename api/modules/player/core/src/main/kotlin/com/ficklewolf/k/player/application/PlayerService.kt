@@ -1,45 +1,71 @@
 package com.ficklewolf.k.player.application
 
+import com.ficklewolf.k.character.api.CharacterApi
 import com.ficklewolf.k.player.domain.Player
 import com.ficklewolf.k.player.domain.PlayerName
+import com.ficklewolf.k.shared.kernel.CharacterId
 import com.ficklewolf.k.shared.kernel.PlayerId
 import com.ficklewolf.k.shared.kernel.TransactionRunner
 import java.util.UUID
 
+sealed interface UpdatePlayerResult {
+    data class Updated(
+        val player: Player,
+    ) : UpdatePlayerResult
+
+    data object PlayerNotFound : UpdatePlayerResult
+
+    data object CharacterNotOwned : UpdatePlayerResult
+}
+
 interface PlayerService {
     fun createPlayer(name: PlayerName): Player
 
-    fun find(id: PlayerId): Player?
+    fun findPlayer(id: PlayerId): Player?
 
-    fun rename(
+    fun updatePlayer(
         id: PlayerId,
-        name: PlayerName,
-    ): Player?
+        name: PlayerName?,
+        selectedCharacterId: CharacterId?,
+    ): UpdatePlayerResult
 }
 
 fun playerService(
+    characterApi: CharacterApi,
     repository: PlayerRepository,
     transaction: TransactionRunner,
-): PlayerService = DefaultPlayerService(repository, transaction)
+): PlayerService = DefaultPlayerService(characterApi, repository, transaction)
 
 internal class DefaultPlayerService(
+    private val characterApi: CharacterApi,
     private val repository: PlayerRepository,
     private val transaction: TransactionRunner,
 ) : PlayerService {
     override fun createPlayer(name: PlayerName): Player =
         transaction.run {
-            val player = Player.createGuest(PlayerId(UUID.randomUUID()), name)
+            val starterCharacterId = characterApi.getStarterId()
+            val player = Player.createGuest(PlayerId(UUID.randomUUID()), name, starterCharacterId)
             repository.save(player)
             player
         }
 
-    override fun find(id: PlayerId): Player? = repository.findById(id)
+    override fun findPlayer(id: PlayerId): Player? = repository.findById(id)
 
-    override fun rename(
+    override fun updatePlayer(
         id: PlayerId,
-        name: PlayerName,
-    ): Player? =
+        name: PlayerName?,
+        selectedCharacterId: CharacterId?,
+    ): UpdatePlayerResult =
         transaction.run {
-            repository.findById(id)?.rename(name)?.also { repository.save(it) }
+            val player = repository.findById(id) ?: return@run UpdatePlayerResult.PlayerNotFound
+            if (selectedCharacterId != null && !characterApi.owns(id, selectedCharacterId)) {
+                return@run UpdatePlayerResult.CharacterNotOwned
+            }
+            val updated =
+                player
+                    .let { if (name != null) it.rename(name) else it }
+                    .let { if (selectedCharacterId != null) it.selectCharacter(selectedCharacterId) else it }
+            repository.save(updated)
+            UpdatePlayerResult.Updated(updated)
         }
 }

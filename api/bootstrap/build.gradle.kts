@@ -13,6 +13,6 @@ dependencies {
     implementation(project(":platform:persistence"))
     implementation(project(":modules:player:adapter"))
     implementation(project(":modules:auth:adapter"))
-    implementation(project(":modules:master:adapter"))
     implementation(project(":modules:app:adapter"))
+    implementation(project(":modules:character:adapter"))
 }

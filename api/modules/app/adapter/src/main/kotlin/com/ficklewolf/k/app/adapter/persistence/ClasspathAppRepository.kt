@@ -13,8 +13,8 @@ class ClasspathAppRepository(
     override fun load(): App = app
 
     private fun read(): App {
-        val settings = ClassPathResource("app/settings.json").contentAsByteArray
-        val minAppVersion = jsonMapper.readTree(settings).required("minAppVersion").stringValue()
+        val content = ClassPathResource("app/settings.json").contentAsByteArray
+        val minAppVersion = jsonMapper.readTree(content).required("minAppVersion").stringValue()
         return App(minAppVersion)
     }
 }

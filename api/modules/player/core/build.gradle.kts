@@ -4,4 +4,5 @@ plugins {
 
 dependencies {
     api(project(":modules:player:api"))
+    api(project(":modules:character:api"))
 }
