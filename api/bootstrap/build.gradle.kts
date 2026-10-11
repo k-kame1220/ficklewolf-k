@@ -15,4 +15,5 @@ dependencies {
     implementation(project(":modules:auth:adapter"))
     implementation(project(":modules:app:adapter"))
     implementation(project(":modules:character:adapter"))
+    implementation(project(":modules:weather:adapter"))
 }
