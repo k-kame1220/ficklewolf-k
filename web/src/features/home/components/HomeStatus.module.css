@@ -1,7 +1,7 @@
 .root {
   display: grid;
   grid-template-areas:
-    "date . name"
+    "date weather name"
     ". level fuda";
   grid-template-columns: repeat(3, 1fr);
   row-gap: var(--space-1);
@@ -17,6 +17,12 @@
   grid-area: date;
   font-size: var(--font-size-sm);
   letter-spacing: normal;
+}
+
+.weather {
+  grid-area: weather;
+  font-size: var(--font-size-md);
+  text-align: center;
 }
 
 .name {

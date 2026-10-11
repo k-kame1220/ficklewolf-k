@@ -58,6 +58,7 @@ shared → （外部ライブラリのみ）
 domain/
 ├── character/     所持キャラの型（MyCharacterModel）
 ├── quest/         挑戦できるクエストの型（MyQuestModel・QuestKind）
+├── weather/       今日の天気の型（TodayWeatherModel）
 ├── version/       アプリのバージョンの比較（必要な最低バージョンより古いか）
 ├── attribute/     属性相性（陽 > 音 > 月 > 陽）と属性の名前（ATTRIBUTE_NAMES）
 ├── player/        プレイヤーの型（PlayerModel・CreateGuestCommand・UpdatePlayerCommand）と名前のルール
