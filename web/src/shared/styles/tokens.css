@@ -32,6 +32,11 @@
   --button-min-width: 160px;
   --character-size: min(80vw, 360px);
   --emblem-size: min(80vw, 360px);
+  --quest-menu-width: min(72vw, 320px);
+  --quest-menu-button-height: 96px;
+  --quest-card-height: 88px;
+  --quest-card-image-size: 72px;
+  --sortie-image-size: min(36vw, 160px);
   --logo-k-size: min(48vw, 220px);
   --duration-fast: 150ms;
   --duration-normal: 300ms;

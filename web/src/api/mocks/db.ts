@@ -13,13 +13,21 @@ export type MockDb = {
   readonly players: Map<string, MockPlayer>;
   readonly playerIdByToken: Map<string, string>;
   readonly ownedCharacterIds: Map<string, ReadonlySet<string>>;
+  /** プレイヤーごとの、一度でもクリアしたクエストの ID */
+  readonly clearedQuestIds: Map<string, ReadonlySet<string>>;
+  /** 今日の天気の ID（モックでは固定） */
+  readonly todayWeatherId: string;
 };
+
+const MOCK_TODAY_WEATHER_ID = "rain";
 
 /** 空のモックの DB を作る */
 export const createMockDb = (): MockDb => ({
   players: new Map(),
   playerIdByToken: new Map(),
-  ownedCharacterIds: new Map()
+  ownedCharacterIds: new Map(),
+  clearedQuestIds: new Map(),
+  todayWeatherId: MOCK_TODAY_WEATHER_ID
 });
 
 /** `Authorization: Bearer` のトークンからプレイヤーを探す。無効なら null */

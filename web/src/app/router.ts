@@ -64,16 +64,55 @@ const registerRoute = createRoute({
   component: lazyRouteComponent(() => import("@/pages/RegisterPage"))
 });
 
+const requireAuthToken = () => {
+  if (readAuthToken() === null) throw redirect({ to: "/register" });
+};
+
 const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/home",
-  beforeLoad: () => {
-    if (readAuthToken() === null) throw redirect({ to: "/register" });
-  },
+  beforeLoad: requireAuthToken,
   component: lazyRouteComponent(() => import("@/pages/HomePage"))
 });
 
-const routeTree = rootRoute.addChildren([updateRoute, titleRoute, registerRoute, homeRoute]);
+const questMenuRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/quests",
+  beforeLoad: requireAuthToken,
+  component: lazyRouteComponent(() => import("@/pages/QuestMenuPage"))
+});
+
+const questMainRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/quests/main",
+  beforeLoad: requireAuthToken,
+  component: lazyRouteComponent(() => import("@/pages/QuestMainPage"))
+});
+
+const questEventRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/quests/event",
+  beforeLoad: requireAuthToken,
+  component: lazyRouteComponent(() => import("@/pages/QuestEventPage"))
+});
+
+const sortieConfirmRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/quests/$questId",
+  beforeLoad: requireAuthToken,
+  component: lazyRouteComponent(() => import("@/pages/SortieConfirmPage"))
+});
+
+const routeTree = rootRoute.addChildren([
+  updateRoute,
+  titleRoute,
+  registerRoute,
+  homeRoute,
+  questMenuRoute,
+  questMainRoute,
+  questEventRoute,
+  sortieConfirmRoute
+]);
 
 /**
  * アプリのルーターを作る。起動時（どのルートでも最初）に、アプリが古くないかを確かめる。
