@@ -73,3 +73,16 @@ describe("クエストを選ぶ流れ", () => {
     expect(router.state.location.pathname).toBe("/register");
   });
 });
+
+describe("モンスターの流れ", () => {
+  it("ホームの「モンスター」タブから一覧を開き、長押し（右クリック）で詳細へ進む", async () => {
+    await createGuest({ name: "ゲスト" });
+    const { router } = renderApp("/home");
+
+    await userEvent.click(await screen.findByRole("button", { name: "モンスター" }));
+    await userEvent.pointer({ keys: "[MouseRight]", target: await screen.findByRole("button", { name: "ZERO" }) });
+
+    expect(await screen.findByText("属性：月")).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe("/monsters/zero");
+  });
+});

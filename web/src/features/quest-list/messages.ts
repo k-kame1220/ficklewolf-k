@@ -1,5 +1,3 @@
-import type { Attribute } from "@/domain/attribute/attribute";
-
 /** クエストを選ぶ画面の文言 */
 export const QUEST_LIST_MESSAGES = {
   loading: "よみこみ中…",
@@ -20,10 +18,3 @@ export const QUEST_LIST_MESSAGES = {
   notFound: "このクエストには挑戦できません。",
   back: "もどる"
 } as const;
-
-/** 属性の表示名 */
-export const ATTRIBUTE_LABELS = {
-  yang: "陽",
-  note: "音",
-  moon: "月"
-} as const satisfies Record<Attribute, string>;
