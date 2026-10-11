@@ -7,8 +7,9 @@ import MenuLayout from "@/shared/ui/MenuLayout";
 
 import type { ReactNode } from "react";
 
-const MENU_TAB_PATHS = new Map<MenuTabId, "/quests" | "/home">([
+const MENU_TAB_PATHS = new Map<MenuTabId, "/quests" | "/monsters" | "/home">([
   ["quest", "/quests"],
+  ["monster", "/monsters"],
   ["home", "/home"]
 ]);
 

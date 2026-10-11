@@ -1,8 +1,9 @@
 import { ApiError } from "@/api/core/apiError";
 import { useMyQuests } from "@/api/quest/quest.query";
+import { ATTRIBUTE_NAMES } from "@/domain/attribute/attribute";
 import Button from "@/shared/ui/Button";
 
-import { ATTRIBUTE_LABELS, QUEST_LIST_MESSAGES } from "../messages";
+import { QUEST_LIST_MESSAGES } from "../messages";
 
 import styles from "./QuestList.module.css";
 import QuestListEventCard from "./QuestListEventCard";
@@ -59,7 +60,7 @@ const QuestList = (props: QuestListProps) => {
               quest={quest}
               label={
                 quest.kind === "weather"
-                  ? `―${QUEST_LIST_MESSAGES.materialQuest}：${ATTRIBUTE_LABELS[quest.attribute]}―`
+                  ? `―${QUEST_LIST_MESSAGES.materialQuest}：${ATTRIBUTE_NAMES[quest.attribute]}―`
                   : null
               }
               onSelect={onSelect}

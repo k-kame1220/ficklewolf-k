@@ -37,6 +37,8 @@
   --quest-card-height: 88px;
   --quest-card-image-size: 72px;
   --sortie-image-size: min(36vw, 160px);
+  --monster-image-size: min(48vw, 200px);
+  --monster-icon-size: 72px;
   --logo-k-size: min(48vw, 220px);
   --duration-fast: 150ms;
   --duration-normal: 300ms;

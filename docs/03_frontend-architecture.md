@@ -59,7 +59,7 @@ domain/
 ├── character/     所持キャラの型（MyCharacterModel）
 ├── quest/         挑戦できるクエストの型（MyQuestModel・QuestKind）
 ├── version/       アプリのバージョンの比較（必要な最低バージョンより古いか）
-├── attribute/     属性相性（陽 > 音 > 月 > 陽）
+├── attribute/     属性相性（陽 > 音 > 月 > 陽）と属性の名前（ATTRIBUTE_NAMES）
 ├── player/        プレイヤーの型（PlayerModel・CreateGuestCommand・UpdatePlayerCommand）と名前のルール
 └── battle/        バトルの表示に使う型（api の状態・イベントを変換したもの。計算はしない。バトル画面を作るときに足す）
 ```

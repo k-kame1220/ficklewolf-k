@@ -103,6 +103,20 @@ const sortieConfirmRoute = createRoute({
   component: lazyRouteComponent(() => import("@/pages/SortieConfirmPage"))
 });
 
+const monsterListRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/monsters",
+  beforeLoad: requireAuthToken,
+  component: lazyRouteComponent(() => import("@/pages/MonsterListPage"))
+});
+
+const monsterDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/monsters/$characterId",
+  beforeLoad: requireAuthToken,
+  component: lazyRouteComponent(() => import("@/pages/MonsterDetailPage"))
+});
+
 const routeTree = rootRoute.addChildren([
   updateRoute,
   titleRoute,
@@ -111,7 +125,9 @@ const routeTree = rootRoute.addChildren([
   questMenuRoute,
   questMainRoute,
   questEventRoute,
-  sortieConfirmRoute
+  sortieConfirmRoute,
+  monsterListRoute,
+  monsterDetailRoute
 ]);
 
 /**

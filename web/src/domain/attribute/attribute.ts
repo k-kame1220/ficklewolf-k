@@ -4,6 +4,13 @@ export const ATTRIBUTES = ["yang", "note", "moon"] as const;
 /** 属性（陽・音・月） */
 export type Attribute = (typeof ATTRIBUTES)[number];
 
+/** 属性の名前（画面に出す 1 文字） */
+export const ATTRIBUTE_NAMES = {
+  yang: "陽",
+  note: "音",
+  moon: "月"
+} as const satisfies Record<Attribute, string>;
+
 const ADVANTAGE = new Map<Attribute, Attribute>([
   ["yang", "note"],
   ["note", "moon"],
