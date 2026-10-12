@@ -1,3 +1,4 @@
+import { useStartQuest } from "@/api/battle/battle.mutate";
 import { useMyCharacters } from "@/api/character/character.query";
 import { ApiError } from "@/api/core/apiError";
 import { useMe } from "@/api/me/me.query";
@@ -14,17 +15,20 @@ type SortieConfirmProps = {
   questId: string;
   /** 挑戦できないクエストだったときの「もどる」で呼ぶ */
   onBack: () => void;
+  /** 「戦う」でバトルを作れたときに呼ぶ */
+  onStarted: () => void;
 };
 
 /**
  * 出撃確認（S-05）。敵と出撃キャラを並べ、属性の相性を出す。
- * 「戦う」はバトル画面ができるまで押せない。まだクリアしていない敵は黒いシルエット（旧作どおり）。
+ * 「戦う」でバトルを作り（前のバトルは無効になる）、バトル画面へ進む。まだクリアしていない敵は黒いシルエット（旧作どおり）。
  */
 const SortieConfirm = (props: SortieConfirmProps) => {
-  const { questId, onBack } = props;
+  const { questId, onBack, onStarted } = props;
   const quests = useMyQuests();
   const me = useMe();
   const characters = useMyCharacters();
+  const startQuest = useStartQuest();
 
   if (quests.error instanceof ApiError || me.error instanceof ApiError || characters.error instanceof ApiError) {
     return null;
@@ -102,7 +106,14 @@ const SortieConfirm = (props: SortieConfirmProps) => {
         </div>
       </section>
       {affinity !== null && <p className={styles.affinity}>{`${QUEST_LIST_MESSAGES.affinity}${affinity}`}</p>}
-      <Button variant="bold" isDisabled>
+      {startQuest.isError && <p role="alert">{QUEST_LIST_MESSAGES.startFailed}</p>}
+      <Button
+        variant="bold"
+        isDisabled={startQuest.isPending}
+        onClick={() => {
+          startQuest.mutate(questId, { onSuccess: onStarted });
+        }}
+      >
         {QUEST_LIST_MESSAGES.fight}
       </Button>
     </div>

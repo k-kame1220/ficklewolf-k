@@ -62,7 +62,7 @@ domain/
 ├── version/       アプリのバージョンの比較（必要な最低バージョンより古いか）
 ├── attribute/     属性相性（陽 > 音 > 月 > 陽）と属性の名前（ATTRIBUTE_NAMES）
 ├── player/        プレイヤーの型（PlayerModel・CreateGuestCommand・UpdatePlayerCommand）と名前のルール
-└── battle/        バトルの表示に使う型（api の状態・イベントを変換したもの。計算はしない。バトル画面を作るときに足す）
+└── battle/        バトルの表示に使う型（api の状態・イベントを変換したもの。計算はしない）
 ```
 - **アプリの中で使う型（`XxxModel`）と操作の入力（`XxxCommand`）は domain に置く**（Shackw の wallet-app と同じ）。API の形（DTO）は domain に持ち込まない。
 - **すべて純粋関数**。入力が同じなら結果も同じ。状態は `readonly` で、書き換えずに新しいオブジェクトを返す。
@@ -115,6 +115,7 @@ api/
 #### モック（MSW）
 - 開発サーバー（`pnpm dev`）は、既定で MSW のモックを使う。本物の api につなぐときは `web/.env.development.local`（git の対象外）に `VITE_API_MOCK=false` を書く。基点 URL は `VITE_API_BASE_URL`（既定は `http://localhost:8080`）。
 - モックはプレイヤーとトークンをメモリに持つ。**ページを読み直すとモックの中身は消える**ので、保存済みのトークンは 401 になり、名前登録からやり直しになる（401 の流れの確認にもなる）。
+- **バトルのモック（`api/battle/battle.mock.ts`）は簡易版。** 敵の行動は `quests.json` の並びどおりに来るが、ダメージなどは大雑把に計算する。画面を動かすためだけのもので、ルールの正ではない（正は `spec/battle/README.md` と api。D-8）。細かい場面（勝ち・断られたとき）は、テストで決まったレスポンスを返す。
 - テストは `src/test/setup.ts` で Node 用の MSW を起動し、テストごとに空の状態のハンドラを入れ直す。知らない通信はエラーにする。
 - 本番のビルドにはモックを含めない（`import.meta.env.DEV` のときだけ読み込む）。
 - モック（`mocks/` と `*.mock.ts`）の中だけは、DB の代わりとして `Map` の書き換えを許可している（`eslint.config.ts`）。

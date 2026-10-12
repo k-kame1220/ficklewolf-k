@@ -117,6 +117,13 @@ const monsterDetailRoute = createRoute({
   component: lazyRouteComponent(() => import("@/pages/MonsterDetailPage"))
 });
 
+const battleRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/battle",
+  beforeLoad: requireAuthToken,
+  component: lazyRouteComponent(() => import("@/pages/BattlePage"))
+});
+
 const routeTree = rootRoute.addChildren([
   updateRoute,
   titleRoute,
@@ -127,7 +134,8 @@ const routeTree = rootRoute.addChildren([
   questEventRoute,
   sortieConfirmRoute,
   monsterListRoute,
-  monsterDetailRoute
+  monsterDetailRoute,
+  battleRoute
 ]);
 
 /**

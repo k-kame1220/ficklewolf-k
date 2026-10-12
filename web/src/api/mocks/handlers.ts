@@ -1,5 +1,6 @@
 import { createAppMockHandlers } from "@/api/app/app.mock";
 import { createAuthMockHandlers } from "@/api/auth/auth.mock";
+import { createBattleMockHandlers } from "@/api/battle/battle.mock";
 import { createCharacterMockHandlers } from "@/api/character/character.mock";
 import { createMeMockHandlers } from "@/api/me/me.mock";
 import { createQuestMockHandlers } from "@/api/quest/quest.mock";
@@ -18,6 +19,7 @@ export const createMockHandlers = () => {
     ...createMeMockHandlers(db),
     ...createCharacterMockHandlers(db),
     ...createQuestMockHandlers(db),
-    ...createWeatherMockHandlers(db)
+    ...createWeatherMockHandlers(db),
+    ...createBattleMockHandlers(db)
   ];
 };

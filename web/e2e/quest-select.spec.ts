@@ -25,7 +25,7 @@ test.describe("クエストを選ぶ", () => {
 
     await page.getByRole("button", { name: "A" }).click();
     await expect(page).toHaveURL(/\/quests\/main-a$/);
-    await expect(page.getByRole("button", { name: "戦う" })).toBeDisabled();
+    await expect(page.getByRole("button", { name: "戦う" })).toBeEnabled();
     await page.screenshot({ path: `${SCREENSHOT_DIR}/09-sortie-confirm.png` });
   });
 });

@@ -39,6 +39,12 @@
   --sortie-image-size: min(36vw, 160px);
   --monster-image-size: min(48vw, 200px);
   --monster-icon-size: 72px;
+  --gauge-height: 10px;
+  --battle-enemy-size: min(64vw, 280px);
+  --battle-icon-size: 64px;
+  --battle-reveal-size: 44px;
+  --battle-command-height: 56px;
+  --battle-message-lines: 2;
   --logo-k-size: min(48vw, 220px);
   --duration-fast: 150ms;
   --duration-normal: 300ms;
