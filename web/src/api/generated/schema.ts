@@ -107,6 +107,47 @@ export type paths = {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/me/characters/{characterId}/enhance": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * アイテムを使ってキャラを強化する
+         * @description キャラと同じ属性のアイテムを、ステータスごとの個数だけ使う（使うアイテムはキャラの属性で決まる）。
+         *     全部使えるときだけ使い、1 つでも足りない・上限を超えるなら何も使わずに断る。強化したあとのキャラを返す。
+         */
+        readonly post: operations["enhanceMyCharacter"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/me/items": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * 所持アイテムの一覧を取る
+         * @description 1 個以上持っているアイテムを返す。並びは `items.json` の順。
+         */
+        readonly get: operations["listMyItems"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/me/quests": {
         readonly parameters: {
             readonly query?: never;
@@ -331,13 +372,71 @@ export type components = {
             readonly icon: string;
             readonly home: string;
         };
-        /** @description 所持キャラ。ステータスの内訳・強化の回数は F-06 / F-07 を作るときに足す */
+        /** @description 所持キャラ */
         readonly MyCharacter: {
             readonly id: components["schemas"]["CharacterId"];
             readonly name: string;
             readonly attribute: components["schemas"]["Attribute"];
             readonly description: string;
             readonly assets: components["schemas"]["CharacterAssets"];
+            /** @description 今のステータス（今日の天気のボーナス込み）。バトルを始めるとこの値で確定する */
+            readonly stats: {
+                readonly hp: components["schemas"]["StatBreakdown"];
+                readonly attack: components["schemas"]["StatBreakdown"];
+                readonly defence: components["schemas"]["StatBreakdown"];
+            };
+            /** @description 強化で使ったアイテムの個数 */
+            readonly itemUses: components["schemas"]["StatCounts"];
+            /** @description 強化で使えるアイテムの上限（`settings.json` の `growth.itemUseMax`。全キャラ共通） */
+            readonly itemUseMax: components["schemas"]["StatCounts"];
+        };
+        /** @description ステータス 1 つの内訳。`total = base + bonus.item + bonus.duplicate + bonus.weather` */
+        readonly StatBreakdown: {
+            /** @description キャラの基礎の値（`characters.json` の `base`） */
+            readonly base: number;
+            readonly bonus: {
+                /** @description アイテムで上がった分 */
+                readonly item: number;
+                /** @description 被りで上がった分 */
+                readonly duplicate: number;
+                /** @description 今日の天気のボーナス（天気と同じ属性のときだけ） */
+                readonly weather: number;
+            };
+            readonly total: number;
+        };
+        readonly StatCounts: {
+            readonly hp: number;
+            readonly attack: number;
+            readonly defence: number;
+        };
+        /** @description ステータスごとに使うアイテムの個数。合計が 1 以上 */
+        readonly EnhanceRequest: {
+            readonly hp: number;
+            readonly attack: number;
+            readonly defence: number;
+        };
+        /**
+         * @description `spec/master/items.json` の `id`
+         * @example moon-hp
+         */
+        readonly ItemId: string;
+        /** @description 所持アイテム */
+        readonly MyItem: {
+            readonly id: components["schemas"]["ItemId"];
+            /** @example HPの酒 */
+            readonly name: string;
+            readonly attribute: components["schemas"]["Attribute"];
+            /**
+             * @description 上がるステータス
+             * @enum {string}
+             */
+            readonly stat: "hp" | "attack" | "defence";
+            /** @description アイコンの素材のキー */
+            readonly iconKey: string;
+            readonly count: number;
+        };
+        readonly MyItemList: {
+            readonly items: readonly components["schemas"]["MyItem"][];
         };
         readonly MyCharacterList: {
             readonly characters: readonly components["schemas"]["MyCharacter"][];
@@ -563,7 +662,9 @@ export type components = {
         /**
          * @description - `VALIDATION_FAILED`: リクエストの形が違う（JSON が壊れている・必須項目がない・余計な項目がある・PATCH の項目が 0 個）
          *     - `INVALID_NAME`: 名前が空・7 文字以上・制御文字を含む
-         *     - `CHARACTER_NOT_OWNED`: 持っていない（または存在しない）キャラを出撃させようとした
+         *     - `CHARACTER_NOT_OWNED`: 持っていない（または存在しない）キャラを出撃させようとした・強化しようとした
+         *     - `ITEM_NOT_ENOUGH`: 強化に使うアイテムが足りない
+         *     - `ENHANCE_LIMIT_EXCEEDED`: 強化に使うアイテムの個数が上限（`itemUseMax`）を超える
          *     - `UNAUTHORIZED`: トークンがない・正しくない
          *     - `QUEST_NOT_AVAILABLE`: そのクエストは存在しない・まだ解放されていない・今日の天気ではない
          *     - `BATTLE_NOT_FOUND`: そのバトルは無い（自分のものでない・期限切れ・新しいバトルで無効になった）
@@ -573,7 +674,7 @@ export type components = {
          *     - `INTERNAL_ERROR`: api の予期しないエラー（バグなど）。原因はレスポンスに出さず、api のログにだけ残す
          * @enum {string}
          */
-        readonly ErrorCode: "VALIDATION_FAILED" | "INVALID_NAME" | "CHARACTER_NOT_OWNED" | "UNAUTHORIZED" | "QUEST_NOT_AVAILABLE" | "BATTLE_NOT_FOUND" | "NO_ACTIVE_BATTLE" | "STALE_SEQUENCE" | "COMMAND_REJECTED" | "INTERNAL_ERROR";
+        readonly ErrorCode: "VALIDATION_FAILED" | "INVALID_NAME" | "CHARACTER_NOT_OWNED" | "ITEM_NOT_ENOUGH" | "ENHANCE_LIMIT_EXCEEDED" | "UNAUTHORIZED" | "QUEST_NOT_AVAILABLE" | "BATTLE_NOT_FOUND" | "NO_ACTIVE_BATTLE" | "STALE_SEQUENCE" | "COMMAND_REJECTED" | "INTERNAL_ERROR";
         readonly Problem: {
             /**
              * Format: uri-reference
@@ -679,6 +780,40 @@ export type components = {
                 readonly "application/problem+json": components["schemas"]["Problem"];
             };
         };
+        /** @description そのキャラを持っていない（`CHARACTER_NOT_OWNED`） */
+        readonly CharacterNotOwned: {
+            headers: {
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "type": "about:blank",
+                 *       "title": "Not Found",
+                 *       "status": 404,
+                 *       "code": "CHARACTER_NOT_OWNED"
+                 *     }
+                 */
+                readonly "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
+        /** @description 今の所持数・使った数では強化できない（`ITEM_NOT_ENOUGH` / `ENHANCE_LIMIT_EXCEEDED`）。何も使っていない */
+        readonly EnhanceConflict: {
+            headers: {
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "type": "about:blank",
+                 *       "title": "Conflict",
+                 *       "status": 409,
+                 *       "code": "ITEM_NOT_ENOUGH"
+                 *     }
+                 */
+                readonly "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
         /** @description 入力が正しくない（`VALIDATION_FAILED` / `INVALID_NAME` / `CHARACTER_NOT_OWNED`） */
         readonly BadRequest: {
             headers: {
@@ -718,6 +853,7 @@ export type components = {
     };
     parameters: {
         readonly QuestId: components["schemas"]["QuestId"];
+        readonly CharacterId: components["schemas"]["CharacterId"];
         readonly SessionId: string;
     };
     requestBodies: never;
@@ -861,6 +997,59 @@ export interface operations {
                 };
                 content: {
                     readonly "application/json": components["schemas"]["MyCharacterList"];
+                };
+            };
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 500: components["responses"]["InternalError"];
+        };
+    };
+    readonly enhanceMyCharacter: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                readonly characterId: components["parameters"]["CharacterId"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": components["schemas"]["EnhanceRequest"];
+            };
+        };
+        readonly responses: {
+            /** @description 強化した */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["MyCharacter"];
+                };
+            };
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 404: components["responses"]["CharacterNotOwned"];
+            readonly 409: components["responses"]["EnhanceConflict"];
+            readonly 500: components["responses"]["InternalError"];
+        };
+    };
+    readonly listMyItems: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description 取れた */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["MyItemList"];
                 };
             };
             readonly 401: components["responses"]["Unauthorized"];

@@ -1,6 +1,6 @@
 # バックエンド設計（モジュラーモノリスとレイヤー構成）
 
-> 版: v0.9（2026-10-11、weather（今日の天気の決め方）を足す）/ 対象: `api/`。バックエンドはオーナーが書く。この文書はオーナーと AI の相談で決めたことの記録。
+> 版: v1.0（2026-10-12、item と強化・キャラのステータスの内訳を足す）/ 対象: `api/`。バックエンドはオーナーが書く。この文書はオーナーと AI の相談で決めたことの記録。
 > 前提: [00_project-context.md](00_project-context.md)（Kotlin + Spring Boot は必須）、[02_requirements.md](02_requirements.md) §6（API 一覧）
 
 ---
@@ -44,7 +44,7 @@ api/
 | `player` | プロフィール（名前・Lv・お札・出撃キャラ）。`/me` | 作成済み（名前・出撃キャラの変更） |
 | `app` | 必要なアプリの最低バージョン（`/app/version`。`settings.json` の `minAppVersion`） | 作成済み |
 | `character` | キャラのマスタ（`characters.json`）・所持キャラ・強化（育成の決まり `growth`）。`/me/characters` | 作成済み（マスタ・所持キャラ・`/me/characters`。強化は item の後） |
-| `item` | アイテムのマスタ（`items.json`）と所持数。`/me/items`。使う（減らす）・渡す（増やす）は `ItemApi` で受ける | 予定 |
+| `item` | アイテムのマスタ（`items.json`）と所持数。`/me/items`。使う（減らす）・渡す（増やす）は `ItemApi` で受ける。ゲスト作成で `starterItems` を渡す | 予定 |
 | `quest` | クエストのマスタ（`quests.json`。敵のステータスと行動）・解放とクリア状況・報酬。`/me/quests` | 予定 |
 | `battle` | バトルのエンジン（ゴールデンテスト）とバトルのセッション。`/quests/{id}/sessions`・`/quest-sessions/*`（docs/02 D-8） | 予定 |
 | `weather` | 天気のマスタ（`weathers.json`）と日替わりの天気 | 予定 |
@@ -292,7 +292,7 @@ D-8（docs/02）でマスタをまとめて配信するのをやめ、マスタ�
 | `weathers.json` | weather |
 | `items.json` | item（所持数も item が持つ。強化する character・報酬を渡す quest は `ItemApi` に頼む） |
 | `attributes.json` | 相性はバトルのルール（battle）。名前・絵のキーは表示する側 |
-| `settings.json` | 項目ごとに持ち主が違う。`minAppVersion` → app、`starterCharacterId`・`growth`（強化の上限・1 個あたりの上昇量）→ character、`rewards` → quest。各モジュールが自分の項目だけを読む |
+| `settings.json` | 項目ごとに持ち主が違う。`minAppVersion` → app、`starterCharacterId`・`growth`（強化の上限・1 個あたりの上昇量）→ character、`starterItems` → item、`rewards` → quest。各モジュールが自分の項目だけを読む |
 
 - **正は `spec/master/*.json`。** 各モジュールの adapter が、ビルド時に `processResources` で**自分のファイルだけ**を jar に同梱し、起動時に 1 回だけ読む（ファイルがない・壊れているときは起動に失敗する）。リポジトリにはコピーを置かない。
 - マスタの読み込みも port（`<対象>MasterRepository` など）にし、実装は adapter に置く。JSON を型に変えるのは adapter の仕事で、core は JSON を知らない。**DB ができたら**、デプロイ時に各モジュールが自分のテーブルへ投入し、差し替えるのは実装だけ。
@@ -363,6 +363,7 @@ com.ficklewolf.k.<モジュール>.adapter.web / .adapter.persistence
 | 2026-10-10 | 複数を取るメソッドは、どの層でも `list` にする（Repository は `listBy〇〇`・`listAll`、Service は `list〇〇s`）。`findAll` は使わない。`find` は 1 件（`T?`）だけ |
 | 2026-10-11 | コントローラの名前は OpenAPI から決める: メソッド名は `operationId`、リクエスト・レスポンスの型はスキーマ名（`〜Request` 以外は `Response` を付ける）、URL はクラスに分けずメソッドに全部書く、クラス名はモジュールの名前 + `Controller`、戻り値は 1 種類なら型を書く（§5「コントローラ」） |
 | 2026-10-11 | weather: 天気は日本時間の日付ごとに 1 つ。その日の最初の問い合わせで重み付き抽選して保存する（定期実行はしない）。`GET /weather/today` は日付・ID・名前・属性を返し、ログインが要る（§7「weather」） |
+| 2026-10-12 | item と強化: `GET /me/items` は 1 個以上のものだけ。強化は `POST /me/characters/{id}/enhance`（ステータスごとの個数。全部使えるときだけ使い、だめなら何も使わずに断る）で、強化したあとのキャラだけを返す。キャラのステータスは api が内訳（基礎・アイテム・被り・天気・合計）まで計算して `/me/characters` で返す。ゲスト作成で `starterItems`（月の酒を 3 個ずつ）を持たせる |
 
 ### 不採用にした案
 - **外側（presentation・infrastructure）を全モジュールで共通にする**: Gradle のモジュールは少なく済むが、外側では境界をコンパイラで守れない（特に DB で他モジュールのテーブルを触れてしまう）。モジュール数はほぼ変わらないので、境界を守れる core + adapter にした。
