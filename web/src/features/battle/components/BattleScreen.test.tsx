@@ -130,7 +130,14 @@ describe("BattleScreen", () => {
               name: "A",
               attribute: "yang",
               description: "",
-              assets: { main: "characters/a/main", icon: "characters/a/icon", home: "characters/a/home" }
+              assets: { main: "characters/a/main", icon: "characters/a/icon", home: "characters/a/home" },
+              stats: {
+                hp: { base: 1400, bonus: { item: 0, duplicate: 0, weather: 0 }, total: 1400 },
+                attack: { base: 400, bonus: { item: 0, duplicate: 0, weather: 0 }, total: 400 },
+                defence: { base: 90, bonus: { item: 0, duplicate: 0, weather: 0 }, total: 90 }
+              },
+              itemUses: { hp: 0, attack: 0, defence: 0 },
+              itemUseMax: { hp: 20, attack: 16, defence: 15 }
             }
           ]
         })

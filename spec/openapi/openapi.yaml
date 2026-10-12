@@ -1,12 +1,17 @@
 openapi: 3.1.0
 info:
   title: K API
-  version: 0.4.0
+  version: 0.5.0
   description: |
     K（リメイク）の API。web と api の約束事で、ここに書かれたものが正。
     エラーは RFC 9457（Problem Details）の形で返し、機械で見分けるための `code` を付ける。
 
     ## 変更履歴
+    ### 0.5.0（2026-10-12）
+    - `GET /me/items` と `POST /me/characters/{characterId}/enhance` を足した
+    - `MyCharacter` に `stats`（基礎・上昇分・合計）・`itemUses`・`itemUseMax` を足した
+    - エラーの種類に `ITEM_NOT_ENOUGH`・`ENHANCE_LIMIT_EXCEEDED` を足した
+
     ### 0.4.0（2026-10-11）
     - `GET /weather/today` を足した
 
@@ -40,6 +45,8 @@ tags:
     description: アプリのバージョン
   - name: characters
     description: 所持キャラ
+  - name: items
+    description: 所持アイテムと強化
   - name: weather
     description: 今日の天気（全プレイヤー共通）
   - name: quests
@@ -165,6 +172,56 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MyCharacterList"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /me/characters/{characterId}/enhance:
+    post:
+      tags: [characters]
+      operationId: enhanceMyCharacter
+      summary: アイテムを使ってキャラを強化する
+      description: |
+        キャラと同じ属性のアイテムを、ステータスごとの個数だけ使う（使うアイテムはキャラの属性で決まる）。
+        全部使えるときだけ使い、1 つでも足りない・上限を超えるなら何も使わずに断る。強化したあとのキャラを返す。
+      parameters:
+        - $ref: "#/components/parameters/CharacterId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EnhanceRequest"
+      responses:
+        "200":
+          description: 強化した
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MyCharacter"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/CharacterNotOwned"
+        "409":
+          $ref: "#/components/responses/EnhanceConflict"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /me/items:
+    get:
+      tags: [items]
+      operationId: listMyItems
+      summary: 所持アイテムの一覧を取る
+      description: 1 個以上持っているアイテムを返す。並びは `items.json` の順。
+      responses:
+        "200":
+          description: 取れた
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MyItemList"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "500":
@@ -358,6 +415,12 @@ components:
       required: true
       schema:
         $ref: "#/components/schemas/QuestId"
+    CharacterId:
+      name: characterId
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/CharacterId"
     SessionId:
       name: sessionId
       in: path
@@ -487,9 +550,9 @@ components:
           type: string
     MyCharacter:
       type: object
-      required: [id, name, attribute, description, assets]
+      required: [id, name, attribute, description, assets, stats, itemUses, itemUseMax]
       additionalProperties: false
-      description: 所持キャラ。ステータスの内訳・強化の回数は F-06 / F-07 を作るときに足す
+      description: 所持キャラ
       properties:
         id:
           $ref: "#/components/schemas/CharacterId"
@@ -501,6 +564,120 @@ components:
           type: string
         assets:
           $ref: "#/components/schemas/CharacterAssets"
+        stats:
+          type: object
+          required: [hp, attack, defence]
+          additionalProperties: false
+          description: 今のステータス（今日の天気のボーナス込み）。バトルを始めるとこの値で確定する
+          properties:
+            hp:
+              $ref: "#/components/schemas/StatBreakdown"
+            attack:
+              $ref: "#/components/schemas/StatBreakdown"
+            defence:
+              $ref: "#/components/schemas/StatBreakdown"
+        itemUses:
+          $ref: "#/components/schemas/StatCounts"
+          description: 強化で使ったアイテムの個数
+        itemUseMax:
+          $ref: "#/components/schemas/StatCounts"
+          description: 強化で使えるアイテムの上限（`settings.json` の `growth.itemUseMax`。全キャラ共通）
+    StatBreakdown:
+      type: object
+      required: [base, bonus, total]
+      additionalProperties: false
+      description: ステータス 1 つの内訳。`total = base + bonus.item + bonus.duplicate + bonus.weather`
+      properties:
+        base:
+          type: integer
+          minimum: 0
+          description: キャラの基礎の値（`characters.json` の `base`）
+        bonus:
+          type: object
+          required: [item, duplicate, weather]
+          additionalProperties: false
+          properties:
+            item:
+              type: integer
+              minimum: 0
+              description: アイテムで上がった分
+            duplicate:
+              type: integer
+              minimum: 0
+              description: 被りで上がった分
+            weather:
+              type: integer
+              minimum: 0
+              description: 今日の天気のボーナス（天気と同じ属性のときだけ）
+        total:
+          type: integer
+          minimum: 0
+    StatCounts:
+      type: object
+      required: [hp, attack, defence]
+      additionalProperties: false
+      properties:
+        hp:
+          type: integer
+          minimum: 0
+        attack:
+          type: integer
+          minimum: 0
+        defence:
+          type: integer
+          minimum: 0
+    EnhanceRequest:
+      type: object
+      required: [hp, attack, defence]
+      additionalProperties: false
+      description: ステータスごとに使うアイテムの個数。合計が 1 以上
+      properties:
+        hp:
+          type: integer
+          minimum: 0
+        attack:
+          type: integer
+          minimum: 0
+        defence:
+          type: integer
+          minimum: 0
+    ItemId:
+      type: string
+      pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+      description: "`spec/master/items.json` の `id`"
+      examples: [moon-hp]
+    MyItem:
+      type: object
+      required: [id, name, attribute, stat, iconKey, count]
+      additionalProperties: false
+      description: 所持アイテム
+      properties:
+        id:
+          $ref: "#/components/schemas/ItemId"
+        name:
+          type: string
+          examples: [HPの酒]
+        attribute:
+          $ref: "#/components/schemas/Attribute"
+        stat:
+          type: string
+          enum: [hp, attack, defence]
+          description: 上がるステータス
+        iconKey:
+          type: string
+          description: アイコンの素材のキー
+        count:
+          type: integer
+          minimum: 1
+    MyItemList:
+      type: object
+      required: [items]
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/MyItem"
     MyCharacterList:
       type: object
       required: [characters]
@@ -954,6 +1131,8 @@ components:
         - VALIDATION_FAILED
         - INVALID_NAME
         - CHARACTER_NOT_OWNED
+        - ITEM_NOT_ENOUGH
+        - ENHANCE_LIMIT_EXCEEDED
         - UNAUTHORIZED
         - QUEST_NOT_AVAILABLE
         - BATTLE_NOT_FOUND
@@ -964,7 +1143,9 @@ components:
       description: |
         - `VALIDATION_FAILED`: リクエストの形が違う（JSON が壊れている・必須項目がない・余計な項目がある・PATCH の項目が 0 個）
         - `INVALID_NAME`: 名前が空・7 文字以上・制御文字を含む
-        - `CHARACTER_NOT_OWNED`: 持っていない（または存在しない）キャラを出撃させようとした
+        - `CHARACTER_NOT_OWNED`: 持っていない（または存在しない）キャラを出撃させようとした・強化しようとした
+        - `ITEM_NOT_ENOUGH`: 強化に使うアイテムが足りない
+        - `ENHANCE_LIMIT_EXCEEDED`: 強化に使うアイテムの個数が上限（`itemUseMax`）を超える
         - `UNAUTHORIZED`: トークンがない・正しくない
         - `QUEST_NOT_AVAILABLE`: そのクエストは存在しない・まだ解放されていない・今日の天気ではない
         - `BATTLE_NOT_FOUND`: そのバトルは無い（自分のものでない・期限切れ・新しいバトルで無効になった）
@@ -1053,6 +1234,28 @@ components:
             status: 500
             detail: unexpected error
             code: INTERNAL_ERROR
+    CharacterNotOwned:
+      description: そのキャラを持っていない（`CHARACTER_NOT_OWNED`）
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          example:
+            type: about:blank
+            title: Not Found
+            status: 404
+            code: CHARACTER_NOT_OWNED
+    EnhanceConflict:
+      description: 今の所持数・使った数では強化できない（`ITEM_NOT_ENOUGH` / `ENHANCE_LIMIT_EXCEEDED`）。何も使っていない
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          example:
+            type: about:blank
+            title: Conflict
+            status: 409
+            code: ITEM_NOT_ENOUGH
     BadRequest:
       description: 入力が正しくない（`VALIDATION_FAILED` / `INVALID_NAME` / `CHARACTER_NOT_OWNED`）
       content:

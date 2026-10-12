@@ -83,6 +83,13 @@ def main() -> int:
     if starter not in character_ids:
         errors.append(f"settings: starterCharacterId '{starter}' のキャラがいません")
 
+    item_ids = set(ids["items"])
+    for starter_item in master["settings"]["starterItems"]:
+        if starter_item["itemId"] not in item_ids:
+            errors.append(f"settings: starterItems の '{starter_item['itemId']}' が items.json にありません")
+    starter_item_ids = [i["itemId"] for i in master["settings"]["starterItems"]]
+    errors += [f"settings: starterItems の '{v}' が重複しています" for v, n in Counter(starter_item_ids).items() if n > 1]
+
     rewards = master["settings"]["rewards"]
     if rewards["weatherItemDropMin"] > rewards["weatherItemDropMax"]:
         errors.append("settings: weatherItemDropMin が weatherItemDropMax より大きいです")
