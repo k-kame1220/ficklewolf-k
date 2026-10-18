@@ -22,36 +22,15 @@
     ],
     "deny": [
       "Edit(/api/**)",
+      "Read(/legacy/unity/**)",
       "Edit(/legacy/unity/**)",
-      "Read(/legacy/unity/*.keystore)",
-      "Read(/legacy/unity/*.apk)",
-      "Read(/legacy/unity/*.aab)",
-      "Read(/legacy/unity/*.csproj)",
-      "Read(/legacy/unity/*.sln)",
-      "Read(/legacy/unity/*.eps)",
-      "Read(/legacy/unity/.collabignore)",
-      "Read(/legacy/unity/.vs/**)",
-      "Read(/legacy/unity/.vscode/**)",
-      "Read(/legacy/unity/Build/**)",
-      "Read(/legacy/unity/Library/**)",
-      "Read(/legacy/unity/ProjectSettings/**)",
-      "Read(/legacy/unity/Packages/**)",
-      "Read(/legacy/unity/UserSettings/**)",
-      "Read(/legacy/unity/Logs/**)",
-      "Read(/legacy/unity/Temp/**)",
-      "Read(/legacy/unity/Assets/*.cs)",
-      "Read(/legacy/unity/Assets/承認とアプリバージョン/**)",
-      "Read(/legacy/unity/Assets/データベース/**)",
-      "Read(/legacy/unity/Assets/シーン/**)",
-      "Read(/legacy/unity/Assets/SaveData/**)",
-      "Read(/legacy/unity/Assets/Scripts/**)",
-      "Read(/legacy/unity/Assets/Resources/**)",
-      "Read(/legacy/unity/Assets/Plugins/**)",
-      "Read(/legacy/unity/Assets/LitJson/**)",
-      "Read(/legacy/unity/Assets/font/**)",
-      "Read(/legacy/unity/Assets/TextMesh Pro/**)",
       "Read(**/.env)",
-      "Edit(**/.env)"
+      "Edit(**/.env)",
+      "Read(**/.env.*)",
+      "Edit(**/.env.*)",
+      "Bash(git commit --no-verify*)",
+      "Bash(git commit -n*)",
+      "Bash(git commit * --no-verify*)"
     ]
   },
   "hooks": {
@@ -61,8 +40,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '.tool_response.filePath // .tool_input.file_path' | { read -r f; case \"$f\" in */web/src/*.ts|*/web/src/*.tsx) cd \"${f%%/web/src/*}/web\" && pnpm exec prettier --write --log-level warn \"$f\" && pnpm exec eslint --fix \"$f\";; */web/src/*.css) cd \"${f%%/web/src/*}/web\" && pnpm exec prettier --write --log-level warn \"$f\";; esac; } 2>/dev/null || true",
-            "statusMessage": "web のファイルを整形しています"
+            "command": "jq -r '.tool_response.filePath // .tool_input.file_path' | { read -r f; case \"$f\" in */web/src/*.ts|*/web/src/*.tsx) cd \"${f%%/web/src/*}/web\" || exit 0; pnpm exec prettier --write --log-level warn \"$f\" >/dev/null 2>&1; out=$(pnpm exec eslint --fix \"$f\" 2>&1) || { printf '%s\\n' \"$out\" >&2; exit 2; };; */web/src/*.css) cd \"${f%%/web/src/*}/web\" || exit 0; pnpm exec prettier --write --log-level warn \"$f\" >/dev/null 2>&1;; esac; exit 0; }",
+            "statusMessage": "web のファイルを整形・lint しています"
           }
         ]
       }

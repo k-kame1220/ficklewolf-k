@@ -10,7 +10,7 @@ GitHub: https://github.com/k-kame1220/ficklewolf-k （公開・既定のブラ�
 | `api/` | オーナー | **読むだけ**（レビュー・解説・相談）。編集はしない |
 | `spec/` | 両方の約束事 | 下書きの提案まで。**確定はオーナー**。テストを通すために spec を書き換えない |
 | `docs/` | 両方 | 決定事項の記録。オーナーの判断が必要な内容は相談してから書く |
-| `legacy/` | — | `data/` を参照する。`unity/` は素材（`Assets/素材`）の読み込みだけ可（素材の変換用）。それ以外は署名鍵・認証情報を含むので読まない（`.claude/settings.json` で禁止） |
+| `legacy/` | — | `data/` を参照する。素材は `assets/`（`unity/Assets/素材` から書き出した画像・音声・動画）を読む。`unity/` は署名鍵・認証情報を含むので、丸ごと読まない（`.claude/settings.json` で禁止） |
 
 ## 作業場所とブランチ
 - AI は worktree `~/develop/ficklewolf/K-ai` で作業する。オーナーの `K/` のブランチは切り替えない。

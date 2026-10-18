@@ -4,7 +4,8 @@
 
 ```
 legacy/
-├── unity/          旧 Unity プロジェクト（.gitignore 済み。署名鍵・GS2 認証情報を含む）
+├── unity/          旧 Unity プロジェクト（.gitignore 済み。署名鍵・GS2 認証情報を含む。AI は読まない）
+├── assets/         unity/Assets/素材 から書き出した画像・音声・動画（.gitignore 済み。AI が読んでよい素材はここだけ）
 ├── data/           抽出したマスタデータ（JSON）
 ├── screenshots/    旧作の実機のスクリーンショット（中身は .gitignore 済み。手元にだけある）
 └── tools/          移行用のスクリプト（Python。依存は tools/requirements.txt）
@@ -19,7 +20,7 @@ legacy/
 | `data/databases.json` | 各 DB の並び順・SE 一覧・バージョン（認証情報は `<REDACTED>`） |
 | `data/ui_texts.json` | シーンごとの UI 文言（ヘルプ・チュートリアル文を含む） |
 | `tools/build_master.py` | `data/` から `spec/master` の初版を作ったスクリプト（1 回だけ使用。以後は `spec/master` を直接編集） |
-| `tools/convert_assets.py` | `unity/Assets/素材` を web 用に変換する（画像 → WebP、無心フォント → WOFF2。`docs/02` §10） |
+| `tools/convert_assets.py` | `assets/素材` を web 用に変換する（画像 → WebP、無心フォント → WOFF2。`docs/02` §10） |
 | `tools/extract_unity_data.py` | 上の JSON を作るスクリプト（ACTk の Obscured 型を復号。PyYAML が必要） |
 
 ツールの準備（初回だけ。`tools/.venv` は git の対象外）:
@@ -33,6 +34,13 @@ legacy/tools/.venv/bin/python legacy/tools/extract_unity_data.py
 ```
 （引数を省略すると `legacy/unity/Assets` → `legacy/data` に書き出す）
 
+素材の書き出し（オーナーが行う。`unity/` に素材を足したときにやり直す）:
+```bash
+mkdir -p legacy/assets && rsync -a --delete --prune-empty-dirs --include='*/' --include='*.'{png,jpg,wav,mp3,ogg,mp4} --exclude='*' legacy/unity/Assets/素材/ legacy/assets/素材/
+```
+- 画像・音声・動画だけを書き出す（Unity の `.meta`・スクリプト・シェーダーなどは入れない）
+- AI は `unity/` を丸ごと読めない（`.claude/settings.json`）。素材が要るときは、ここに書き出してもらう
+
 素材の変換:
 ```bash
 legacy/tools/.venv/bin/python legacy/tools/convert_assets.py --font <mushin.otf>
@@ -40,8 +48,8 @@ legacy/tools/.venv/bin/python legacy/tools/convert_assets.py --font <mushin.otf>
 - 同梱素材（紙・ノイズ・枠・ロゴ）→ `web/src/shared/assets/bundled/`、無心 → `web/src/shared/assets/fonts/`（どちらもコミットする）
 - 取得素材（キャラの絵）→ `web/public/assets/`（コミットしない。配信先に手でアップロードする）と、キーの一覧 `web/src/shared/assets/remoteAssets.json`（コミットする）
 - フォントは MODI工場の「無心」ver1.04（https://modi.jpn.org/font_mushin.php）。`--font` を省くとフォントは変換しない
-- `--assets` で Unity の Assets の場所を変えられる（worktree では `legacy/unity` がないので、元のチェックアウトを指す）
+- `--assets` で素材の場所を変えられる（既定は `legacy/assets`。worktree では `legacy/assets` がないので、元のチェックアウトの `legacy/assets` を指す）
 
-画像・音声のパス（`mainImage` など）は `unity/Assets/` からの相対パス。
+画像・音声のパス（`mainImage` など）は `unity/Assets/`（書き出したあとは `assets/`）からの相対パス。
 
 `screenshots/` は旧作を実機で動かして撮った画面（ホーム・クエスト・戦闘・ガチャ・チュートリアルなど）。画面を作り直すときの見た目と流れの参考にする。画像は重く、公開リポジトリには置かないので、コミットするのは `.gitignore` だけ。
