@@ -144,7 +144,7 @@
 | S-13 | アイテム強化 | 所持アイテム、使う個数、強化前→強化後 |
 | S-14 | その他 | 名前変更、音量、ヘルプ（旧作のヘルプ文を流用: `legacy/data/ui_texts.json`） |
 
-演出: 画面の揺れ、HP バーのアニメーション、カットイン（リターン / 必殺技）、属性変化時の暗転と BGM 切り替え、ビリビリのアニメーション。素材は `legacy/unity/Assets/素材` から移す。
+演出: 画面の揺れ、HP バーのアニメーション、カットイン（リターン / 必殺技）、属性変化時の暗転と BGM 切り替え、ビリビリのアニメーション。素材は `legacy/assets/素材`（`legacy/unity/Assets/素材` から書き出したもの）から移す。
 
 ---
 
@@ -222,7 +222,7 @@
 | 開発用のモック | MSW | API が完成する前に、OpenAPI どおりの仮レスポンスでフロントを進める |
 | Web 配信 | PWA（vite-plugin-pwa） | ホーム画面に追加できる |
 | ストア配信（1.5） | Capacitor | Android はローカル（WSL / Windows）でビルド。**iOS は Mac が無いのでクラウドでビルド**（Codemagic か GitHub Actions の macOS ランナー）。Apple Developer Program（年額）への登録が必要 |
-| 素材 | `legacy/unity/Assets/素材` から変換して移す（PNG → WebP、WAV → OGG/M4A）。変換は `legacy/tools/` の Python スクリプトで行う | |
+| 素材 | `legacy/assets/素材`（`legacy/unity/Assets/素材` から書き出したもの）から変換して移す（PNG → WebP、WAV → OGG/M4A）。変換は `legacy/tools/` の Python スクリプトで行う | |
 | 置き場所 | `web/` | `api/`（オーナー）と分ける |
 
 ---
@@ -252,7 +252,7 @@
 |---|---|---|
 | 同梱素材 | タイトル・共通 UI・効果音（起動に必要なもの） | 変換後のファイルを `web/` にコミットする |
 | 取得素材 | キャラの画像・クエスト・BGM など（増えていくもの） | 静的ホスティングの素材用の場所（フェーズ 1 は web と同じサーバー、ストア配信の頃に ストレージ＋CDN へ） |
-| 元ファイル | 変換前の PNG・WAV | git の外（`legacy/unity` とバックアップ） |
+| 元ファイル | 変換前の PNG・WAV | git の外（`legacy/unity`・`legacy/assets` とバックアップ） |
 
 - 取得素材は、変換スクリプトが出力したものを手元から手でアップロードする。変換後の素材の一覧（キー・ハッシュ）は git で管理する。
 - マスタには素材の**パスではなくキー**（例: `characters/A/main.webp`）を書く。置き場所の基点 URL は設定で切り替える。

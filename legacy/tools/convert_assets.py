@@ -7,7 +7,7 @@
 - フォント: --font で渡した OTF を web/src/shared/assets/fonts/ に WOFF2 で出力する
 
 使い方:
-    legacy/tools/.venv/bin/python legacy/tools/convert_assets.py [--assets <Unity の Assets>] [--font <mushin.otf>]
+    legacy/tools/.venv/bin/python legacy/tools/convert_assets.py [--assets <素材の書き出し先>] [--font <mushin.otf>]
 """
 import argparse
 import hashlib
@@ -27,7 +27,7 @@ BUNDLED_DIR = WEB_ASSETS_DIR / "bundled"
 FONT_DIR = WEB_ASSETS_DIR / "fonts"
 REMOTE_DIR = REPO_DIR / "web" / "public" / "assets"
 REMOTE_MANIFEST = WEB_ASSETS_DIR / "remoteAssets.json"
-DEFAULT_UNITY_ASSETS = LEGACY_DIR / "unity" / "Assets"
+DEFAULT_ASSETS = LEGACY_DIR / "assets"
 
 WEBP_QUALITY = 82
 WEBP_METHOD = 6
@@ -107,7 +107,7 @@ def convert_font(font: Path):
 
 def main():
     parser = argparse.ArgumentParser(description="旧作の素材を web 用に変換する")
-    parser.add_argument("--assets", type=Path, default=DEFAULT_UNITY_ASSETS, help="Unity の Assets フォルダ")
+    parser.add_argument("--assets", type=Path, default=DEFAULT_ASSETS, help="素材の書き出し先（中に 素材/ がある。既定は legacy/assets）")
     parser.add_argument("--font", type=Path, help="無心（MODI工場）の mushin.otf。渡したときだけ変換する")
     args = parser.parse_args()
 

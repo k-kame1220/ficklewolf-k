@@ -31,7 +31,7 @@
 - git の履歴は 1 つを共有する。AI のブランチは `K/` 側からもそのまま見え、マージできる。
 - 同じブランチは 2 つのフォルダで同時に開けない（git が止める）。AI は `K-ai/` で `develop` から作業ブランチを切る。
 - `node_modules` はフォルダごとに必要（`K-ai/web` で `pnpm install`）。pnpm のストアと Gradle のキャッシュは共有される。
-- git 管理外のファイル（`api/.env`、`legacy/unity/`）は `K-ai/` には無い。
+- git 管理外のファイル（`api/.env`、`legacy/unity/`、`legacy/assets/`）は `K-ai/` には無い。
 - AI の作業が終わったら、オーナーがレビューして `develop` にマージする。
 
 ```bash

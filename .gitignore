@@ -1,4 +1,5 @@
 /legacy/unity/
+/legacy/assets/
 *.keystore
 *.aab
 *.apk
