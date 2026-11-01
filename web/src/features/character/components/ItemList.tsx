@@ -52,7 +52,7 @@ const ItemList = (props: ItemListProps) => {
         character={characters.data.get(me.data.selectedCharacterId)}
         fallbackName={me.data.selectedCharacterId}
       />
-      <section aria-label={CHARACTER_MESSAGES.items}>
+      <section className={styles.scroll} aria-label={CHARACTER_MESSAGES.items}>
         {items.data.length === 0 && <p>{CHARACTER_MESSAGES.noItems}</p>}
         <ul className={styles.items}>
           {items.data.map(item => {
@@ -69,9 +69,11 @@ const ItemList = (props: ItemListProps) => {
           })}
         </ul>
       </section>
-      <Button variant="pencil" onClick={onClose}>
-        {CHARACTER_MESSAGES.close}
-      </Button>
+      <div className={styles.actions}>
+        <Button variant="pencil" onClick={onClose}>
+          {CHARACTER_MESSAGES.close}
+        </Button>
+      </div>
     </div>
   );
 };

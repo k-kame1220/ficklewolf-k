@@ -55,17 +55,21 @@ const MonsterDetail = (props: MonsterDetailProps) => {
   return (
     <article className={styles.root}>
       <h2 className={styles.name}>{character.name}</h2>
-      <div className={styles.profile}>
-        <div className={styles.frame}>
-          {imageUrl !== null && <img className={styles.image} src={imageUrl} alt={character.name} />}
+      <div className={styles.scroll}>
+        <div className={styles.profile}>
+          <div className={styles.frame}>
+            {imageUrl !== null && <img className={styles.image} src={imageUrl} alt={character.name} />}
+          </div>
+          <MonsterDetailStats character={character} />
         </div>
-        <MonsterDetailStats character={character} />
+        <MonsterDetailEnhance character={character} />
+        <p className={styles.description}>{character.description}</p>
       </div>
-      <MonsterDetailEnhance character={character} />
-      <p className={styles.description}>{character.description}</p>
-      <Button variant="pencil" onClick={onBack}>
-        {CHARACTER_MESSAGES.back}
-      </Button>
+      <div className={styles.actions}>
+        <Button variant="pencil" onClick={onBack}>
+          {CHARACTER_MESSAGES.back}
+        </Button>
+      </div>
     </article>
   );
 };

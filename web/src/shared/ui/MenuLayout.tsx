@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 type MenuLayoutProps = {
   /** 上の帯のすぐ下に出すもの（プレイヤーの状態など） */
   header: ReactNode;
-  /** 真ん中に出すもの */
+  /** 真ん中に出すもの。上下の帯とタブは動かさず、ここだけがスクロールする（中で `flex: 1` にすれば高さいっぱいに広がる） */
   children: ReactNode;
   /** 下の帯のすぐ上に出すもの（タブなど） */
   footer: ReactNode;
