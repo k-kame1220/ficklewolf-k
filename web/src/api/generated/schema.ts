@@ -660,7 +660,7 @@ export type components = {
          */
         readonly BattleRejectReason: "BATTLE_FINISHED" | "CANNOT_CHECK_FIRST_TURN" | "ALREADY_CHECKED" | "CHECK_LIMIT" | "NO_CHECKPOINT" | "REWIND_LIMIT" | "CANNOT_REWIND_HERE" | "INVALID_REWIND_TARGET" | "SPECIAL_UNAVAILABLE" | "INVALID_SPECIAL_TARGET" | "REVEAL_LIMIT" | "SPECIAL_PENDING" | "SPECIAL_NOT_OPENED";
         /**
-         * @description - `VALIDATION_FAILED`: リクエストの形が違う（JSON が壊れている・必須項目がない・余計な項目がある・PATCH の項目が 0 個）
+         * @description - `VALIDATION_FAILED`: リクエストの形が違う（JSON が壊れている・必須項目がない・余計な項目がある・PATCH の項目が 0 個・強化の個数がマイナスか合計 0）
          *     - `INVALID_NAME`: 名前が空・7 文字以上・制御文字を含む
          *     - `CHARACTER_NOT_OWNED`: 持っていない（または存在しない）キャラを出撃させようとした・強化しようとした
          *     - `ITEM_NOT_ENOUGH`: 強化に使うアイテムが足りない

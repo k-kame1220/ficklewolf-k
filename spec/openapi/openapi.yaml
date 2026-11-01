@@ -1141,7 +1141,7 @@ components:
         - COMMAND_REJECTED
         - INTERNAL_ERROR
       description: |
-        - `VALIDATION_FAILED`: リクエストの形が違う（JSON が壊れている・必須項目がない・余計な項目がある・PATCH の項目が 0 個）
+        - `VALIDATION_FAILED`: リクエストの形が違う（JSON が壊れている・必須項目がない・余計な項目がある・PATCH の項目が 0 個・強化の個数がマイナスか合計 0）
         - `INVALID_NAME`: 名前が空・7 文字以上・制御文字を含む
         - `CHARACTER_NOT_OWNED`: 持っていない（または存在しない）キャラを出撃させようとした・強化しようとした
         - `ITEM_NOT_ENOUGH`: 強化に使うアイテムが足りない

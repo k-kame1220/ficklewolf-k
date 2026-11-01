@@ -165,7 +165,7 @@
 | GET | `/app/version` | 必要なアプリの最低バージョン（起動時に確認） |
 | ~~GET~~ | ~~`/master/version`・`/master`~~ | **削除した**（D-8。マスタはまとめて配信しない） |
 | GET | `/weather/today` | 今日の天気（日付・ID・名前・属性） |
-| GET | `/me/characters` | 所持キャラ（名前・属性・説明・素材のキー。育成値は F-06 で足す） |
+| GET | `/me/characters` | 所持キャラ（名前・属性・説明・素材のキー・ステータスの内訳・アイテムを使った数と上限。図鑑の番号順） |
 | GET | `/me/items` | 所持アイテム（1 個以上のものだけ。`items.json` の順） |
 | POST | `/me/characters/{id}/enhance` | アイテム強化 `{hp, attack, defence}` の個数 → 強化したあとのキャラ |
 | GET | `/me/quests` | 挑戦できるクエストとクリア状況 |
