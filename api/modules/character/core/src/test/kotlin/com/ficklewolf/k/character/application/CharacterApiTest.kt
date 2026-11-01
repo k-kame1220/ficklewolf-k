@@ -4,9 +4,11 @@ import com.ficklewolf.k.character.api.AcquireCharacterResult
 import com.ficklewolf.k.character.api.CharacterSummary
 import com.ficklewolf.k.character.domain.Character
 import com.ficklewolf.k.character.domain.CharacterAssets
+import com.ficklewolf.k.character.domain.OwnedCharacter
 import com.ficklewolf.k.shared.kernel.Attribute
 import com.ficklewolf.k.shared.kernel.CharacterId
 import com.ficklewolf.k.shared.kernel.PlayerId
+import com.ficklewolf.k.shared.kernel.Stats
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -22,6 +24,8 @@ class CharacterApiTest {
             attribute = Attribute.MOON,
             description = "説明",
             assets = CharacterAssets("characters/zero/main", "characters/zero/icon", "characters/zero/home"),
+            baseStats = Stats.ZERO,
+            duplicateBonusMax = Stats.ZERO,
         )
 
     private val owned = mutableSetOf<Pair<PlayerId, CharacterId>>()
@@ -30,7 +34,7 @@ class CharacterApiTest {
         object : CharacterService {
             override fun findCharacter(id: CharacterId): Character? = if (id == zero.id) zero else null
 
-            override fun listOwnedCharacters(playerId: PlayerId): List<Character> = error("使わない")
+            override fun listOwnedCharacters(playerId: PlayerId): List<OwnedCharacter> = error("使わない")
 
             override fun ownsCharacter(
                 playerId: PlayerId,
@@ -41,6 +45,12 @@ class CharacterApiTest {
                 playerId: PlayerId,
                 characterId: CharacterId,
             ): Character? = findCharacter(characterId)?.also { owned += playerId to it.id }
+
+            override fun enhanceCharacter(
+                playerId: PlayerId,
+                characterId: CharacterId,
+                items: Stats,
+            ): EnhanceCharacterResult = error("使わない")
 
             override fun getStarterCharacter(): Character = zero
         }

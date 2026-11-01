@@ -13,7 +13,7 @@ K のバックエンド API。設計は `../docs/05_backend-architecture.md`、A
 api/
 ├── bootstrap/               起動（KApplication）と設定（application.properties）
 ├── build-logic/             Gradle の共通設定（k.kotlin-core・k.spring-adapter・k.spring-boot-app）
-├── shared/kernel/           全モジュールで共有する小さな型（PlayerId・CharacterId・Attribute・TransactionRunner など）
+├── shared/kernel/           全モジュールで共有する小さな型（PlayerId・CharacterId・ItemId・Attribute・Stat・Stats・TransactionRunner など）
 ├── platform/
 │   ├── web/                 Web の共通の仕組み（エラー・JSON の読み方・認証・CORS・リクエストのログ）
 │   └── persistence/         永続化の共通の仕組み（TransactionRunner の実装）
@@ -26,13 +26,14 @@ api/
 
 | モジュール | 担当 | API |
 |---|---|---|
-| `auth` | ゲストアカウントの作成・トークンの発行と照合 | `POST /auth/guest` |
+| `auth` | ゲストアカウントの作成・トークンの発行と照合（作成時に最初のキャラとアイテムを渡す） | `POST /auth/guest` |
 | `player` | プロフィール（名前・Lv・お札・出撃キャラ） | `GET /me`・`PATCH /me` |
 | `app` | 必要なアプリの最低バージョン | `GET /app/version` |
-| `character` | キャラのマスタ・所持キャラ | `GET /me/characters` |
-| `weather` | 天気のマスタと今日の天気（日本時間の日付ごとに抽選） | `GET /weather/today` |
+| `character` | キャラのマスタ・所持キャラ・ステータスの内訳・アイテムでの強化 | `GET /me/characters`・`POST /me/characters/{characterId}/enhance` |
+| `item` | アイテムのマスタ・所持アイテム（使う・渡すは `ItemApi`） | `GET /me/items` |
+| `weather` | 天気のマスタと今日の天気（日本時間の日付ごとに抽選。ボーナスは `WeatherApi`） | `GET /weather/today` |
 
-予定: item → quest（`/me/quests`）→ battle（エンジンとバトルの API）→ DB。モジュールの決まり・名前の付け方は docs/05 §4・§5。
+予定: quest（`/me/quests`）→ battle（エンジンとバトルの API）→ DB。モジュールの決まり・名前の付け方は docs/05 §4・§5。
 
 ## 起動
 

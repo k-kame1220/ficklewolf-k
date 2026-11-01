@@ -1,7 +1,7 @@
 package com.ficklewolf.k.weather.adapter.persistence
 
 import com.ficklewolf.k.shared.kernel.Attribute
-import com.ficklewolf.k.shared.kernel.CharacterStatus
+import com.ficklewolf.k.shared.kernel.Stats
 import com.ficklewolf.k.shared.kernel.WeatherId
 import com.ficklewolf.k.weather.application.WeatherRepository
 import com.ficklewolf.k.weather.domain.Weather
@@ -38,7 +38,7 @@ private fun JsonNode.toWeather(): Weather {
         attribute = Attribute.of(rawAttribute) ?: error("Unknown attribute $rawAttribute"),
         weight = required("weight").intValue(),
         bonus =
-            CharacterStatus(
+            Stats(
                 bonus.required("hp").intValue(),
                 bonus.required("attack").intValue(),
                 bonus.required("defence").intValue(),

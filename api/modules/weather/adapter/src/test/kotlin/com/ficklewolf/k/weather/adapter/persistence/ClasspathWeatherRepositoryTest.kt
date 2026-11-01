@@ -1,7 +1,7 @@
 package com.ficklewolf.k.weather.adapter.persistence
 
 import com.ficklewolf.k.shared.kernel.Attribute
-import com.ficklewolf.k.shared.kernel.CharacterStatus
+import com.ficklewolf.k.shared.kernel.Stats
 import com.ficklewolf.k.shared.kernel.WeatherId
 import tools.jackson.databind.json.JsonMapper
 import kotlin.test.Test
@@ -19,7 +19,7 @@ class ClasspathWeatherRepositoryTest {
         assertEquals("雨", rain.name)
         assertEquals(Attribute.NOTE, rain.attribute)
         assertEquals(2, rain.weight)
-        assertEquals(CharacterStatus(hp = 0, attack = 60, defence = 0), rain.bonus)
+        assertEquals(Stats(hp = 0, attack = 60, defence = 0), rain.bonus)
     }
 
     @Test
