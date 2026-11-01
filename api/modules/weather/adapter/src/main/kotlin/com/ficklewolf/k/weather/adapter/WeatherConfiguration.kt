@@ -2,6 +2,7 @@ package com.ficklewolf.k.weather.adapter
 
 import com.ficklewolf.k.weather.adapter.persistence.ClasspathWeatherRepository
 import com.ficklewolf.k.weather.adapter.persistence.InMemoryDailyWeatherRepository
+import com.ficklewolf.k.weather.api.WeatherApi
 import com.ficklewolf.k.weather.application.DailyWeatherRepository
 import com.ficklewolf.k.weather.application.WeatherRepository
 import com.ficklewolf.k.weather.application.WeatherService
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Configuration
 import tools.jackson.databind.json.JsonMapper
 import java.time.Clock
 import kotlin.random.Random
+import com.ficklewolf.k.weather.application.weatherApi as createWeatherApi
 import com.ficklewolf.k.weather.application.weatherService as createWeatherService
 
 @Configuration
@@ -26,4 +28,7 @@ class WeatherConfiguration {
         dailyWeatherRepository: DailyWeatherRepository,
     ): WeatherService =
         createWeatherService(weatherRepository, dailyWeatherRepository, Clock.systemUTC(), Random.Default)
+
+    @Bean
+    fun weatherApi(weatherService: WeatherService): WeatherApi = createWeatherApi(weatherService)
 }

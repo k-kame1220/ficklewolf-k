@@ -6,6 +6,7 @@ import com.ficklewolf.k.auth.application.AuthService
 import com.ficklewolf.k.auth.application.AuthTokenRepository
 import com.ficklewolf.k.auth.application.TokenGenerator
 import com.ficklewolf.k.character.api.CharacterApi
+import com.ficklewolf.k.item.api.ItemApi
 import com.ficklewolf.k.platform.web.security.PublicEndpoint
 import com.ficklewolf.k.platform.web.security.TokenAuthenticator
 import com.ficklewolf.k.player.api.PlayerApi
@@ -28,6 +29,7 @@ class AuthConfiguration {
     fun authService(
         playerApi: PlayerApi,
         characterApi: CharacterApi,
+        itemApi: ItemApi,
         authTokenRepository: AuthTokenRepository,
         tokenGenerator: TokenGenerator,
         transactionRunner: TransactionRunner,
@@ -35,6 +37,7 @@ class AuthConfiguration {
         createAuthService(
             playerApi,
             characterApi,
+            itemApi,
             authTokenRepository,
             tokenGenerator,
             transactionRunner,

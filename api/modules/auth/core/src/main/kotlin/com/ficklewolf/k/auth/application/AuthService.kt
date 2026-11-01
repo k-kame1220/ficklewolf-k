@@ -4,6 +4,7 @@ import com.ficklewolf.k.auth.domain.AuthToken
 import com.ficklewolf.k.auth.domain.TokenHash
 import com.ficklewolf.k.character.api.AcquireCharacterResult
 import com.ficklewolf.k.character.api.CharacterApi
+import com.ficklewolf.k.item.api.ItemApi
 import com.ficklewolf.k.player.api.CreatePlayerResult
 import com.ficklewolf.k.player.api.PlayerApi
 import com.ficklewolf.k.player.api.PlayerSummary
@@ -29,15 +30,18 @@ interface AuthService {
 fun authService(
     playerApi: PlayerApi,
     characterApi: CharacterApi,
+    itemApi: ItemApi,
     tokenRepository: AuthTokenRepository,
     tokenGenerator: TokenGenerator,
     transaction: TransactionRunner,
     clock: Clock,
-): AuthService = DefaultAuthService(playerApi, characterApi, tokenRepository, tokenGenerator, transaction, clock)
+): AuthService =
+    DefaultAuthService(playerApi, characterApi, itemApi, tokenRepository, tokenGenerator, transaction, clock)
 
 internal class DefaultAuthService(
     private val playerApi: PlayerApi,
     private val characterApi: CharacterApi,
+    private val itemApi: ItemApi,
     private val tokenRepository: AuthTokenRepository,
     private val tokenGenerator: TokenGenerator,
     private val transaction: TransactionRunner,
@@ -55,6 +59,8 @@ internal class DefaultAuthService(
                     if (acquired is AcquireCharacterResult.CharacterNotFound) {
                         error("starter character not found: ${created.player.selectedCharacterId.value}")
                     }
+
+                    itemApi.acquireStarter(created.player.id)
 
                     val rawToken = tokenGenerator.generate()
                     tokenRepository.save(AuthToken(TokenHash.of(rawToken), created.player.id, clock.instant()))

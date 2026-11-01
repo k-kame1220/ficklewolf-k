@@ -5,12 +5,15 @@ import com.ficklewolf.k.auth.domain.TokenHash
 import com.ficklewolf.k.character.api.AcquireCharacterResult
 import com.ficklewolf.k.character.api.CharacterApi
 import com.ficklewolf.k.character.api.CharacterSummary
+import com.ficklewolf.k.item.api.ConsumeResult
+import com.ficklewolf.k.item.api.ItemApi
 import com.ficklewolf.k.player.api.CreatePlayerResult
 import com.ficklewolf.k.player.api.PlayerApi
 import com.ficklewolf.k.player.api.PlayerSummary
 import com.ficklewolf.k.shared.kernel.Attribute
 import com.ficklewolf.k.shared.kernel.CharacterId
 import com.ficklewolf.k.shared.kernel.PlayerId
+import com.ficklewolf.k.shared.kernel.Stats
 import com.ficklewolf.k.shared.kernel.TransactionRunner
 import java.time.Clock
 import java.time.Instant
@@ -55,6 +58,20 @@ class AuthServiceTest {
             override fun getStarterId(): CharacterId = error("使わない")
         }
 
+    private val starterGranted = mutableListOf<PlayerId>()
+    private val itemApi =
+        object : ItemApi {
+            override fun consume(
+                playerId: PlayerId,
+                attribute: Attribute,
+                counts: Stats,
+            ): ConsumeResult = error("使わない")
+
+            override fun acquireStarter(playerId: PlayerId) {
+                starterGranted += playerId
+            }
+        }
+
     private val tokens = mutableMapOf<TokenHash, AuthToken>()
     private val tokenRepository =
         object : AuthTokenRepository {
@@ -77,7 +94,8 @@ class AuthServiceTest {
 
     private val clock = Clock.fixed(Instant.parse("2026-10-04T00:00:00Z"), ZoneOffset.UTC)
 
-    private val service = authService(playerApi, characterApi, tokenRepository, tokenGenerator, transaction, clock)
+    private val service =
+        authService(playerApi, characterApi, itemApi, tokenRepository, tokenGenerator, transaction, clock)
 
     @Test
     fun `ゲストを作るとトークン本体を返し、保存するのはハッシュだけ`() {
@@ -101,6 +119,7 @@ class AuthServiceTest {
         assertEquals(RegisterGuestResult.InvalidName, service.registerGuest("abcdefg"))
         assertTrue(tokens.isEmpty())
         assertTrue(acquiredCharacters.isEmpty())
+        assertTrue(starterGranted.isEmpty())
     }
 
     @Test
@@ -131,9 +150,17 @@ class AuthServiceTest {
 
                 override fun getStarterId(): CharacterId = error("使わない")
             }
-        val service = authService(playerApi, missingCharacterApi, tokenRepository, tokenGenerator, transaction, clock)
+        val service =
+            authService(playerApi, missingCharacterApi, itemApi, tokenRepository, tokenGenerator, transaction, clock)
 
         assertFailsWith<IllegalStateException> { service.registerGuest("ゲスト") }
         assertTrue(tokens.isEmpty())
+    }
+
+    @Test
+    fun `ゲストを作ると、最初のアイテムを渡す`() {
+        service.registerGuest("ゲスト")
+
+        assertEquals(listOf(guest.id), starterGranted)
     }
 }

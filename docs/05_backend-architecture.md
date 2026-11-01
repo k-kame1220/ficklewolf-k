@@ -1,6 +1,6 @@
 # バックエンド設計（モジュラーモノリスとレイヤー構成）
 
-> 版: v0.9（2026-10-11、weather（今日の天気の決め方）を足す）/ 対象: `api/`。バックエンドはオーナーが書く。この文書はオーナーと AI の相談で決めたことの記録。
+> 版: v1.2（2026-11-01、item・weather・強化の作成を反映する）/ 対象: `api/`。バックエンドはオーナーが書く。この文書はオーナーと AI の相談で決めたことの記録。
 > 前提: [00_project-context.md](00_project-context.md)（Kotlin + Spring Boot は必須）、[02_requirements.md](02_requirements.md) §6（API 一覧）
 
 ---
@@ -43,11 +43,11 @@ api/
 | `auth` | トークンの発行と照合。外に出すのは「トークン → PlayerId」 | 作成済み（`POST /auth/guest`） |
 | `player` | プロフィール（名前・Lv・お札・出撃キャラ）。`/me` | 作成済み（名前・出撃キャラの変更） |
 | `app` | 必要なアプリの最低バージョン（`/app/version`。`settings.json` の `minAppVersion`） | 作成済み |
-| `character` | キャラのマスタ（`characters.json`）・所持キャラ・強化（育成の決まり `growth`）。`/me/characters` | 作成済み（マスタ・所持キャラ・`/me/characters`。強化は item の後） |
-| `item` | アイテムのマスタ（`items.json`）と所持数。`/me/items`。使う（減らす）・渡す（増やす）は `ItemApi` で受ける | 予定 |
+| `character` | キャラのマスタ（`characters.json`）・所持キャラ・強化（育成の決まり `growth`）。`/me/characters` | 作成済み（マスタ・所持キャラ・ステータスの内訳・`/me/characters`・強化 `POST /me/characters/{id}/enhance`）。被り（ランダムで 1 つ +1）は quest の報酬と一緒に作る |
+| `item` | アイテムのマスタ（`items.json`）と所持数。`/me/items`。使う（減らす）・渡す（増やす）は `ItemApi` で受ける。ゲスト作成で `starterItems` を渡す | 作成済み（`/me/items`・`ItemApi.consume`・`ItemApi.acquireStarter`） |
 | `quest` | クエストのマスタ（`quests.json`。敵のステータスと行動）・解放とクリア状況・報酬。`/me/quests` | 予定 |
 | `battle` | バトルのエンジン（ゴールデンテスト）とバトルのセッション。`/quests/{id}/sessions`・`/quest-sessions/*`（docs/02 D-8） | 予定 |
-| `weather` | 天気のマスタ（`weathers.json`）と日替わりの天気 | 予定 |
+| `weather` | 天気のマスタ（`weathers.json`）と日替わりの天気。`/weather/today`。今日の天気の属性とボーナスは `WeatherApi` で受ける | 作成済み（`/weather/today`・`WeatherApi.getToday`） |
 | `master` | マスタをまとめて配信していた。D-8 で配信をやめ、マスタは各モジュールが持つことにしたので消した（§7） | 削除済み（2026-10-10） |
 
 ---
@@ -82,6 +82,7 @@ bootstrap ─→ modules/*/adapter ─→ modules/*/core ─→ modules/*/api �
 ## 4. api・core の中身と公開のしかた
 
 - **api**: 他モジュールに約束する窓口（`<モジュール>Api` の interface）と、そこでやり取りする外向けの型だけを置く。失敗しうる操作は `sealed interface` の結果の型で返す（例: `CreatePlayerResult`）。
+  - 結果の型にするのは、**呼ぶ側が受けて動きを変える失敗**だけ（例: 名前が使えない、アイテムが足りない）。マスタやコードのバグでしか起きないもの（存在しないはずのない ID など）は例外にする（トランザクションが巻き戻り、500 とログで気づける）。
 - **core**: パッケージで `domain`（エンティティ・値オブジェクト・ルール）と `application`（処理・ports・api の実装）に分ける。
 - core の中は **2 つの入口**を持つ。
 
@@ -91,7 +92,7 @@ bootstrap ─→ modules/*/adapter ─→ modules/*/core ─→ modules/*/api �
 | `<モジュール>Api`（の実装 `Default<モジュール>Api`） | 他のモジュール | api の外向けの型（`String`・`PlayerSummary`） |
 
 - **処理の本体は `<モジュール>Service` に書く。** `Default<モジュール>Api` は**変換だけ**をする（外の型 → domain の型にして Service を呼び、domain の型 → 外の型にして返す）。
-- **core の中で api の型を import するのは `Default<モジュール>Api` だけ。** domain と Service は api を知らない。api の約束を変えても、直すのは変換役だけで済む。
+- **core の中で自分のモジュールの api の型を import するのは `Default<モジュール>Api` だけ。** domain と Service は自分の api を知らない（他モジュールの api の窓口を Service から呼ぶのはよい。§3）。api の約束を変えても、直すのは変換役だけで済む。
 - 依存の向きは **core → api**（約束を実装するため）。api は core を知らない。他モジュールは api だけに依存し、core には依存しない（Gradle の依存に入れない）。
 - `<モジュール>Service` は自分の adapter（別の Gradle モジュール）から使うので public にする。他モジュールは core に依存しないので、外からは見えない。`Default<モジュール>Service`・`Default<モジュール>Api` は `internal`。
 
@@ -292,11 +293,11 @@ D-8（docs/02）でマスタをまとめて配信するのをやめ、マスタ�
 | `weathers.json` | weather |
 | `items.json` | item（所持数も item が持つ。強化する character・報酬を渡す quest は `ItemApi` に頼む） |
 | `attributes.json` | 相性はバトルのルール（battle）。名前・絵のキーは表示する側 |
-| `settings.json` | 項目ごとに持ち主が違う。`minAppVersion` → app、`starterCharacterId`・`growth`（強化の上限・1 個あたりの上昇量）→ character、`rewards` → quest。各モジュールが自分の項目だけを読む |
+| `settings.json` | 項目ごとに持ち主が違う。`minAppVersion` → app、`starterCharacterId`・`growth`（強化の上限・1 個あたりの上昇量）→ character、`starterItems` → item、`rewards` → quest。各モジュールが自分の項目だけを読む |
 
 - **正は `spec/master/*.json`。** 各モジュールの adapter が、ビルド時に `processResources` で**自分のファイルだけ**を jar に同梱し、起動時に 1 回だけ読む（ファイルがない・壊れているときは起動に失敗する）。リポジトリにはコピーを置かない。
-- マスタの読み込みも port（`<対象>MasterRepository` など）にし、実装は adapter に置く。JSON を型に変えるのは adapter の仕事で、core は JSON を知らない。**DB ができたら**、デプロイ時に各モジュールが自分のテーブルへ投入し、差し替えるのは実装だけ。
-- 他のモジュールのマスタやデータが要るときは、持ち主の api に聞く（例: battle はキャラの基礎ステータスを `CharacterApi`、敵を `QuestApi` から。character の強化は `ItemApi` でアイテムを減らしてから自分のステータスを上げる。quest の報酬は `ItemApi` でアイテムを渡す）。マスタを丸ごと渡さず、要る形で返す。
+- マスタの読み込みも port（`<対象>Repository`。例: `CharacterRepository`・`ItemRepository`）にし、実装は adapter に置く。JSON を型に変えるのは adapter の仕事で、core は JSON を知らない。**DB ができたら**、デプロイ時に各モジュールが自分のテーブルへ投入し、差し替えるのは実装だけ。
+- 他のモジュールのマスタやデータが要るときは、持ち主の api に聞く（例: battle はキャラの基礎ステータスを `CharacterApi`、敵を `QuestApi` から。character の強化は、先に自分の上限を確かめ、通ったら `ItemApi` でアイテムを減らし、使えたら自分の使った数を保存する。quest の報酬は `ItemApi` でアイテムを渡す）。マスタを丸ごと渡さず、要る形で返す。
 - `settings.json` は 1 つのファイルに持ち主の違う値が混ざっている。気になったら spec のファイルを分けることを相談する（spec の変更なのでオーナーが決める）。
 
 ### master モジュールは消した（2026-10-10）
@@ -363,6 +364,7 @@ com.ficklewolf.k.<モジュール>.adapter.web / .adapter.persistence
 | 2026-10-10 | 複数を取るメソッドは、どの層でも `list` にする（Repository は `listBy〇〇`・`listAll`、Service は `list〇〇s`）。`findAll` は使わない。`find` は 1 件（`T?`）だけ |
 | 2026-10-11 | コントローラの名前は OpenAPI から決める: メソッド名は `operationId`、リクエスト・レスポンスの型はスキーマ名（`〜Request` 以外は `Response` を付ける）、URL はクラスに分けずメソッドに全部書く、クラス名はモジュールの名前 + `Controller`、戻り値は 1 種類なら型を書く（§5「コントローラ」） |
 | 2026-10-11 | weather: 天気は日本時間の日付ごとに 1 つ。その日の最初の問い合わせで重み付き抽選して保存する（定期実行はしない）。`GET /weather/today` は日付・ID・名前・属性を返し、ログインが要る（§7「weather」） |
+| 2026-10-12 | item と強化: `GET /me/items` は 1 個以上のものだけ。強化は `POST /me/characters/{id}/enhance`（ステータスごとの個数。全部使えるときだけ使い、だめなら何も使わずに断る）で、強化したあとのキャラだけを返す。キャラのステータスは api が内訳（基礎・アイテム・被り・天気・合計）まで計算して `/me/characters` で返す。ゲスト作成で `starterItems`（月の酒を 3 個ずつ）を持たせる |
 
 ### 不採用にした案
 - **外側（presentation・infrastructure）を全モジュールで共通にする**: Gradle のモジュールは少なく済むが、外側では境界をコンパイラで守れない（特に DB で他モジュールのテーブルを触れてしまう）。モジュール数はほぼ変わらないので、境界を守れる core + adapter にした。

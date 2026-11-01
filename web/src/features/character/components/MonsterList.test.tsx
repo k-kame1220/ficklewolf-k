@@ -18,7 +18,14 @@ const character = (id: string, name: string): components["schemas"]["MyCharacter
   name,
   attribute: "yang",
   description: "",
-  assets: { main: `characters/${id}/main`, icon: `characters/${id}/icon`, home: `characters/${id}/home` }
+  assets: { main: `characters/${id}/main`, icon: `characters/${id}/icon`, home: `characters/${id}/home` },
+  stats: {
+    hp: { base: 1000, bonus: { item: 0, duplicate: 0, weather: 0 }, total: 1000 },
+    attack: { base: 600, bonus: { item: 0, duplicate: 0, weather: 0 }, total: 600 },
+    defence: { base: 150, bonus: { item: 0, duplicate: 0, weather: 0 }, total: 150 }
+  },
+  itemUses: { hp: 0, attack: 0, defence: 0 },
+  itemUseMax: { hp: 20, attack: 16, defence: 15 }
 });
 
 /** ZERO と A を持っていることにする（モックのゲストは ZERO だけを持つため） */

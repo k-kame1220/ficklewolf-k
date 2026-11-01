@@ -1,7 +1,7 @@
 package com.ficklewolf.k.weather.application
 
 import com.ficklewolf.k.shared.kernel.Attribute
-import com.ficklewolf.k.shared.kernel.CharacterStatus
+import com.ficklewolf.k.shared.kernel.Stats
 import com.ficklewolf.k.shared.kernel.WeatherId
 import com.ficklewolf.k.weather.domain.DailyWeather
 import com.ficklewolf.k.weather.domain.Weather
@@ -107,5 +107,5 @@ class WeatherServiceTest {
     private fun weather(
         id: String,
         weight: Int,
-    ): Weather = Weather(WeatherId(id), id, Attribute.YANG, weight, CharacterStatus(0, 0, 0))
+    ): Weather = Weather(WeatherId(id), id, Attribute.YANG, weight, Stats(0, 0, 0))
 }

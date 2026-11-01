@@ -5,6 +5,7 @@ import com.ficklewolf.k.character.domain.Character
 import com.ficklewolf.k.character.domain.CharacterAssets
 import com.ficklewolf.k.shared.kernel.Attribute
 import com.ficklewolf.k.shared.kernel.CharacterId
+import com.ficklewolf.k.shared.kernel.Stats
 import org.springframework.core.io.ClassPathResource
 import tools.jackson.databind.JsonNode
 import tools.jackson.databind.json.JsonMapper
@@ -34,6 +35,8 @@ class ClasspathCharacterRepository(
 private fun JsonNode.toCharacter(): Character {
     val rawAttribute = required("attribute").stringValue()
     val assets = required("assets")
+    val base = required("base")
+    val duplicateBonusMax = required("duplicateBonusMax")
     return Character(
         no = required("no").intValue(),
         id = CharacterId(required("id").stringValue()),
@@ -45,6 +48,18 @@ private fun JsonNode.toCharacter(): Character {
                 main = assets.required("main").stringValue(),
                 icon = assets.required("icon").stringValue(),
                 home = assets.required("home").stringValue(),
+            ),
+        baseStats =
+            Stats(
+                hp = base.required("hp").intValue(),
+                attack = base.required("attack").intValue(),
+                defence = base.required("defence").intValue(),
+            ),
+        duplicateBonusMax =
+            Stats(
+                hp = duplicateBonusMax.required("hp").intValue(),
+                attack = duplicateBonusMax.required("attack").intValue(),
+                defence = duplicateBonusMax.required("defence").intValue(),
             ),
     )
 }
