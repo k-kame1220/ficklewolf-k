@@ -53,21 +53,24 @@ const ItemList = (props: ItemListProps) => {
         fallbackName={me.data.selectedCharacterId}
       />
       <section className={styles.scroll} aria-label={CHARACTER_MESSAGES.items}>
-        {items.data.length === 0 && <p>{CHARACTER_MESSAGES.noItems}</p>}
-        <ul className={styles.items}>
-          {items.data.map(item => {
-            const iconUrl = remoteAssetUrl(item.iconKey);
-            return (
-              <li key={item.id} className={styles.item}>
-                <span className={styles.itemFrame}>
-                  {iconUrl !== null && <img className={styles.itemImage} src={iconUrl} alt="" />}
-                </span>
-                <span>{item.name}</span>
-                <span>{`${String(item.count)}${CHARACTER_MESSAGES.countUnit}`}</span>
-              </li>
-            );
-          })}
-        </ul>
+        {items.data.length === 0 ? (
+          <p className={styles.empty}>{CHARACTER_MESSAGES.noItems}</p>
+        ) : (
+          <ul className={styles.items}>
+            {items.data.map(item => {
+              const iconUrl = remoteAssetUrl(item.iconKey);
+              return (
+                <li key={item.id} className={styles.item}>
+                  <span className={styles.itemFrame}>
+                    {iconUrl !== null && <img className={styles.itemImage} src={iconUrl} alt="" />}
+                  </span>
+                  <span>{item.name}</span>
+                  <span>{`${String(item.count)}${CHARACTER_MESSAGES.countUnit}`}</span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </section>
       <div className={styles.actions}>
         <Button variant="pencil" onClick={onClose}>
