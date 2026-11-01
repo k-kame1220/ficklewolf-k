@@ -1,4 +1,7 @@
 {
+  "attributes/moon": "attributes/moon.917cfa76.webp",
+  "attributes/note": "attributes/note.0bc3d5ad.webp",
+  "attributes/yang": "attributes/yang.216dab32.webp",
   "characters/a/home": "characters/a/home.035e8b6e.webp",
   "characters/a/icon": "characters/a/icon.f412a946.webp",
   "characters/a/main": "characters/a/main.bc74aad6.webp",
@@ -112,5 +115,14 @@
   "characters/z/main": "characters/z/main.e590f6d0.webp",
   "characters/zero/home": "characters/zero/home.4fa50963.webp",
   "characters/zero/icon": "characters/zero/icon.4652cd08.webp",
-  "characters/zero/main": "characters/zero/main.1c9e0d2d.webp"
+  "characters/zero/main": "characters/zero/main.1c9e0d2d.webp",
+  "items/moon-attack": "items/moon-attack.86bdd5e2.webp",
+  "items/moon-defence": "items/moon-defence.5e406a00.webp",
+  "items/moon-hp": "items/moon-hp.f0679c6f.webp",
+  "items/note-attack": "items/note-attack.c5be4e90.webp",
+  "items/note-defence": "items/note-defence.42abe807.webp",
+  "items/note-hp": "items/note-hp.e21792bb.webp",
+  "items/yang-attack": "items/yang-attack.29de2550.webp",
+  "items/yang-defence": "items/yang-defence.9109d09d.webp",
+  "items/yang-hp": "items/yang-hp.a70a8d76.webp"
 }

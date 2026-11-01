@@ -46,7 +46,7 @@ mkdir -p legacy/assets && rsync -a --delete --prune-empty-dirs --include='*/' --
 legacy/tools/.venv/bin/python legacy/tools/convert_assets.py --font <mushin.otf>
 ```
 - 同梱素材（紙・ノイズ・枠・ロゴ）→ `web/src/shared/assets/bundled/`、無心 → `web/src/shared/assets/fonts/`（どちらもコミットする）
-- 取得素材（キャラの絵）→ `web/public/assets/`（コミットしない。配信先に手でアップロードする）と、キーの一覧 `web/src/shared/assets/remoteAssets.json`（コミットする）
+- 取得素材（キャラの絵・属性とアイテムのアイコン。属性とアイテムのキーは `spec/master` の `iconKey`）→ `web/public/assets/`（コミットしない。配信先に手でアップロードする）と、キーの一覧 `web/src/shared/assets/remoteAssets.json`（コミットする）
 - フォントは MODI工場の「無心」ver1.04（https://modi.jpn.org/font_mushin.php）。`--font` を省くとフォントは変換しない
 - `--assets` で素材の場所を変えられる（既定は `legacy/assets`。worktree では `legacy/assets` がないので、元のチェックアウトの `legacy/assets` を指す）
 
