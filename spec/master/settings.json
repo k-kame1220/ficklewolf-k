@@ -1,6 +1,20 @@
 {
   "minAppVersion": "0.1.0",
   "starterCharacterId": "zero",
+  "starterItems": [
+    {
+      "itemId": "moon-hp",
+      "count": 3
+    },
+    {
+      "itemId": "moon-attack",
+      "count": 3
+    },
+    {
+      "itemId": "moon-defence",
+      "count": 3
+    }
+  ],
   "growth": {
     "itemUseMax": {
       "hp": 20,
