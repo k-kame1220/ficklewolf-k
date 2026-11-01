@@ -13,6 +13,9 @@ const MonsterListPage = () => {
         onOpenDetail={characterId => {
           void navigate({ to: "/monsters/$characterId", params: { characterId } });
         }}
+        onOpenItems={() => {
+          void navigate({ to: "/items" });
+        }}
       />
     </MenuScreen>
   );

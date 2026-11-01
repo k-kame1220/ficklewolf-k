@@ -17,8 +17,10 @@ export const CHARACTER_MESSAGES = {
   countUnit: "コ",
   items: "持っているアイテム",
   noItems: "アイテムを持っていません。",
-  itemsFailed: "アイテムを読み込めませんでした。",
   itemNotEnough: "アイテムが足りません。",
   enhanceLimitExceeded: "これ以上は使えません。",
-  enhanceFailed: "強化できませんでした。"
+  itemsFailed: "アイテムを読み込めませんでした。",
+  enhanceFailed: "強化できませんでした。",
+  openItems: "アイテム表示",
+  close: "とじる"
 } as const;
