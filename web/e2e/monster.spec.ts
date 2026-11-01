@@ -14,6 +14,13 @@ test.describe("モンスター", () => {
     await expect(page.getByRole("button", { name: "ZERO" })).toBeVisible();
     await page.screenshot({ path: `${SCREENSHOT_DIR}/10-monster-list.png`, fullPage: true });
 
+    await page.getByRole("button", { name: "アイテム表示" }).click();
+    await expect(page).toHaveURL(/\/items$/);
+    await expect(page.getByText("HPの酒")).toBeVisible();
+    await page.screenshot({ path: `${SCREENSHOT_DIR}/13-item-list.png`, fullPage: true });
+    await page.getByRole("button", { name: "とじる" }).click();
+    await expect(page).toHaveURL(/\/monsters$/);
+
     await page.getByRole("button", { name: "ZERO" }).click({ button: "right" });
     await expect(page).toHaveURL(/\/monsters\/zero$/);
     await expect(page.getByText("1000(+0)")).toBeVisible();

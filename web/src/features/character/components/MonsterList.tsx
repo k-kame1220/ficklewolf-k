@@ -2,26 +2,27 @@ import { useMyCharacters } from "@/api/character/character.query";
 import { ApiError } from "@/api/core/apiError";
 import { useUpdateMe } from "@/api/me/me.mutate";
 import { useMe } from "@/api/me/me.query";
-import { remoteAssetUrl } from "@/shared/assets/remoteAsset";
 import Button from "@/shared/ui/Button";
 
 import { CHARACTER_MESSAGES } from "../messages";
 
 import styles from "./MonsterList.module.css";
 import MonsterListIcon from "./MonsterListIcon";
-import MonsterListItems from "./MonsterListItems";
+import SelectedMonster from "./SelectedMonster";
 
 type MonsterListProps = {
   /** アイコンを長く押したときに呼ぶ */
   onOpenDetail: (characterId: string) => void;
+  /** 「アイテム表示」で呼ぶ */
+  onOpenItems: () => void;
 };
 
 /**
- * モンスターの画面（S-11）。上に今の出撃キャラ、その下に持っているキャラのアイコン（図鑑の番号順）、いちばん下に持っているアイテム。
+ * モンスターの画面（S-11）。上に今の出撃キャラ（アイコンの絵とステータス）、その下に持っているキャラのアイコン（図鑑の番号順）、いちばん下に「アイテム表示」。
  * アイコンを短く押すと出撃キャラにし、長く押すと詳細を開く。
  */
 const MonsterList = (props: MonsterListProps) => {
-  const { onOpenDetail } = props;
+  const { onOpenDetail, onOpenItems } = props;
   const me = useMe();
   const characters = useMyCharacters();
   const updateMe = useUpdateMe();
@@ -45,19 +46,12 @@ const MonsterList = (props: MonsterListProps) => {
   }
   if (me.isPending || characters.isPending) return <p className={styles.status}>{CHARACTER_MESSAGES.loading}</p>;
 
-  const selected = characters.data.get(me.data.selectedCharacterId);
-  const selectedImageUrl = selected === undefined ? null : remoteAssetUrl(selected.assets.main);
-
   return (
     <div className={styles.root}>
-      <section className={styles.current} aria-label={CHARACTER_MESSAGES.selected}>
-        <h2 className={styles.name}>{selected?.name ?? me.data.selectedCharacterId}</h2>
-        <div className={styles.frame}>
-          {selectedImageUrl !== null && (
-            <img className={styles.image} src={selectedImageUrl} alt={selected?.name ?? ""} />
-          )}
-        </div>
-      </section>
+      <SelectedMonster
+        character={characters.data.get(me.data.selectedCharacterId)}
+        fallbackName={me.data.selectedCharacterId}
+      />
       {updateMe.isError && <p role="alert">{CHARACTER_MESSAGES.selectFailed}</p>}
       <section className={styles.list} aria-label={CHARACTER_MESSAGES.list}>
         <p className={styles.help}>{CHARACTER_MESSAGES.howToUse}</p>
@@ -78,7 +72,9 @@ const MonsterList = (props: MonsterListProps) => {
           ))}
         </ul>
       </section>
-      <MonsterListItems />
+      <Button variant="pencil" onClick={onOpenItems}>
+        {CHARACTER_MESSAGES.openItems}
+      </Button>
     </div>
   );
 };

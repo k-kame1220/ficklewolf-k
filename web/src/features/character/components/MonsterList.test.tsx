@@ -45,20 +45,33 @@ describe("MonsterList", () => {
   it("上に今の出撃キャラ、下に持っているキャラのアイコンを出す", async () => {
     await createGuest({ name: "ゲスト" });
 
-    renderWithQueryClient(<MonsterList onOpenDetail={vi.fn()} />);
+    renderWithQueryClient(<MonsterList onOpenDetail={vi.fn()} onOpenItems={vi.fn()} />);
 
     expect(await screen.findByRole("region", { name: "出撃中" })).toHaveTextContent("ZERO");
     expect(screen.getByRole("button", { name: "ZERO" })).toHaveAttribute("aria-pressed", "true");
   });
 
-  it("いちばん下に、持っているアイテムと個数を出す", async () => {
+  it("上の出撃キャラにはアイコンの絵とステータス（合計）を出す", async () => {
     await createGuest({ name: "ゲスト" });
 
-    renderWithQueryClient(<MonsterList onOpenDetail={vi.fn()} />);
+    renderWithQueryClient(<MonsterList onOpenDetail={vi.fn()} onOpenItems={vi.fn()} />);
 
-    const items = await screen.findByRole("region", { name: "持っているアイテム" });
-    expect(await within(items).findByText("HPの酒")).toBeInTheDocument();
-    expect(within(items).getAllByText("3コ")).toHaveLength(3);
+    const selected = await screen.findByRole("region", { name: "出撃中" });
+    expect(within(selected).getByRole("img", { name: "ZERO" })).toHaveAttribute(
+      "src",
+      expect.stringContaining("characters/zero/icon")
+    );
+    expect(within(selected).getByText("1000")).toBeInTheDocument();
+  });
+
+  it("「アイテム表示」でアイテム一覧を開く", async () => {
+    await createGuest({ name: "ゲスト" });
+    const onOpenItems = vi.fn();
+
+    renderWithQueryClient(<MonsterList onOpenDetail={vi.fn()} onOpenItems={onOpenItems} />);
+
+    await userEvent.click(await screen.findByRole("button", { name: "アイテム表示" }));
+    expect(onOpenItems).toHaveBeenCalled();
   });
 
   it("アイコンを短く押すと、そのキャラを出撃キャラにする", async () => {
@@ -80,7 +93,7 @@ describe("MonsterList", () => {
     );
     const onOpenDetail = vi.fn();
 
-    renderWithQueryClient(<MonsterList onOpenDetail={onOpenDetail} />);
+    renderWithQueryClient(<MonsterList onOpenDetail={onOpenDetail} onOpenItems={vi.fn()} />);
     await userEvent.click(await screen.findByRole("button", { name: "A" }));
 
     await waitFor(() => {
@@ -96,7 +109,7 @@ describe("MonsterList", () => {
     ownZeroAndA();
     const onOpenDetail = vi.fn();
 
-    renderWithQueryClient(<MonsterList onOpenDetail={onOpenDetail} />);
+    renderWithQueryClient(<MonsterList onOpenDetail={onOpenDetail} onOpenItems={vi.fn()} />);
     const icon = await screen.findByRole("button", { name: "A" });
     vi.useFakeTimers();
     fireEvent.pointerDown(icon);
@@ -112,7 +125,7 @@ describe("MonsterList", () => {
     await createGuest({ name: "ゲスト" });
     const onOpenDetail = vi.fn();
 
-    renderWithQueryClient(<MonsterList onOpenDetail={onOpenDetail} />);
+    renderWithQueryClient(<MonsterList onOpenDetail={onOpenDetail} onOpenItems={vi.fn()} />);
     fireEvent.contextMenu(await screen.findByRole("button", { name: "ZERO" }));
 
     expect(onOpenDetail).toHaveBeenCalledWith("zero");
@@ -130,7 +143,7 @@ describe("MonsterList", () => {
       )
     );
 
-    renderWithQueryClient(<MonsterList onOpenDetail={vi.fn()} />);
+    renderWithQueryClient(<MonsterList onOpenDetail={vi.fn()} onOpenItems={vi.fn()} />);
     await userEvent.click(await screen.findByRole("button", { name: "A" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent("出撃キャラを変えられませんでした。");
