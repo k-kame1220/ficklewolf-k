@@ -53,7 +53,7 @@ const MonsterList = (props: MonsterListProps) => {
         fallbackName={me.data.selectedCharacterId}
       />
       {updateMe.isError && <p role="alert">{CHARACTER_MESSAGES.selectFailed}</p>}
-      <section className={styles.list} aria-label={CHARACTER_MESSAGES.list}>
+      <section className={[styles.list, styles.scroll].join(" ")} aria-label={CHARACTER_MESSAGES.list}>
         <p className={styles.help}>{CHARACTER_MESSAGES.howToUse}</p>
         <ul className={styles.grid}>
           {[...characters.data.values()].map(character => (
@@ -72,9 +72,11 @@ const MonsterList = (props: MonsterListProps) => {
           ))}
         </ul>
       </section>
-      <Button variant="pencil" onClick={onOpenItems}>
-        {CHARACTER_MESSAGES.openItems}
-      </Button>
+      <div className={styles.actions}>
+        <Button variant="pencil" onClick={onOpenItems}>
+          {CHARACTER_MESSAGES.openItems}
+        </Button>
+      </div>
     </div>
   );
 };
