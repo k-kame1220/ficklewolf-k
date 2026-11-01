@@ -91,6 +91,18 @@
   margin: 0;
 }
 
+.enhanceList,
+.enhanceEmpty {
+  min-height: calc(var(--tap-min-size) * 3 + var(--space-2) * 2);
+}
+
+.enhanceEmpty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+}
+
 .enhanceList {
   display: flex;
   flex-direction: column;
@@ -143,8 +155,7 @@
   width: var(--tap-min-size);
   height: var(--tap-min-size);
   padding: 0;
-  border: var(--frame-pencil-width) solid transparent;
-  border-image: var(--frame-pencil);
+  border: none;
   background: none;
   color: var(--color-ink);
   font-size: var(--font-size-md);

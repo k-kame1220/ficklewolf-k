@@ -1,8 +1,11 @@
-import { screen, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
+import { http, HttpResponse } from "msw";
 import { describe, expect, it, vi } from "vitest";
 
 import { createGuest } from "@/api/auth/auth.mutate";
+import { API_BASE_URL } from "@/api/core/config";
+import { server } from "@/api/mocks/node";
 import { renderWithQueryClient } from "@/test/render";
 
 import MonsterDetail from "./MonsterDetail";
@@ -51,6 +54,36 @@ describe("MonsterDetail", () => {
 
     expect(within(row).getByLabelText("DEFの酒を使う個数")).toHaveTextContent("3");
     expect(increase).toBeDisabled();
+  });
+
+  it("使い切ったアイテムの行は出さない", async () => {
+    await createGuest({ name: "ゲスト" });
+
+    renderWithQueryClient(<MonsterDetail characterId="zero" onBack={vi.fn()} />);
+
+    const row = (await screen.findByText("HPの酒")).closest("li");
+    if (row === null) throw new Error("HPの酒 の行がない");
+    const increase = within(row).getByRole("button", { name: "HPの酒をふやす" });
+    await userEvent.click(increase);
+    await userEvent.click(increase);
+    await userEvent.click(increase);
+    await userEvent.click(within(row).getByRole("button", { name: "使う" }));
+
+    expect(await screen.findByText("1126(+126)")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText("HPの酒")).not.toBeInTheDocument();
+    });
+    expect(screen.getByText("ATKの酒")).toBeInTheDocument();
+  });
+
+  it("キャラの属性のアイテムを 1 つも持っていなければ、そう出す", async () => {
+    await createGuest({ name: "ゲスト" });
+    server.use(http.get(`${API_BASE_URL}/me/items`, () => HttpResponse.json({ items: [] })));
+
+    renderWithQueryClient(<MonsterDetail characterId="zero" onBack={vi.fn()} />);
+
+    expect(await screen.findByText("使用できるアイテムがありません。")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "使う" })).not.toBeInTheDocument();
   });
 
   it("持っていないキャラなら、そう出して「もどる」で戻る", async () => {
