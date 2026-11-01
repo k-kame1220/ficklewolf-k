@@ -84,7 +84,7 @@ describe("モンスターの流れ", () => {
     await userEvent.click(await screen.findByRole("button", { name: "モンスター" }));
     await userEvent.pointer({ keys: "[MouseRight]", target: await screen.findByRole("button", { name: "ZERO" }) });
 
-    expect(await screen.findByText("属性：月")).toBeInTheDocument();
+    expect(await screen.findByRole("region", { name: "ー強化ー" })).toBeInTheDocument();
     expect(router.state.location.pathname).toBe("/monsters/zero");
   });
 });

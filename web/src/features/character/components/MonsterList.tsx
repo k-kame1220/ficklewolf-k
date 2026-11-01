@@ -9,6 +9,7 @@ import { CHARACTER_MESSAGES } from "../messages";
 
 import styles from "./MonsterList.module.css";
 import MonsterListIcon from "./MonsterListIcon";
+import MonsterListItems from "./MonsterListItems";
 
 type MonsterListProps = {
   /** アイコンを長く押したときに呼ぶ */
@@ -16,7 +17,7 @@ type MonsterListProps = {
 };
 
 /**
- * モンスターの画面（S-11）。上に今の出撃キャラ、下に持っているキャラのアイコン（図鑑の番号順）。
+ * モンスターの画面（S-11）。上に今の出撃キャラ、その下に持っているキャラのアイコン（図鑑の番号順）、いちばん下に持っているアイテム。
  * アイコンを短く押すと出撃キャラにし、長く押すと詳細を開く。
  */
 const MonsterList = (props: MonsterListProps) => {
@@ -77,6 +78,7 @@ const MonsterList = (props: MonsterListProps) => {
           ))}
         </ul>
       </section>
+      <MonsterListItems />
     </div>
   );
 };

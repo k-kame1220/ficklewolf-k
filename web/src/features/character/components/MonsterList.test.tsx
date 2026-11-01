@@ -1,4 +1,4 @@
-import { act, fireEvent, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -49,6 +49,16 @@ describe("MonsterList", () => {
 
     expect(await screen.findByRole("region", { name: "出撃中" })).toHaveTextContent("ZERO");
     expect(screen.getByRole("button", { name: "ZERO" })).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("いちばん下に、持っているアイテムと個数を出す", async () => {
+    await createGuest({ name: "ゲスト" });
+
+    renderWithQueryClient(<MonsterList onOpenDetail={vi.fn()} />);
+
+    const items = await screen.findByRole("region", { name: "持っているアイテム" });
+    expect(await within(items).findByText("HPの酒")).toBeInTheDocument();
+    expect(within(items).getAllByText("3コ")).toHaveLength(3);
   });
 
   it("アイコンを短く押すと、そのキャラを出撃キャラにする", async () => {

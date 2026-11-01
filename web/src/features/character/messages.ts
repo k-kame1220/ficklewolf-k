@@ -7,7 +7,18 @@ export const CHARACTER_MESSAGES = {
   selected: "出撃中",
   howToUse: "タップで出撃。長押しでくわしく。",
   selectFailed: "出撃キャラを変えられませんでした。",
-  attribute: "属性：",
   notFound: "このモンスターは持っていません。",
-  back: "もどる"
+  back: "もどる",
+  stats: "ステータス",
+  enhance: "ー強化ー",
+  use: "使う",
+  decrease: "へらす",
+  increase: "ふやす",
+  countUnit: "コ",
+  items: "持っているアイテム",
+  noItems: "アイテムを持っていません。",
+  itemsFailed: "アイテムを読み込めませんでした。",
+  itemNotEnough: "アイテムが足りません。",
+  enhanceLimitExceeded: "これ以上は使えません。",
+  enhanceFailed: "強化できませんでした。"
 } as const;

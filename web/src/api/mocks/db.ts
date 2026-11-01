@@ -13,6 +13,10 @@ export type MockDb = {
   readonly players: Map<string, MockPlayer>;
   readonly playerIdByToken: Map<string, string>;
   readonly ownedCharacterIds: Map<string, ReadonlySet<string>>;
+  /** プレイヤーごとの、アイテムの ID → 持っている数（0 のものも残る） */
+  readonly itemCounts: Map<string, ReadonlyMap<string, number>>;
+  /** プレイヤーごとの、キャラの ID → 強化で使ったアイテムの個数 */
+  readonly itemUses: Map<string, ReadonlyMap<string, MockStatCounts>>;
   /** プレイヤーごとの、一度でもクリアしたクエストの ID */
   readonly clearedQuestIds: Map<string, ReadonlySet<string>>;
   /** 今日の天気の ID（モックでは固定） */
@@ -20,6 +24,9 @@ export type MockDb = {
   /** プレイヤーごとの、最後に始めたバトル（`battle.mock.ts` の簡易モック。決着したものも残す） */
   readonly battles: Map<string, MockBattle>;
 };
+
+/** ステータスごとの数（api の `StatCounts` と同じ形） */
+export type MockStatCounts = components["schemas"]["StatCounts"];
 
 /** モックのバトル。`battle` は api の形、それ以外は画面に出さない中の値 */
 export type MockBattle = {
@@ -54,6 +61,8 @@ export const createMockDb = (): MockDb => ({
   players: new Map(),
   playerIdByToken: new Map(),
   ownedCharacterIds: new Map(),
+  itemCounts: new Map(),
+  itemUses: new Map(),
   clearedQuestIds: new Map(),
   todayWeatherId: MOCK_TODAY_WEATHER_ID,
   battles: new Map()

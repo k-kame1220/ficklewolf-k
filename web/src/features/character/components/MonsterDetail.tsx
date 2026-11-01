@@ -1,12 +1,13 @@
 import { useMyCharacters } from "@/api/character/character.query";
 import { ApiError } from "@/api/core/apiError";
-import { ATTRIBUTE_NAMES } from "@/domain/attribute/attribute";
 import { remoteAssetUrl } from "@/shared/assets/remoteAsset";
 import Button from "@/shared/ui/Button";
 
 import { CHARACTER_MESSAGES } from "../messages";
 
 import styles from "./MonsterDetail.module.css";
+import MonsterDetailEnhance from "./MonsterDetailEnhance";
+import MonsterDetailStats from "./MonsterDetailStats";
 
 type MonsterDetailProps = {
   characterId: string;
@@ -14,7 +15,7 @@ type MonsterDetailProps = {
   onBack: () => void;
 };
 
-/** モンスターの詳細（S-12）。絵・名前・属性・説明。ステータスは F-06 で api に足してから出す */
+/** モンスターの詳細（S-12）。名前・絵（属性の入ったアイコン）・ステータス・強化・説明 */
 const MonsterDetail = (props: MonsterDetailProps) => {
   const { characterId, onBack } = props;
   const characters = useMyCharacters();
@@ -49,15 +50,18 @@ const MonsterDetail = (props: MonsterDetailProps) => {
     );
   }
 
-  const imageUrl = remoteAssetUrl(character.assets.main);
+  const imageUrl = remoteAssetUrl(character.assets.icon);
 
   return (
     <article className={styles.root}>
       <h2 className={styles.name}>{character.name}</h2>
-      <div className={styles.frame}>
-        {imageUrl !== null && <img className={styles.image} src={imageUrl} alt={character.name} />}
+      <div className={styles.profile}>
+        <div className={styles.frame}>
+          {imageUrl !== null && <img className={styles.image} src={imageUrl} alt={character.name} />}
+        </div>
+        <MonsterDetailStats character={character} />
       </div>
-      <p className={styles.attribute}>{`${CHARACTER_MESSAGES.attribute}${ATTRIBUTE_NAMES[character.attribute]}`}</p>
+      <MonsterDetailEnhance character={character} />
       <p className={styles.description}>{character.description}</p>
       <Button variant="pencil" onClick={onBack}>
         {CHARACTER_MESSAGES.back}

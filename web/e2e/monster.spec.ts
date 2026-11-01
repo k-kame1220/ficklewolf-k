@@ -12,11 +12,17 @@ test.describe("モンスター", () => {
     await page.getByRole("button", { name: "モンスター" }).click();
     await expect(page).toHaveURL(/\/monsters$/);
     await expect(page.getByRole("button", { name: "ZERO" })).toBeVisible();
-    await page.screenshot({ path: `${SCREENSHOT_DIR}/10-monster-list.png` });
+    await page.screenshot({ path: `${SCREENSHOT_DIR}/10-monster-list.png`, fullPage: true });
 
     await page.getByRole("button", { name: "ZERO" }).click({ button: "right" });
     await expect(page).toHaveURL(/\/monsters\/zero$/);
-    await expect(page.getByText("属性：月")).toBeVisible();
-    await page.screenshot({ path: `${SCREENSHOT_DIR}/11-monster-detail.png` });
+    await expect(page.getByText("1000(+0)")).toBeVisible();
+    await page.screenshot({ path: `${SCREENSHOT_DIR}/11-monster-detail.png`, fullPage: true });
+
+    await page.getByRole("button", { name: "HPの酒をふやす" }).click();
+    await page.getByRole("button", { name: "HPの酒をふやす" }).click();
+    await page.getByRole("button", { name: "使う" }).first().click();
+    await expect(page.getByText("1084(+84)")).toBeVisible();
+    await page.screenshot({ path: `${SCREENSHOT_DIR}/12-monster-enhanced.png`, fullPage: true });
   });
 });

@@ -13,14 +13,19 @@
   font-weight: normal;
 }
 
-.frame {
+.profile {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--monster-image-size);
-  height: var(--monster-image-size);
-  border: var(--frame-square-width) solid transparent;
-  border-image: var(--frame-square);
+  gap: var(--space-4);
+  width: 100%;
+  padding: 0 var(--space-4);
+}
+
+.frame {
+  flex-shrink: 0;
+  width: var(--monster-detail-image-size);
+  height: var(--monster-detail-image-size);
 }
 
 .image {
@@ -29,9 +34,134 @@
   object-fit: contain;
 }
 
-.attribute {
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
   margin: 0;
   font-size: var(--font-size-md);
+}
+
+.statRow {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.statRow dt {
+  min-width: 4em;
+}
+
+.statRow dd {
+  margin: 0;
+}
+
+.enhance {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: 0 var(--space-4);
+}
+
+.enhanceTitle {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: normal;
+}
+
+.enhance p {
+  margin: 0;
+}
+
+.enhanceList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.enhanceRow {
+  display: grid;
+  grid-template-columns: var(--tap-min-size) 1fr auto auto;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.itemFrame {
+  display: block;
+  width: var(--tap-min-size);
+  height: var(--tap-min-size);
+}
+
+.itemImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.itemLabel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+.owned {
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-xs);
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.stepButton {
+  width: var(--tap-min-size);
+  height: var(--tap-min-size);
+  padding: 0;
+  border: var(--frame-pencil-width) solid transparent;
+  border-image: var(--frame-pencil);
+  background: none;
+  color: var(--color-ink);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+}
+
+.useButton {
+  min-width: var(--tap-min-size);
+  height: var(--tap-min-size);
+  padding: 0 var(--space-3);
+  border: var(--frame-pencil-width) solid transparent;
+  border-image: var(--frame-pencil);
+  background: none;
+  color: var(--color-ink);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.stepButton:active:not(:disabled),
+.useButton:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+}
+
+.useButton:disabled,
+.stepButton:disabled {
+  color: var(--color-ink-faint);
+  cursor: default;
+}
+
+.count {
+  min-width: 2ch;
+  font-size: var(--font-size-md);
+  text-align: center;
 }
 
 .description {
