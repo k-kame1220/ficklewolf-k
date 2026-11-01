@@ -52,15 +52,19 @@ def main() -> int:
 
     character_ids = set(ids["characters"])
     quest_ids = set(ids["quests"])
-    weather_ids = set(ids["weathers"])
     quests_by_id = {q["id"]: q for q in master["quests"]}
+    items_by_id = {i["id"]: i for i in master["items"]}
+    items_by_attribute_stat = {(i["attribute"], i["stat"]): i["id"] for i in master["items"]}
 
     for q in master["quests"]:
         recruit = q["rewards"]["recruit"]
         if recruit is not None and recruit not in character_ids:
             errors.append(f"quests/{q['id']}: recruit '{recruit}' のキャラがいません")
-        if q["kind"] == "weather" and q.get("weatherId") not in weather_ids:
-            errors.append(f"quests/{q['id']}: weatherId '{q.get('weatherId')}' の天気がありません")
+        drop = q["rewards"]["dropItemId"]
+        if drop is not None and drop not in items_by_id:
+            errors.append(f"quests/{q['id']}: dropItemId '{drop}' が items.json にありません")
+        if q["kind"] != "weather" and drop is not None:
+            errors.append(f"quests/{q['id']}: dropItemId はお天気クエストだけに書けます")
         for i, stage in enumerate(q["stages"]):
             if stage["battle"]["turns"][-1] != LAST_TURN_ACTION:
                 errors.append(f"quests/{q['id']}: stages[{i}] の最後の行動が {LAST_TURN_ACTION} ではありません")
@@ -68,8 +72,21 @@ def main() -> int:
     for w in master["weathers"]:
         if w["questId"] not in quest_ids:
             errors.append(f"weathers/{w['id']}: questId '{w['questId']}' のクエストがありません")
-        elif quests_by_id[w["questId"]].get("weatherId") != w["id"]:
-            errors.append(f"weathers/{w['id']}: クエスト '{w['questId']}' の weatherId と一致しません")
+            continue
+        quest = quests_by_id[w["questId"]]
+        if quest["kind"] != "weather":
+            errors.append(f"weathers/{w['id']}: クエスト '{w['questId']}' はお天気クエストではありません")
+        bonus_stats = [stat for stat, value in w["bonus"].items() if value != 0]
+        expected = items_by_attribute_stat.get((w["attribute"], bonus_stats[0])) if len(bonus_stats) == 1 else None
+        if quest["rewards"]["dropItemId"] != expected:
+            errors.append(
+                f"weathers/{w['id']}: クエスト '{w['questId']}' の dropItemId は {json.dumps(expected)}"
+                "（天気の属性 × ボーナスの付くステータス。ボーナスが無い天気は null）にしてください"
+            )
+    weather_quest_ids = Counter(w["questId"] for w in master["weathers"])
+    errors += [f"weathers: questId '{v}' が重複しています" for v, n in weather_quest_ids.items() if n > 1]
+    errors += [f"quests/{q['id']}: どの天気の questId にもなっていません"
+               for q in master["quests"] if q["kind"] == "weather" and q["id"] not in weather_quest_ids]
 
     for kind in ["main", "event", "weather"]:
         orders = sorted(q["order"] for q in master["quests"] if q["kind"] == kind)

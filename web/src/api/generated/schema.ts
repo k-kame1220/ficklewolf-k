@@ -551,7 +551,7 @@ export type components = {
                 /** @enum {string} */
                 readonly stat: "hp" | "attack" | "defence";
             } | null;
-            /** @description もらった強化アイテム（お天気クエスト） */
+            /** @description もらった強化アイテム（お天気クエスト。0 個のときやほかのクエストは空のリスト） */
             readonly items: readonly {
                 readonly itemId: string;
                 readonly count: number;
