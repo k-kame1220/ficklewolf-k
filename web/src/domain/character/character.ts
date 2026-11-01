@@ -1,4 +1,5 @@
 import type { Attribute } from "../attribute/attribute";
+import type { Stat } from "../stat/stat";
 
 /** ステータスごとの数（HP・攻撃・防御） */
 export type StatCountsModel = {
@@ -45,3 +46,16 @@ export type MyCharacterModel = {
   /** 強化で使えるアイテムの上限（全キャラ共通） */
   readonly itemUseMax: StatCountsModel;
 };
+
+/** キャラの強化（`POST /me/characters/{characterId}/enhance`）。ステータスごとに使うアイテムの個数 */
+export type EnhanceCharacterCommand = {
+  readonly characterId: string;
+  readonly counts: StatCountsModel;
+};
+
+/** アイテムと被りで上がった分。天気のボーナスは日によって変わるので入れない（合計には入っている） */
+export const statUpgrade = (stat: StatBreakdownModel): number => stat.bonus.item + stat.bonus.duplicate;
+
+/** そのステータスに、あとアイテムを使える数（上限 − 使った数。0 未満にはならない） */
+export const remainingItemUses = (character: MyCharacterModel, stat: Stat): number =>
+  Math.max(0, character.itemUseMax[stat] - character.itemUses[stat]);
