@@ -2,7 +2,6 @@ import { useState } from "react";
 
 import type { MyItemModel } from "@/domain/item/item";
 import type { Stat } from "@/domain/stat/stat";
-import { STAT_NAMES } from "@/domain/stat/stat";
 import { remoteAssetUrl } from "@/shared/assets/remoteAsset";
 
 import { CHARACTER_MESSAGES } from "../messages";
@@ -11,8 +10,8 @@ import styles from "./MonsterDetail.module.css";
 
 type MonsterDetailEnhanceRowProps = {
   stat: Stat;
-  /** そのステータスを上げる、キャラと同じ属性のアイテム。持っていなければ undefined */
-  item: MyItemModel | undefined;
+  /** そのステータスを上げる、キャラと同じ属性の持っているアイテム */
+  item: MyItemModel;
   /** 一度に使える数の上限（持っている数と、あと使える数の小さいほう） */
   max: number;
   isDisabled: boolean;
@@ -25,9 +24,8 @@ const MonsterDetailEnhanceRow = (props: MonsterDetailEnhanceRowProps) => {
   const { stat, item, max, isDisabled, onUse } = props;
   const [count, setCount] = useState(0);
 
-  const label = item?.name ?? STAT_NAMES[stat];
-  const owned = item?.count ?? 0;
-  const iconUrl = item === undefined ? null : remoteAssetUrl(item.iconKey);
+  const label = item.name;
+  const iconUrl = remoteAssetUrl(item.iconKey);
   const clampedCount = Math.min(count, max);
 
   return (
@@ -37,7 +35,7 @@ const MonsterDetailEnhanceRow = (props: MonsterDetailEnhanceRowProps) => {
       </span>
       <span className={styles.itemLabel}>
         <span>{label}</span>
-        <span className={styles.owned}>{`${String(owned)}${CHARACTER_MESSAGES.countUnit}`}</span>
+        <span className={styles.owned}>{`${String(item.count)}${CHARACTER_MESSAGES.countUnit}`}</span>
       </span>
       <span className={styles.stepper}>
         <button

@@ -19,6 +19,7 @@ export const CHARACTER_MESSAGES = {
   noItems: "アイテムを持っていません。",
   itemNotEnough: "アイテムが足りません。",
   enhanceLimitExceeded: "これ以上は使えません。",
+  noUsableItems: "使用できるアイテムがありません。",
   itemsFailed: "アイテムを読み込めませんでした。",
   enhanceFailed: "強化できませんでした。",
   openItems: "アイテム表示",
