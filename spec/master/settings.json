@@ -35,7 +35,7 @@
   "rewards": {
     "firstClearRecruitRate": 1,
     "repeatRecruitRate": 0.2,
-    "weatherItemDropMin": 1,
+    "weatherItemDropMin": 0,
     "weatherItemDropMax": 3,
     "fudaPerEvenLevel": 1
   }

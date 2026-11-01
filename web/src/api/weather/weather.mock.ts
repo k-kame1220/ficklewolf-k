@@ -25,15 +25,18 @@ const MasterWeathersSchema = v.array(
   v.object({
     id: v.string(),
     name: v.string(),
-    attribute: v.picklist(ATTRIBUTES)
+    attribute: v.picklist(ATTRIBUTES),
+    questId: v.string()
   })
 );
 
+const weathers = new Map(v.parse(MasterWeathersSchema, JSON.parse(weathersRaw)).map(weather => [weather.id, weather]));
+
+/** モックの今日の天気のお天気クエストの ID（spec/master/weathers.json の `questId`）。天気が見つからなければ null */
+export const todayWeatherQuestId = (db: MockDb): string | null => weathers.get(db.todayWeatherId)?.questId ?? null;
+
 /** `GET /weather/today` のモック。モックの今日の天気（`db.todayWeatherId`）を spec/master/weathers.json から返す */
 export const createWeatherMockHandlers = (db: MockDb) => {
-  const weathers = new Map(
-    v.parse(MasterWeathersSchema, JSON.parse(weathersRaw)).map(weather => [weather.id, weather])
-  );
   return [
     http.get(`${API_BASE_URL}/weather/today`, ({ request }) => {
       const me = authenticate(db, request);
