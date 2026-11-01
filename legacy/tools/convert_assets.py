@@ -2,7 +2,8 @@
 """旧作の素材を web 用に変換する（docs/02 §10）。
 
 - 同梱素材: web/src/shared/assets/bundled/ に WebP で出力する（git にコミットする）
-- 取得素材: web/public/assets/ にハッシュ付きの名前の WebP で出力する（git の外。手でアップロードする）
+- 取得素材（キャラの絵・属性とアイテムのアイコン）: web/public/assets/ にハッシュ付きの名前の WebP で出力する（git の外。手でアップロードする）
+  属性とアイテムのキーは spec/master の attributes.json・items.json の iconKey
   キー → ファイル名の一覧は web/src/shared/assets/remoteAssets.json（git にコミットする）
 - フォント: --font で渡した OTF を web/src/shared/assets/fonts/ に WOFF2 で出力する
 
@@ -22,6 +23,7 @@ from PIL import Image
 LEGACY_DIR = Path(__file__).resolve().parent.parent
 REPO_DIR = LEGACY_DIR.parent
 DATA_DIR = LEGACY_DIR / "data"
+MASTER_DIR = REPO_DIR / "spec" / "master"
 WEB_ASSETS_DIR = REPO_DIR / "web" / "src" / "shared" / "assets"
 BUNDLED_DIR = WEB_ASSETS_DIR / "bundled"
 FONT_DIR = WEB_ASSETS_DIR / "fonts"
@@ -34,6 +36,7 @@ WEBP_METHOD = 6
 HASH_LENGTH = 8
 JSON_INDENT = 2
 CHARACTER_MAX_WIDTH = 640
+ICON_MAX_WIDTH = 256
 
 # 同梱素材: 出力名 → (Unity の Assets からのパス, 最大の幅)
 BUNDLED = {
@@ -49,6 +52,9 @@ BUNDLED = {
     "title-background": ("素材/OP & Tittle素材/タイトル素材/kタイトル.png", 348),
 }
 IMAGE_VARIANTS = {"(アイコン)": "icon", "(ホーム)": "home"}
+# 属性の ID → 旧作のファイル名（属性画像 は日本語、強化素材 は英語の頭）
+ATTRIBUTE_FILES = {"yang": ("陽", "Yang"), "note": ("音", "Note"), "moon": ("月", "Moon")}
+STAT_FILES = {"hp": "HP", "attack": "ATK", "defence": "DEF"}
 
 
 def to_id(name: str) -> str:
@@ -83,10 +89,22 @@ def character_sources():
             yield f"characters/{character_id}/{variant}", path
 
 
+def icon_sources():
+    attributes = json.loads((MASTER_DIR / "attributes.json").read_text(encoding="utf-8"))
+    for a in attributes:
+        yield a["iconKey"], f"素材/属性画像/{ATTRIBUTE_FILES[a['id']][0]}.png"
+    items = json.loads((MASTER_DIR / "items.json").read_text(encoding="utf-8"))
+    for i in items:
+        yield i["iconKey"], f"素材/アイテム素材/強化素材/{ATTRIBUTE_FILES[i['attribute']][1]}{STAT_FILES[i['stat']]}.png"
+
+
 def convert_remote(assets: Path):
     manifest = {}
-    for key, path in character_sources():
-        data = to_webp(assets / path, CHARACTER_MAX_WIDTH)
+    sources = [(key, path, CHARACTER_MAX_WIDTH) for key, path in character_sources()] + [
+        (key, path, ICON_MAX_WIDTH) for key, path in icon_sources()
+    ]
+    for key, path, max_width in sources:
+        data = to_webp(assets / path, max_width)
         file_name = f"{key}.{hashlib.sha256(data).hexdigest()[:HASH_LENGTH]}.webp"
         (REMOTE_DIR / file_name).parent.mkdir(parents=True, exist_ok=True)
         (REMOTE_DIR / file_name).write_bytes(data)
