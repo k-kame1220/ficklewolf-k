@@ -9,5 +9,5 @@ internal class DefaultWeatherApi(
     private val weatherService: WeatherService,
 ) : WeatherApi {
     override fun getToday(): TodayWeatherSummary =
-        weatherService.getTodayWeather().weather.let { TodayWeatherSummary(it.attribute, it.bonus) }
+        weatherService.getTodayWeather().weather.let { TodayWeatherSummary(it.id, it.attribute, it.bonus) }
 }

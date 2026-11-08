@@ -1,6 +1,6 @@
 # バックエンド設計（モジュラーモノリスとレイヤー構成）
 
-> 版: v1.2（2026-11-01、item・weather・強化の作成を反映する）/ 対象: `api/`。バックエンドはオーナーが書く。この文書はオーナーと AI の相談で決めたことの記録。
+> 版: v1.3（2026-11-01、quest の報酬・クリアの記録・お天気クエストを決める）/ 対象: `api/`。バックエンドはオーナーが書く。この文書はオーナーと AI の相談で決めたことの記録。
 > 前提: [00_project-context.md](00_project-context.md)（Kotlin + Spring Boot は必須）、[02_requirements.md](02_requirements.md) §6（API 一覧）
 
 ---
@@ -45,7 +45,7 @@ api/
 | `app` | 必要なアプリの最低バージョン（`/app/version`。`settings.json` の `minAppVersion`） | 作成済み |
 | `character` | キャラのマスタ（`characters.json`）・所持キャラ・強化（育成の決まり `growth`）。`/me/characters` | 作成済み（マスタ・所持キャラ・ステータスの内訳・`/me/characters`・強化 `POST /me/characters/{id}/enhance`）。被り（ランダムで 1 つ +1）は quest の報酬と一緒に作る |
 | `item` | アイテムのマスタ（`items.json`）と所持数。`/me/items`。使う（減らす）・渡す（増やす）は `ItemApi` で受ける。ゲスト作成で `starterItems` を渡す | 作成済み（`/me/items`・`ItemApi.consume`・`ItemApi.acquireStarter`） |
-| `quest` | クエストのマスタ（`quests.json`。敵のステータスと行動）・解放とクリア状況・報酬。`/me/quests` | 予定 |
+| `quest` | クエストのマスタ（`quests.json`。敵のステータスと行動）・解放とクリアの記録・報酬。`/me/quests`。battle は勝ったら `QuestApi` でクリアを知らせ、quest が報酬を決めて渡す | 予定 |
 | `battle` | バトルのエンジン（ゴールデンテスト）とバトルのセッション。`/quests/{id}/sessions`・`/quest-sessions/*`（docs/02 D-8） | 予定 |
 | `weather` | 天気のマスタ（`weathers.json`）と日替わりの天気。`/weather/today`。今日の天気の属性とボーナスは `WeatherApi` で受ける | 作成済み（`/weather/today`・`WeatherApi.getToday`） |
 | `master` | マスタをまとめて配信していた。D-8 で配信をやめ、マスタは各モジュールが持つことにしたので消した（§7） | 削除済み（2026-10-10） |
@@ -297,7 +297,7 @@ D-8（docs/02）でマスタをまとめて配信するのをやめ、マスタ�
 
 - **正は `spec/master/*.json`。** 各モジュールの adapter が、ビルド時に `processResources` で**自分のファイルだけ**を jar に同梱し、起動時に 1 回だけ読む（ファイルがない・壊れているときは起動に失敗する）。リポジトリにはコピーを置かない。
 - マスタの読み込みも port（`<対象>Repository`。例: `CharacterRepository`・`ItemRepository`）にし、実装は adapter に置く。JSON を型に変えるのは adapter の仕事で、core は JSON を知らない。**DB ができたら**、デプロイ時に各モジュールが自分のテーブルへ投入し、差し替えるのは実装だけ。
-- 他のモジュールのマスタやデータが要るときは、持ち主の api に聞く（例: battle はキャラの基礎ステータスを `CharacterApi`、敵を `QuestApi` から。character の強化は、先に自分の上限を確かめ、通ったら `ItemApi` でアイテムを減らし、使えたら自分の使った数を保存する。quest の報酬は `ItemApi` でアイテムを渡す）。マスタを丸ごと渡さず、要る形で返す。
+- 他のモジュールのマスタやデータが要るときは、持ち主の api に聞く（例: battle はキャラの基礎ステータスを `CharacterApi`、敵を `QuestApi` から。character の強化は、先に自分の上限を確かめ、通ったら `ItemApi` でアイテムを減らし、使えたら自分の使った数を保存する。quest の報酬は、Lv・お札を `PlayerApi`、仲間・被りを `CharacterApi`、アイテムを `ItemApi` に頼む）。マスタを丸ごと渡さず、要る形で返す。
 - `settings.json` は 1 つのファイルに持ち主の違う値が混ざっている。気になったら spec のファイルを分けることを相談する（spec の変更なのでオーナーが決める）。
 
 ### master モジュールは消した（2026-10-10）
@@ -309,7 +309,13 @@ D-8（docs/02）でマスタをまとめて配信するのをやめ、マスタ�
   - 抽選は `weathers.json` の `weight` で重み付き。乱数は外から渡す（`Clock` と同じく、テストで結果を固定するため）。
   - 同時に問い合わせが来ても 1 日 1 つに決まるよう、保存は「その日の分がなければ入れる」にする（InMemory は `putIfAbsent`、DB は日付を主キーにして、重複で入らなければ読み直す）。
   - 保存するのは日付と天気の ID だけ（DB では `daily_weather`）。名前・属性・ボーナスはマスタから引く。
-- 外への窓口: `GET /weather/today`（日付・ID・名前・属性。ログインが要る）。他のモジュール（quest のお天気クエスト、battle のボーナス）が要るときは、そのとき `WeatherApi` に足す。
+- 外への窓口: `GET /weather/today`（日付・ID・名前・属性。ログインが要る）と `WeatherApi`（今日の天気の属性とボーナス）。weather はクエストを知らない。quest は `WeatherApi` で今日の天気の ID を聞き、自分のマスタからお天気クエストを探す（依存は quest → weather の一方向）。
+
+### quest（クエストの一覧・クリアの記録・報酬）
+- **報酬は quest が持つ。** battle は勝ったら `QuestApi` にクリアを知らせるだけで、quest が `quests.json` の `rewards` と `settings.json` の `rewards` から報酬を決め、Lv・お札は `PlayerApi`、仲間・被りは `CharacterApi`、アイテムは `ItemApi` に頼む。結果は `Reward`（OpenAPI）の形で battle に返す。
+- **クリアの記録**は、プレイヤー × クエストごとに回数と初めてクリアした日時（DB では `quest_clear`）。初クリアかどうか（Lv+1・仲間になる確率）と一覧の `isCleared` に使う。
+- お天気クエストは、`quests.json` の `weatherId` が今日の天気の ID と同じもの（天気とクエストは 1 対 1）。Lv1 から、何回でも挑戦できる。落ちるアイテムは `quests.json` の `rewards.dropItemId`、個数は `settings.json` の `weatherItemDropMin`〜`Max`（0〜3）。乱数は外から渡す（weather と同じ）。
+- 被りは、上限（`characters.json` の `duplicateBonusMax`）に達していないステータスから 1 つを選ぶ（character の仕事。全部上限なら何も起きない）。
 
 ---
 
@@ -365,6 +371,7 @@ com.ficklewolf.k.<モジュール>.adapter.web / .adapter.persistence
 | 2026-10-11 | コントローラの名前は OpenAPI から決める: メソッド名は `operationId`、リクエスト・レスポンスの型はスキーマ名（`〜Request` 以外は `Response` を付ける）、URL はクラスに分けずメソッドに全部書く、クラス名はモジュールの名前 + `Controller`、戻り値は 1 種類なら型を書く（§5「コントローラ」） |
 | 2026-10-11 | weather: 天気は日本時間の日付ごとに 1 つ。その日の最初の問い合わせで重み付き抽選して保存する（定期実行はしない）。`GET /weather/today` は日付・ID・名前・属性を返し、ログインが要る（§7「weather」） |
 | 2026-10-12 | item と強化: `GET /me/items` は 1 個以上のものだけ。強化は `POST /me/characters/{id}/enhance`（ステータスごとの個数。全部使えるときだけ使い、だめなら何も使わずに断る）で、強化したあとのキャラだけを返す。キャラのステータスは api が内訳（基礎・アイテム・被り・天気・合計）まで計算して `/me/characters` で返す。ゲスト作成で `starterItems`（月の酒を 3 個ずつ）を持たせる |
+| 2026-11-01 | quest: 報酬は quest が持ち、battle は `QuestApi` でクリアを知らせる。クリアの記録は回数と初クリアの日時。天気とお天気クエストのつながりは `quests.json` の `weatherId` に持ち、`weathers.json` の `questId` は消した（weather がクエストを知らないように。quest → weather の一方向）。落ちるアイテムは `rewards.dropItemId`（天気の属性 × ボーナスの付くステータス。スピードの天気は `null`）、個数は 0〜3。Lv1 から何回でも |
 
 ### 不採用にした案
 - **外側（presentation・infrastructure）を全モジュールで共通にする**: Gradle のモジュールは少なく済むが、外側では境界をコンパイラで守れない（特に DB で他モジュールのテーブルを触れてしまう）。モジュール数はほぼ変わらないので、境界を守れる core + adapter にした。
@@ -378,3 +385,4 @@ com.ficklewolf.k.<モジュール>.adapter.web / .adapter.persistence
 - **今日の天気を 0 時の定期実行で抽選する**（2026-10-11）: サーバーが止まっていた日や、複数台で動かすときの扱いが要る。最初の問い合わせで抽選すれば、仕組みがいらない。
 - **今日の天気を日付から計算する（保存しない）**（2026-10-11）: 秘密の値を設定で管理する必要があり、漏れると先の天気が計算できてしまう（リポジトリは公開）。
 - **アーキテクチャのテスト（Konsist など）**: 境界のほとんどは Gradle の依存で守れるので、必要になったら入れる。
+- **`weathers.json` に `questId` を持たせ、`WeatherApi` が今日のお天気クエストを返す**（2026-11-08）: weather が quest の ID を知ることになり、依存が逆向きにもできる。お天気クエストを足し替えるときに weather のマスタも直すことになる。「この天気の日のクエスト」はクエストの性質なので、`quests.json` の `weatherId` に持つ。

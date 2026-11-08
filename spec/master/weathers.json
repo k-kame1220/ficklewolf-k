@@ -8,8 +8,7 @@
       "hp": 200,
       "attack": 0,
       "defence": 0
-    },
-    "questId": "weather-blue-sky"
+    }
   },
   {
     "id": "sunny",
@@ -20,8 +19,7 @@
       "hp": 0,
       "attack": 60,
       "defence": 0
-    },
-    "questId": "weather-sunny"
+    }
   },
   {
     "id": "galleon",
@@ -32,8 +30,7 @@
       "hp": 0,
       "attack": 0,
       "defence": 15
-    },
-    "questId": "weather-galleon"
+    }
   },
   {
     "id": "mexico",
@@ -44,8 +41,7 @@
       "hp": 0,
       "attack": 0,
       "defence": 0
-    },
-    "questId": "weather-mexico"
+    }
   },
   {
     "id": "snow",
@@ -56,8 +52,7 @@
       "hp": 200,
       "attack": 0,
       "defence": 0
-    },
-    "questId": "weather-snow"
+    }
   },
   {
     "id": "rain",
@@ -68,8 +63,7 @@
       "hp": 0,
       "attack": 60,
       "defence": 0
-    },
-    "questId": "weather-rain"
+    }
   },
   {
     "id": "dark",
@@ -80,8 +74,7 @@
       "hp": 0,
       "attack": 0,
       "defence": 15
-    },
-    "questId": "weather-dark"
+    }
   },
   {
     "id": "shukuchi",
@@ -92,8 +85,7 @@
       "hp": 0,
       "attack": 0,
       "defence": 0
-    },
-    "questId": "weather-shukuchi"
+    }
   },
   {
     "id": "fog",
@@ -104,8 +96,7 @@
       "hp": 200,
       "attack": 0,
       "defence": 0
-    },
-    "questId": "weather-fog"
+    }
   },
   {
     "id": "cloudy",
@@ -116,8 +107,7 @@
       "hp": 0,
       "attack": 60,
       "defence": 0
-    },
-    "questId": "weather-cloudy"
+    }
   },
   {
     "id": "storm",
@@ -128,8 +118,7 @@
       "hp": 0,
       "attack": 0,
       "defence": 15
-    },
-    "questId": "weather-storm"
+    }
   },
   {
     "id": "thunder",
@@ -140,7 +129,6 @@
       "hp": 0,
       "attack": 0,
       "defence": 0
-    },
-    "questId": "weather-thunder"
+    }
   }
 ]

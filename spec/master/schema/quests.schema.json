@@ -31,11 +31,11 @@
       },
       "rewards": {
         "type": "object",
-        "required": ["recruit", "weatherItems"],
+        "required": ["recruit", "dropItemId"],
         "additionalProperties": false,
         "properties": {
           "recruit": { "oneOf": [{ "$ref": "common.schema.json#/$defs/id" }, { "type": "null" }] },
-          "weatherItems": { "type": "boolean" }
+          "dropItemId": { "oneOf": [{ "$ref": "common.schema.json#/$defs/id" }, { "type": "null" }] }
         }
       }
     }
