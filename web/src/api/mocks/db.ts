@@ -34,7 +34,12 @@ export type MockBattle = {
   /** ステージごとの敵（行動の並びとステータス） */
   readonly stages: readonly MockBattleStage[];
   /** プレイヤーの基礎の値（`characters.json` の `base`） */
-  readonly playerBase: { readonly attackBuffRate: number; readonly defenceBuffAmount: number };
+  readonly playerBase: {
+    readonly attackBuffRate: number;
+    readonly defenceBuffAmount: number;
+    readonly checkMax: number;
+    readonly rewindMax: number;
+  };
   /** 敵の今の防御力 */
   readonly enemyDefence: number;
 };

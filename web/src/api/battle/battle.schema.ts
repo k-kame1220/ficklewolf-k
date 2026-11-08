@@ -29,6 +29,8 @@ const SPECIAL_ACTIONS = [
   "provocation"
 ] as const satisfies readonly components["schemas"]["SpecialAction"][];
 
+const TurnActionSchema = v.object({ turn: v.number(), action: v.picklist(ENEMY_ACTIONS) });
+
 const BattleSchema = v.object({
   id: v.pipe(v.string(), v.uuid()),
   questId: v.string(),
@@ -64,6 +66,7 @@ const BattleSchema = v.object({
   }),
   checkpoints: v.array(v.number()),
   revealRemaining: v.number(),
+  specialChoices: v.nullable(v.array(TurnActionSchema)),
   history: v.array(
     v.object({
       stage: v.number(),
@@ -117,3 +120,15 @@ export const BattleStepResponseSchema = v.object({
   battle: BattleSchema,
   reward: v.nullable(RewardSchema)
 }) satisfies v.GenericSchema<unknown, components["schemas"]["BattleStepResult"]>;
+
+/** api の `RevealResult`（みえーるみえーる） */
+export const RevealResponseSchema = v.object({
+  turns: v.array(TurnActionSchema),
+  battle: BattleSchema
+}) satisfies v.GenericSchema<unknown, components["schemas"]["RevealResult"]>;
+
+/** api の `SpecialChoices`（必殺技で書き換えられるターン） */
+export const SpecialChoicesResponseSchema = v.object({
+  turns: v.array(TurnActionSchema),
+  battle: BattleSchema
+}) satisfies v.GenericSchema<unknown, components["schemas"]["SpecialChoices"]>;

@@ -1,5 +1,11 @@
 import type { BattleRejectReason } from "@/api/core/apiError";
-import type { BattleEventModel, BattleModel, EnemyAction, PlayerActionCommand } from "@/domain/battle/battle";
+import type {
+  BattleEventModel,
+  BattleModel,
+  EnemyAction,
+  PlayerActionCommand,
+  SpecialAction
+} from "@/domain/battle/battle";
 
 /** バトルの画面の文言（旧作の言い回し） */
 export const BATTLE_MESSAGES = {
@@ -35,8 +41,35 @@ export const BATTLE_MESSAGES = {
   fudaGained: "お札をゲットしました。",
   tapToNext: "タップで次へ",
   start: "せんとうをはじめてください",
-  sendFailed: "通信エラーが発生しました。もう一度選んでください。"
+  sendFailed: "通信エラーが発生しました。もう一度選んでください。",
+  rewindPrompt: "どこにリターンしますか。",
+  rewindTargets: "リターンする先",
+  specialPrompt: "どの敵の行動を変えますか？",
+  specialConfirmPrompt: "決定またはやりなおしてください。",
+  specialTurns: "書き換えるターン",
+  specialActions: "書き換える行動",
+  decide: "決定",
+  revealTurns: "敵の行動"
 } as const;
+
+/** 必殺技で書き換えられる行動の名前 */
+export const SPECIAL_ACTION_NAMES = {
+  attack: "攻撃",
+  provocation: "挑発",
+  defend: "防御",
+  attackBuff: "攻撃バフ",
+  defenceBuff: "防御バフ"
+} as const satisfies Record<SpecialAction, string>;
+
+/** 必殺技で書き換える行動を選ぶときの文言 */
+export const specialActionPrompt = (turn: number): string => `${String(turn)}ターン目の敵の行動を何に変更しますか？`;
+
+/** 残り時間の小数点以下の桁数（旧作どおり 1/100 秒まで） */
+const SECONDS_FRACTION_DIGITS = 2;
+
+/** みえーるみえーるを閉じるまでの残り時間 */
+export const revealRemainingMessage = (seconds: number): string =>
+  `残り ${seconds.toFixed(SECONDS_FRACTION_DIGITS)} 秒`;
 
 /** プレイヤーの行動の名前（ログ・ボタン） */
 export const COMMAND_NAMES = {

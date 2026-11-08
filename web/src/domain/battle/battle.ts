@@ -96,6 +96,8 @@ export type BattleModel = {
   /** チェックしたターン */
   readonly checkpoints: readonly number[];
   readonly revealRemaining: number;
+  /** 必殺技で書き換えられるターンの敵の行動（`phase` が `choosingSpecial` のときだけ。ほかは null） */
+  readonly specialChoices: readonly TurnActionModel[] | null;
   readonly history: readonly BattleHistoryEntryModel[];
 };
 
@@ -135,6 +137,18 @@ export type RewardModel = {
   /** 被りで上がったステータス。なければ null */
   readonly duplicate: { readonly characterId: string; readonly stat: "hp" | "attack" | "defence" } | null;
   readonly items: readonly { readonly itemId: string; readonly count: number }[];
+};
+
+/** 敵の 1 ターンの行動（みえーるみえーる・必殺技で見せる） */
+export type TurnActionModel = {
+  readonly turn: number;
+  readonly action: EnemyAction;
+};
+
+/** みえーるみえーる・必殺技を開いた結果。`turns` は見せる敵の行動、`battle` は使ったあとの状態 */
+export type BattleTurnsModel = {
+  readonly turns: readonly TurnActionModel[];
+  readonly battle: BattleModel;
 };
 
 /** コマンドを 1 つ実行した結果 */

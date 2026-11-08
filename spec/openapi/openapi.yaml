@@ -1,12 +1,15 @@
 openapi: 3.1.0
 info:
   title: K API
-  version: 0.5.0
+  version: 0.6.0
   description: |
     K（リメイク）の API。web と api の約束事で、ここに書かれたものが正。
     エラーは RFC 9457（Problem Details）の形で返し、機械で見分けるための `code` を付ける。
 
     ## 変更履歴
+    ### 0.6.0（2026-11-08）
+    - `Battle` に `specialChoices`（必殺技の書き換えを選んでいる間の、書き換えられるターンの敵の行動）を足した
+
     ### 0.5.0（2026-10-12）
     - `GET /me/items` と `POST /me/characters/{characterId}/enhance` を足した
     - `MyCharacter` に `stats`（基礎・上昇分・合計）・`itemUses`・`itemUseMax` を足した
@@ -360,7 +363,7 @@ paths:
       summary: 必殺技を使う（書き換えられる敵の行動を見る）
       description: |
         必殺技の条件を満たしていれば、`turn − 2` 〜 `turn + 2` の敵の行動（存在するターンだけ）を返す。
-        **この時点で必殺技の回数を 1 使い**、バトルは書き換えを選ぶ状態（`phase: choosingSpecial`）になる。
+        **この時点で必殺技の回数を 1 使い**、バトルは書き換えを選ぶ状態（`phase: choosingSpecial`）になる。返す `battle.specialChoices` にも同じ行動が入る。
         その状態では `special` コマンド（書き換え）以外は受け付けない（行動を見てからやめることはできない）。
       parameters:
         - $ref: "#/components/parameters/SessionId"
@@ -920,7 +923,7 @@ components:
                 minimum: 1
     Battle:
       type: object
-      required: [id, questId, seq, phase, outcome, stage, stageCount, turn, turnCount, player, enemy, checkpoints, revealRemaining, history, expiresAt]
+      required: [id, questId, seq, phase, outcome, stage, stageCount, turn, turnCount, player, enemy, checkpoints, revealRemaining, specialChoices, history, expiresAt]
       additionalProperties: false
       description: |
         バトルの今の状態。
@@ -969,6 +972,15 @@ components:
         revealRemaining:
           type: integer
           minimum: 0
+        specialChoices:
+          oneOf:
+            - type: array
+              items:
+                $ref: "#/components/schemas/TurnAction"
+            - type: "null"
+          description: |
+            必殺技で書き換えられるターンの敵の行動（`POST /special` の `turns` と同じ）。`phase` が `choosingSpecial` のときだけ入り、ほかは null。
+            アプリを開き直したときに、書き換えを選ぶところから続けるため。
         history:
           type: array
           items:

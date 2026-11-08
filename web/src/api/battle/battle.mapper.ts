@@ -1,5 +1,11 @@
 import type { components } from "@/api/generated/schema";
-import type { BattleEventModel, BattleModel, BattleStepModel, RewardModel } from "@/domain/battle/battle";
+import type {
+  BattleEventModel,
+  BattleModel,
+  BattleStepModel,
+  BattleTurnsModel,
+  RewardModel
+} from "@/domain/battle/battle";
 
 /** api の `Battle` をアプリの型にする */
 export const battleToDomain = (battle: components["schemas"]["Battle"]): BattleModel => ({
@@ -37,6 +43,10 @@ export const battleToDomain = (battle: components["schemas"]["Battle"]): BattleM
   },
   checkpoints: battle.checkpoints,
   revealRemaining: battle.revealRemaining,
+  specialChoices:
+    battle.specialChoices === null
+      ? null
+      : battle.specialChoices.map(entry => ({ turn: entry.turn, action: entry.action })),
   history: battle.history.map(entry => ({
     stage: entry.stage,
     turn: entry.turn,
@@ -61,4 +71,12 @@ export const battleStepToDomain = (step: components["schemas"]["BattleStepResult
   events: step.events.map((event): BattleEventModel => ({ ...event })),
   battle: battleToDomain(step.battle),
   reward: step.reward === null ? null : rewardToDomain(step.reward)
+});
+
+/** api の `RevealResult`・`SpecialChoices` をアプリの型にする */
+export const battleTurnsToDomain = (
+  result: components["schemas"]["RevealResult"] | components["schemas"]["SpecialChoices"]
+): BattleTurnsModel => ({
+  turns: result.turns.map(entry => ({ turn: entry.turn, action: entry.action })),
+  battle: battleToDomain(result.battle)
 });

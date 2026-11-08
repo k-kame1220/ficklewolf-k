@@ -273,3 +273,104 @@
 .status p {
   margin: 0;
 }
+
+.tacticPanel {
+  position: absolute;
+  inset: var(--space-2) calc(var(--battle-reveal-size) + var(--space-4)) var(--space-2) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border: var(--frame-paper-width) solid transparent;
+  border-image: var(--frame-paper);
+  background: var(--color-paper);
+}
+
+.turnList {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.turnRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.turnAction,
+.decide,
+.rewindTarget {
+  min-height: var(--tap-min-size);
+  padding: var(--space-1) var(--space-2);
+  border: var(--frame-pencil-width) solid transparent;
+  border-image: var(--frame-pencil);
+  background: none;
+  color: var(--color-ink);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.turnActionSelected {
+  border-image: var(--frame-bold);
+}
+
+.turnAction:disabled,
+.decide:disabled,
+.rewindTarget:disabled {
+  color: var(--color-ink-faint);
+  cursor: default;
+}
+
+.revealTimer {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+.rewindPanel {
+  position: absolute;
+  inset: var(--space-2) calc(var(--battle-reveal-size) + var(--space-4)) var(--space-2) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  background: var(--image-pencil-fill) center / 100% 100% no-repeat;
+}
+
+.rewindTarget {
+  min-width: 50%;
+  background: var(--color-paper);
+}
+
+.rewindPanel .textButton {
+  color: var(--color-paper);
+}
+
+.specialActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-1);
+}
+
+.specialActions button {
+  min-width: 0;
+  min-height: var(--battle-command-height);
+  padding: var(--space-1);
+}
+
+.specialActions button:last-child {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: 50%;
+}
