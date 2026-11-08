@@ -910,7 +910,7 @@ components:
           description: 被りで上がったステータス
         items:
           type: array
-          description: もらった強化アイテム（お天気クエスト）
+          description: もらった強化アイテム（お天気クエスト。0 個のときやほかのクエストは空のリスト）
           items:
             type: object
             required: [itemId, count]
