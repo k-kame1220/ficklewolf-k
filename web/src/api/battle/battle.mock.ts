@@ -290,6 +290,7 @@ export const createBattleMockHandlers = (db: MockDb) => {
         enemy: enemyOf(first),
         checkpoints: [],
         revealRemaining: first.revealCount,
+        specialChoices: null,
         history: [],
         expiresAt: new Date(Date.now() + EXPIRES_IN_MS).toISOString()
       };
@@ -354,9 +355,10 @@ export const createBattleMockHandlers = (db: MockDb) => {
             )
           };
         });
-        return respond({ ...current, stages, battle: { ...battle, seq: battle.seq + 1, phase: "command" } }, [
-          { type: "specialApplied", turn: requested.turn, action: requested.action }
-        ]);
+        return respond(
+          { ...current, stages, battle: { ...battle, seq: battle.seq + 1, phase: "command", specialChoices: null } },
+          [{ type: "specialApplied", turn: requested.turn, action: requested.action }]
+        );
       }
 
       if (requested.type === "check") {
@@ -520,15 +522,13 @@ export const createBattleMockHandlers = (db: MockDb) => {
       const stage = current.stages[battle.stage - 1];
       if (stage === undefined) return problem(HTTP_CONFLICT, "STALE_SEQUENCE");
       const player = { ...battle.player, specialRemaining: battle.player.specialRemaining - 1 };
+      const turns = turnActions(stage, battle.turn - SPECIAL_RANGE, battle.turn + SPECIAL_RANGE);
       const updated = withSpecialAvailability({
         ...current,
-        battle: { ...battle, seq: battle.seq + 1, phase: "choosingSpecial", player }
+        battle: { ...battle, seq: battle.seq + 1, phase: "choosingSpecial", player, specialChoices: turns }
       });
       db.battles.set(me.id, updated);
-      return HttpResponse.json({
-        turns: turnActions(stage, battle.turn - SPECIAL_RANGE, battle.turn + SPECIAL_RANGE),
-        battle: updated.battle
-      } satisfies components["schemas"]["SpecialChoices"]);
+      return HttpResponse.json({ turns, battle: updated.battle } satisfies components["schemas"]["SpecialChoices"]);
     }),
 
     http.post(`${API_BASE_URL}/quest-sessions/:sessionId/retire`, ({ request, params }) => {

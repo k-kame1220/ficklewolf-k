@@ -96,6 +96,8 @@ export type BattleModel = {
   /** チェックしたターン */
   readonly checkpoints: readonly number[];
   readonly revealRemaining: number;
+  /** 必殺技で書き換えられるターンの敵の行動（`phase` が `choosingSpecial` のときだけ。ほかは null） */
+  readonly specialChoices: readonly TurnActionModel[] | null;
   readonly history: readonly BattleHistoryEntryModel[];
 };
 

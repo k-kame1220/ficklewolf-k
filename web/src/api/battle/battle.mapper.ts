@@ -43,6 +43,10 @@ export const battleToDomain = (battle: components["schemas"]["Battle"]): BattleM
   },
   checkpoints: battle.checkpoints,
   revealRemaining: battle.revealRemaining,
+  specialChoices:
+    battle.specialChoices === null
+      ? null
+      : battle.specialChoices.map(entry => ({ turn: entry.turn, action: entry.action })),
   history: battle.history.map(entry => ({
     stage: entry.stage,
     turn: entry.turn,

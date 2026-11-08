@@ -1,4 +1,4 @@
-import type { SpecialAction } from "@/domain/battle/battle";
+import type { SpecialAction, TurnActionModel } from "@/domain/battle/battle";
 
 import { useBattleActions } from "../hooks/useBattleActions";
 import { BATTLE_MESSAGES, ENEMY_ACTION_NAMES, SPECIAL_ACTION_NAMES } from "../messages";
@@ -6,11 +6,9 @@ import { useBattleStore } from "../store";
 
 import styles from "./Battle.module.css";
 
-import type { SpecialTurn } from "../store";
-
 type BattleSpecialTurnsProps = {
   /** 書き換えられるターン */
-  turns: readonly SpecialTurn[];
+  turns: readonly TurnActionModel[];
   /** 選んだターン（まだなら null） */
   turn: number | null;
   /** 選んだ行動（まだなら null） */
@@ -29,11 +27,7 @@ const BattleSpecialTurns = (props: BattleSpecialTurnsProps) => {
       <ul className={styles.turnList} aria-label={BATTLE_MESSAGES.specialTurns}>
         {turns.map(entry => {
           const isSelected = entry.turn === turn;
-          const label = (() => {
-            if (isSelected && action !== null) return SPECIAL_ACTION_NAMES[action];
-            if (entry.action === null) return BATTLE_MESSAGES.unknownAction;
-            return ENEMY_ACTION_NAMES[entry.action];
-          })();
+          const label = isSelected && action !== null ? SPECIAL_ACTION_NAMES[action] : ENEMY_ACTION_NAMES[entry.action];
           return (
             <li key={entry.turn} className={styles.turnRow}>
               <span>{`${String(entry.turn)}${BATTLE_MESSAGES.turn}`}</span>

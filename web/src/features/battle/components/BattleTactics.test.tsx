@@ -114,32 +114,31 @@ describe("BattleScreen のチェック・リターン・みえーるみえーる
       turn: 5,
       player: { ...started.player, hp: 400, rewindRemaining: 0, isSpecialAvailable: true }
     };
+    const choices = [
+      { turn: 3, action: "defend" },
+      { turn: 4, action: "provocation" },
+      { turn: 5, action: "strongAttack" },
+      { turn: 6, action: "defend" },
+      { turn: 7, action: "attack" }
+    ] as const;
     const choosing: Battle = {
       ...ready,
       seq: ready.seq + 1,
       phase: "choosingSpecial",
+      specialChoices: choices,
       player: { ...ready.player, specialRemaining: 0, isSpecialAvailable: false }
     };
     const sent = vi.fn();
     server.use(
       http.get(`${API_BASE_URL}/quest-sessions/current`, () => HttpResponse.json(ready)),
       http.post(`${API_BASE_URL}/quest-sessions/:sessionId/special`, () =>
-        HttpResponse.json({
-          turns: [
-            { turn: 3, action: "defend" },
-            { turn: 4, action: "provocation" },
-            { turn: 5, action: "strongAttack" },
-            { turn: 6, action: "defend" },
-            { turn: 7, action: "attack" }
-          ],
-          battle: choosing
-        })
+        HttpResponse.json({ turns: choices, battle: choosing })
       ),
       http.post(`${API_BASE_URL}/quest-sessions/:sessionId/commands`, async ({ request }) => {
         sent(await request.json());
         return HttpResponse.json({
           events: [{ type: "specialApplied", turn: 5, action: "provocation" }],
-          battle: { ...choosing, seq: choosing.seq + 1, phase: "command" },
+          battle: { ...choosing, seq: choosing.seq + 1, phase: "command", specialChoices: null },
           reward: null
         });
       })
@@ -173,7 +172,18 @@ describe("BattleScreen のチェック・リターン・みえーるみえーる
     const started = await startRawBattle();
     server.use(
       http.get(`${API_BASE_URL}/quest-sessions/current`, () =>
-        HttpResponse.json({ ...started, turn: 5, phase: "choosingSpecial" } satisfies Battle)
+        HttpResponse.json({
+          ...started,
+          turn: 5,
+          phase: "choosingSpecial",
+          specialChoices: [
+            { turn: 3, action: "defend" },
+            { turn: 4, action: "provocation" },
+            { turn: 5, action: "strongAttack" },
+            { turn: 6, action: "defend" },
+            { turn: 7, action: "attack" }
+          ]
+        } satisfies Battle)
       )
     );
 
@@ -184,8 +194,7 @@ describe("BattleScreen のチェック・リターン・みえーるみえーる
       within(turns)
         .getAllByRole("button")
         .map(button => button.textContent)
-    ).toStrictEqual(["？", "？", "？", "？", "？"]);
-    expect(within(turns).getByRole("button", { name: "3ターン目：？" })).toBeInTheDocument();
+    ).toStrictEqual(["防御", "挑発", "強攻撃", "防御", "攻撃"]);
     expect(screen.getByRole("button", { name: "みえーるみえーる（あと1回）" })).toBeDisabled();
   });
 });

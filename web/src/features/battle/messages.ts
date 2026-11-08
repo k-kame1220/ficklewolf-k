@@ -49,8 +49,7 @@ export const BATTLE_MESSAGES = {
   specialTurns: "書き換えるターン",
   specialActions: "書き換える行動",
   decide: "決定",
-  revealTurns: "敵の行動",
-  unknownAction: "？"
+  revealTurns: "敵の行動"
 } as const;
 
 /** 必殺技で書き換えられる行動の名前 */

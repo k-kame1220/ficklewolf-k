@@ -6,7 +6,6 @@ import type {
   BattleModel,
   BattleStepModel,
   BattleTurnsModel,
-  EnemyAction,
   RewardModel,
   SpecialAction
 } from "@/domain/battle/battle";
@@ -18,15 +17,6 @@ import type { StoreApi } from "zustand";
 /** 画面の進み具合。`sending`: api の返事待ち / `playing`: イベントを演出中 / `idle`: 入力を待っている */
 export type BattleUiPhase = "idle" | "sending" | "playing";
 
-/** 必殺技で書き換えられる範囲（今のターンの前後。spec/battle/README.md の 11） */
-const SPECIAL_RANGE = 2;
-
-/** 必殺技で書き換えられる 1 ターン。`action` は今の敵の行動（アプリを開き直して分からないときは null） */
-export type SpecialTurn = {
-  readonly turn: number;
-  readonly action: EnemyAction | null;
-};
-
 /**
  * 敵の絵の上に開いているもの。`reveal`: みえーるみえーる（全ターンの行動） / `rewind`: リターンの行き先を選ぶ /
  * `special`: 必殺技で書き換えるターン（`turn`）と行動（`action`）を選ぶ（選ぶ前は null）
@@ -36,18 +26,15 @@ export type BattleTactic =
   | { readonly type: "rewind" }
   | {
       readonly type: "special";
-      readonly turns: readonly SpecialTurn[];
+      readonly turns: BattleTurnsModel["turns"];
       readonly turn: number | null;
       readonly action: SpecialAction | null;
     };
 
-/** 必殺技の書き換えを待っている状態で開き直したとき、書き換えられるターン（行動は分からない） */
+/** 必殺技の書き換えを待っている状態で開き直したとき、書き換えるターンを選ぶところから続ける */
 const resumedTactic = (battle: BattleModel): BattleTactic | null => {
-  if (battle.phase !== "choosingSpecial") return null;
-  const first = Math.max(1, battle.turn - SPECIAL_RANGE);
-  const last = Math.min(battle.turnCount, battle.turn + SPECIAL_RANGE);
-  const turns = Array.from({ length: last - first + 1 }, (_, index) => ({ turn: first + index, action: null }));
-  return { type: "special", turns, turn: null, action: null };
+  if (battle.phase !== "choosingSpecial" || battle.specialChoices === null) return null;
+  return { type: "special", turns: battle.specialChoices, turn: null, action: null };
 };
 
 /** 入力を待っているときの文言（必殺技の書き換えを待っているときは、その案内） */

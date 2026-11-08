@@ -265,7 +265,7 @@ export type paths = {
         /**
          * 必殺技を使う（書き換えられる敵の行動を見る）
          * @description 必殺技の条件を満たしていれば、`turn − 2` 〜 `turn + 2` の敵の行動（存在するターンだけ）を返す。
-         *     **この時点で必殺技の回数を 1 使い**、バトルは書き換えを選ぶ状態（`phase: choosingSpecial`）になる。
+         *     **この時点で必殺技の回数を 1 使い**、バトルは書き換えを選ぶ状態（`phase: choosingSpecial`）になる。返す `battle.specialChoices` にも同じ行動が入る。
          *     その状態では `special` コマンド（書き換え）以外は受け付けない（行動を見てからやめることはできない）。
          */
         readonly post: operations["openSpecial"];
@@ -585,6 +585,11 @@ export type components = {
             readonly enemy: components["schemas"]["BattleEnemy"];
             readonly checkpoints: readonly number[];
             readonly revealRemaining: number;
+            /**
+             * @description 必殺技で書き換えられるターンの敵の行動（`POST /special` の `turns` と同じ）。`phase` が `choosingSpecial` のときだけ入り、ほかは null。
+             *     アプリを開き直したときに、書き換えを選ぶところから続けるため。
+             */
+            readonly specialChoices: readonly components["schemas"]["TurnAction"][] | null;
             readonly history: readonly components["schemas"]["BattleHistoryEntry"][];
             /** Format: date-time */
             readonly expiresAt: string;
