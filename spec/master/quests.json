@@ -1571,6 +1571,7 @@
         "revealCount": 1
       }
     ],
+    "weatherId": "blue-sky",
     "rewards": {
       "recruit": null,
       "dropItemId": "yang-hp"
@@ -1614,6 +1615,7 @@
         "revealCount": 1
       }
     ],
+    "weatherId": "sunny",
     "rewards": {
       "recruit": null,
       "dropItemId": "yang-attack"
@@ -1657,6 +1659,7 @@
         "revealCount": 1
       }
     ],
+    "weatherId": "galleon",
     "rewards": {
       "recruit": null,
       "dropItemId": "yang-defence"
@@ -1700,6 +1703,7 @@
         "revealCount": 1
       }
     ],
+    "weatherId": "mexico",
     "rewards": {
       "recruit": null,
       "dropItemId": null
@@ -1743,6 +1747,7 @@
         "revealCount": 1
       }
     ],
+    "weatherId": "snow",
     "rewards": {
       "recruit": null,
       "dropItemId": "note-hp"
@@ -1786,6 +1791,7 @@
         "revealCount": 1
       }
     ],
+    "weatherId": "rain",
     "rewards": {
       "recruit": null,
       "dropItemId": "note-attack"
@@ -1829,6 +1835,7 @@
         "revealCount": 1
       }
     ],
+    "weatherId": "dark",
     "rewards": {
       "recruit": null,
       "dropItemId": "note-defence"
@@ -1872,6 +1879,7 @@
         "revealCount": 1
       }
     ],
+    "weatherId": "shukuchi",
     "rewards": {
       "recruit": null,
       "dropItemId": null
@@ -1915,6 +1923,7 @@
         "revealCount": 1
       }
     ],
+    "weatherId": "fog",
     "rewards": {
       "recruit": null,
       "dropItemId": "moon-hp"
@@ -1958,6 +1967,7 @@
         "revealCount": 1
       }
     ],
+    "weatherId": "cloudy",
     "rewards": {
       "recruit": null,
       "dropItemId": "moon-attack"
@@ -2001,6 +2011,7 @@
         "revealCount": 1
       }
     ],
+    "weatherId": "storm",
     "rewards": {
       "recruit": null,
       "dropItemId": "moon-defence"
@@ -2044,6 +2055,7 @@
         "revealCount": 1
       }
     ],
+    "weatherId": "thunder",
     "rewards": {
       "recruit": null,
       "dropItemId": null

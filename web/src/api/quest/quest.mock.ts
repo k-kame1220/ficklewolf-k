@@ -5,7 +5,6 @@ import { API_BASE_URL } from "@/api/core/config";
 import type { components } from "@/api/generated/schema";
 import { authenticate, problem } from "@/api/mocks/db";
 import type { MockDb } from "@/api/mocks/db";
-import { todayWeatherQuestId } from "@/api/weather/weather.mock";
 import { ATTRIBUTES } from "@/domain/attribute/attribute";
 import { QUEST_KINDS } from "@/domain/quest/quest";
 
@@ -32,6 +31,7 @@ const MasterQuestsSchema = v.array(
     kind: v.picklist(QUEST_KINDS),
     name: v.string(),
     order: v.number(),
+    weatherId: v.optional(v.string()),
     stages: v.tupleWithRest([MasterStageSchema], MasterStageSchema)
   })
 );
@@ -51,7 +51,7 @@ export const createQuestMockHandlers = (db: MockDb) => {
       const cleared = db.clearedQuestIds.get(me.id) ?? new Set<string>();
       const available = [
         ...mainQuests.slice(0, me.level),
-        ...weatherQuests.filter(quest => quest.id === todayWeatherQuestId(db))
+        ...weatherQuests.filter(quest => quest.weatherId === db.todayWeatherId)
       ];
       return HttpResponse.json({
         quests: available.map(quest => {

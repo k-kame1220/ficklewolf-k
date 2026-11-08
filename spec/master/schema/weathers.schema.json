@@ -4,15 +4,14 @@
   "type": "array",
   "items": {
     "type": "object",
-    "required": ["id", "name", "attribute", "weight", "bonus", "questId"],
+    "required": ["id", "name", "attribute", "weight", "bonus"],
     "additionalProperties": false,
     "properties": {
       "id": { "$ref": "common.schema.json#/$defs/id" },
       "name": { "type": "string" },
       "attribute": { "$ref": "common.schema.json#/$defs/attribute" },
       "weight": { "type": "integer", "minimum": 1 },
-      "bonus": { "$ref": "common.schema.json#/$defs/stats" },
-      "questId": { "$ref": "common.schema.json#/$defs/id" }
+      "bonus": { "$ref": "common.schema.json#/$defs/stats" }
     }
   }
 }

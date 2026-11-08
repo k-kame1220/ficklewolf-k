@@ -5,7 +5,6 @@ import { API_BASE_URL } from "@/api/core/config";
 import type { components } from "@/api/generated/schema";
 import { authenticate, problem, readJson } from "@/api/mocks/db";
 import type { MockBattle, MockBattleStage, MockDb } from "@/api/mocks/db";
-import { todayWeatherQuestId } from "@/api/weather/weather.mock";
 import { ATTRIBUTES, attackMultiplier } from "@/domain/attribute/attribute";
 
 /*
@@ -64,6 +63,7 @@ const MasterQuestsSchema = v.array(
     id: v.string(),
     kind: v.string(),
     order: v.number(),
+    weatherId: v.optional(v.string()),
     rewards: v.object({ recruit: v.nullable(v.string()) }),
     stages: v.array(
       v.object({
@@ -196,7 +196,7 @@ export const createBattleMockHandlers = (db: MockDb) => {
       const isAvailable = (() => {
         if (quest === undefined) return false;
         if (quest.kind === "main") return quest.order <= me.level;
-        if (quest.kind === "weather") return quest.id === todayWeatherQuestId(db);
+        if (quest.kind === "weather") return quest.weatherId === db.todayWeatherId;
         return false;
       })();
       const character = characters.get(me.selectedCharacterId);

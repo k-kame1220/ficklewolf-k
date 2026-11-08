@@ -11,6 +11,7 @@
       "kind": { "enum": ["main", "event", "weather"] },
       "name": { "type": "string" },
       "order": { "type": "integer", "minimum": 1 },
+      "weatherId": { "$ref": "common.schema.json#/$defs/id" },
       "bannerKey": { "$ref": "common.schema.json#/$defs/assetKey" },
       "bgmKey": { "$ref": "common.schema.json#/$defs/assetKey" },
       "stages": {
