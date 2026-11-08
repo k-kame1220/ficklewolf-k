@@ -11,6 +11,7 @@ import com.ficklewolf.k.shared.kernel.CharacterId
 import com.ficklewolf.k.shared.kernel.PlayerId
 import com.ficklewolf.k.shared.kernel.Stats
 import com.ficklewolf.k.shared.kernel.TransactionRunner
+import com.ficklewolf.k.shared.kernel.WeatherId
 import com.ficklewolf.k.weather.api.TodayWeatherSummary
 import com.ficklewolf.k.weather.api.WeatherApi
 import java.util.UUID
@@ -92,7 +93,7 @@ class CharacterServiceTest {
     private val weatherApi =
         object : WeatherApi {
             override fun getToday(): TodayWeatherSummary =
-                TodayWeatherSummary(Attribute.MOON, Stats(hp = 0, attack = 60, defence = 0))
+                TodayWeatherSummary(WeatherId("cloudy"), Attribute.MOON, Stats(hp = 0, attack = 60, defence = 0))
         }
 
     private val transaction =
