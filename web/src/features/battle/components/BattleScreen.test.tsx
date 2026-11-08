@@ -34,7 +34,7 @@ const problem = (status: number, body: Record<string, string>) =>
   );
 
 describe("BattleScreen", () => {
-  it("敵・ターン・自分の欄を出し、チェック・リターン・必殺技はまだ押せない", async () => {
+  it("敵・ターン・自分の欄を出し、1 ターン目はチェック・リターン・必殺技を押せない", async () => {
     await renderStartedBattle();
 
     expect(screen.getByText("1ターン目")).toBeInTheDocument();

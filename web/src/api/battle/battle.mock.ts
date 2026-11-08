@@ -29,6 +29,8 @@ type Battle = components["schemas"]["Battle"];
 type BattleEvent = components["schemas"]["BattleEvent"];
 type EnemyAction = components["schemas"]["EnemyAction"];
 type PlayerActionCommand = "attack" | "defend" | "attackBuff" | "defenceBuff";
+type BattleRejectReason = components["schemas"]["BattleRejectReason"];
+type TurnAction = components["schemas"]["TurnAction"];
 
 const HTTP_OK = 200;
 const HTTP_CREATED = 201;
@@ -39,6 +41,10 @@ const HTTP_CONFLICT = 409;
 const EXPIRES_IN_MS = 86_400_000;
 const GUARDED_DAMAGE_DIVISOR = 10;
 const MIN_DAMAGE = 1;
+/** 必殺技で書き換えられる範囲（今のターンの前後） */
+const SPECIAL_RANGE = 2;
+/** 必殺技を使える HP（最大 HP のこの割合より少ないとき） */
+const SPECIAL_HP_DIVISOR = 2;
 
 const EnemyActionSchema = v.picklist([
   "attack",
@@ -106,8 +112,44 @@ const MasterCharactersSchema = v.array(
 
 const CommandRequestSchema = v.strictObject({
   seq: v.number(),
-  command: v.strictObject({ type: v.picklist(["attack", "defend", "attackBuff", "defenceBuff"]) })
+  command: v.variant("type", [
+    v.strictObject({ type: v.picklist(["attack", "defend", "attackBuff", "defenceBuff", "check"]) }),
+    v.strictObject({ type: v.literal("rewind"), to: v.number() }),
+    v.strictObject({
+      type: v.literal("special"),
+      turn: v.number(),
+      action: v.picklist(["attack", "defend", "attackBuff", "defenceBuff", "provocation"])
+    })
+  ])
 });
+
+const SequenceRequestSchema = v.strictObject({ seq: v.number() });
+
+/** コマンドを実行できなかった（409 `COMMAND_REJECTED`） */
+const rejected = (reason: BattleRejectReason) =>
+  HttpResponse.json(
+    { type: "about:blank", title: "Conflict", status: HTTP_CONFLICT, code: "COMMAND_REJECTED", reason },
+    { status: HTTP_CONFLICT, headers: { "Content-Type": "application/problem+json" } }
+  );
+
+/** 必殺技の条件（spec/battle/README.md の 11）を満たしているかを入れ直す */
+const withSpecialAvailability = (mock: MockBattle): MockBattle => {
+  const { battle } = mock;
+  const isSpecialAvailable =
+    battle.phase === "command" &&
+    battle.player.hp * SPECIAL_HP_DIVISOR < battle.player.maxHp &&
+    battle.player.rewindRemaining < mock.playerBase.rewindMax &&
+    battle.turn > SPECIAL_RANGE &&
+    battle.turn < battle.turnCount - SPECIAL_RANGE &&
+    battle.player.specialRemaining > 0;
+  return { ...mock, battle: { ...battle, player: { ...battle.player, isSpecialAvailable } } };
+};
+
+/** 今の敵の行動を、ターン番号を付けて並べる（`from`〜`to` のうち存在するターンだけ） */
+const turnActions = (stage: MockBattleStage, from: number, to: number): readonly TurnAction[] =>
+  stage.turns
+    .map((action, index) => ({ turn: index + 1, action }))
+    .filter(entry => entry.turn >= from && entry.turn <= to);
 
 /** バトルの状態が 1 つ進んだ途中の値（プレイヤーと敵の行動を順に当てていく） */
 type Progress = {
@@ -256,7 +298,9 @@ export const createBattleMockHandlers = (db: MockDb) => {
         stages,
         playerBase: {
           attackBuffRate: character.base.attackBuffRate,
-          defenceBuffAmount: character.base.defenceBuffAmount
+          defenceBuffAmount: character.base.defenceBuffAmount,
+          checkMax: character.base.checkMax,
+          rewindMax: character.base.rewindMax
         },
         enemyDefence: first.defence
       });
@@ -281,20 +325,72 @@ export const createBattleMockHandlers = (db: MockDb) => {
       const body = v.safeParse(CommandRequestSchema, await readJson(request));
       if (!body.success) return problem(HTTP_BAD_REQUEST, "VALIDATION_FAILED");
       if (body.output.seq !== current.battle.seq) return problem(HTTP_CONFLICT, "STALE_SEQUENCE");
-      if (current.battle.phase === "finished") {
+      if (current.battle.phase === "finished") return rejected("BATTLE_FINISHED");
+
+      const { battle } = current;
+      const respond = (mock: MockBattle, events: readonly BattleEvent[]) => {
+        const updated = withSpecialAvailability(mock);
+        db.battles.set(me.id, updated);
         return HttpResponse.json(
+          { events, battle: updated.battle, reward: null } satisfies components["schemas"]["BattleStepResult"],
+          { status: HTTP_OK }
+        );
+      };
+      const requested = body.output.command;
+      if (battle.phase === "choosingSpecial" && requested.type !== "special") return rejected("SPECIAL_PENDING");
+
+      if (requested.type === "special") {
+        if (battle.phase !== "choosingSpecial") return rejected("SPECIAL_NOT_OPENED");
+        const isInRange =
+          requested.turn >= Math.max(1, battle.turn - SPECIAL_RANGE) &&
+          requested.turn <= Math.min(battle.turnCount, battle.turn + SPECIAL_RANGE);
+        if (!isInRange) return rejected("INVALID_SPECIAL_TARGET");
+        const stages = current.stages.map((stage, index) => {
+          if (index !== battle.stage - 1) return stage;
+          return {
+            ...stage,
+            turns: stage.turns.map((action, turnIndex) =>
+              turnIndex === requested.turn - 1 ? requested.action : action
+            )
+          };
+        });
+        return respond({ ...current, stages, battle: { ...battle, seq: battle.seq + 1, phase: "command" } }, [
+          { type: "specialApplied", turn: requested.turn, action: requested.action }
+        ]);
+      }
+
+      if (requested.type === "check") {
+        if (battle.turn === 1) return rejected("CANNOT_CHECK_FIRST_TURN");
+        if (new Set(battle.checkpoints).has(battle.turn)) return rejected("ALREADY_CHECKED");
+        if (battle.player.checkRemaining === 0) return rejected("CHECK_LIMIT");
+        const player = { ...battle.player, checkRemaining: battle.player.checkRemaining - 1 };
+        return respond(
           {
-            type: "about:blank",
-            title: "Conflict",
-            status: HTTP_CONFLICT,
-            code: "COMMAND_REJECTED",
-            reason: "BATTLE_FINISHED"
+            ...current,
+            battle: { ...battle, seq: battle.seq + 1, checkpoints: [...battle.checkpoints, battle.turn], player }
           },
-          { status: HTTP_CONFLICT, headers: { "Content-Type": "application/problem+json" } }
+          [{ type: "checked", turn: battle.turn }]
         );
       }
 
-      const command = body.output.command.type;
+      if (requested.type === "rewind") {
+        const checkpoints = new Set(battle.checkpoints);
+        if (checkpoints.size === 0) return rejected("NO_CHECKPOINT");
+        if (battle.player.rewindRemaining === 0) return rejected("REWIND_LIMIT");
+        if (checkpoints.size === 1 && checkpoints.has(battle.turn)) return rejected("CANNOT_REWIND_HERE");
+        if (!checkpoints.has(requested.to) || requested.to === battle.turn) return rejected("INVALID_REWIND_TARGET");
+        const player = {
+          ...battle.player,
+          checkRemaining: current.playerBase.checkMax,
+          rewindRemaining: battle.player.rewindRemaining - 1
+        };
+        return respond(
+          { ...current, battle: { ...battle, seq: battle.seq + 1, turn: requested.to, checkpoints: [], player } },
+          [{ type: "rewound", to: requested.to }]
+        );
+      }
+
+      const command = requested.type;
       const stage = current.stages[current.battle.stage - 1];
       const enemyAction = stage?.turns[current.battle.turn - 1];
       if (stage === undefined || enemyAction === undefined) return problem(HTTP_CONFLICT, "STALE_SEQUENCE");
@@ -355,7 +451,8 @@ export const createBattleMockHandlers = (db: MockDb) => {
           events: acted.events
         };
       })();
-      db.battles.set(me.id, next.mock);
+      const updated = withSpecialAvailability(next.mock);
+      db.battles.set(me.id, updated);
 
       const reward = (() => {
         if (outcome !== "win") return null;
@@ -374,9 +471,64 @@ export const createBattleMockHandlers = (db: MockDb) => {
       })();
 
       return HttpResponse.json(
-        { events: next.events, battle: next.mock.battle, reward } satisfies components["schemas"]["BattleStepResult"],
+        { events: next.events, battle: updated.battle, reward } satisfies components["schemas"]["BattleStepResult"],
         { status: HTTP_OK }
       );
+    }),
+
+    http.post(`${API_BASE_URL}/quest-sessions/:sessionId/reveal`, async ({ request, params }) => {
+      const me = authenticate(db, request);
+      if (me === null) return problem(HTTP_UNAUTHORIZED, "UNAUTHORIZED");
+      const current = db.battles.get(me.id);
+      if (current === undefined || current.battle.id !== params.sessionId) {
+        return problem(HTTP_NOT_FOUND, "BATTLE_NOT_FOUND");
+      }
+      const body = v.safeParse(SequenceRequestSchema, await readJson(request));
+      if (!body.success) return problem(HTTP_BAD_REQUEST, "VALIDATION_FAILED");
+      const { battle } = current;
+      if (body.output.seq !== battle.seq) return problem(HTTP_CONFLICT, "STALE_SEQUENCE");
+      if (battle.phase === "finished") return rejected("BATTLE_FINISHED");
+      if (battle.phase === "choosingSpecial") return rejected("SPECIAL_PENDING");
+      if (battle.revealRemaining === 0) return rejected("REVEAL_LIMIT");
+      const stage = current.stages[battle.stage - 1];
+      if (stage === undefined) return problem(HTTP_CONFLICT, "STALE_SEQUENCE");
+      const updated = {
+        ...current,
+        battle: { ...battle, seq: battle.seq + 1, revealRemaining: battle.revealRemaining - 1 }
+      };
+      db.battles.set(me.id, updated);
+      return HttpResponse.json({
+        turns: turnActions(stage, 1, battle.turnCount),
+        battle: updated.battle
+      } satisfies components["schemas"]["RevealResult"]);
+    }),
+
+    http.post(`${API_BASE_URL}/quest-sessions/:sessionId/special`, async ({ request, params }) => {
+      const me = authenticate(db, request);
+      if (me === null) return problem(HTTP_UNAUTHORIZED, "UNAUTHORIZED");
+      const current = db.battles.get(me.id);
+      if (current === undefined || current.battle.id !== params.sessionId) {
+        return problem(HTTP_NOT_FOUND, "BATTLE_NOT_FOUND");
+      }
+      const body = v.safeParse(SequenceRequestSchema, await readJson(request));
+      if (!body.success) return problem(HTTP_BAD_REQUEST, "VALIDATION_FAILED");
+      const { battle } = current;
+      if (body.output.seq !== battle.seq) return problem(HTTP_CONFLICT, "STALE_SEQUENCE");
+      if (battle.phase === "finished") return rejected("BATTLE_FINISHED");
+      if (battle.phase === "choosingSpecial") return rejected("SPECIAL_PENDING");
+      if (!battle.player.isSpecialAvailable) return rejected("SPECIAL_UNAVAILABLE");
+      const stage = current.stages[battle.stage - 1];
+      if (stage === undefined) return problem(HTTP_CONFLICT, "STALE_SEQUENCE");
+      const player = { ...battle.player, specialRemaining: battle.player.specialRemaining - 1 };
+      const updated = withSpecialAvailability({
+        ...current,
+        battle: { ...battle, seq: battle.seq + 1, phase: "choosingSpecial", player }
+      });
+      db.battles.set(me.id, updated);
+      return HttpResponse.json({
+        turns: turnActions(stage, battle.turn - SPECIAL_RANGE, battle.turn + SPECIAL_RANGE),
+        battle: updated.battle
+      } satisfies components["schemas"]["SpecialChoices"]);
     }),
 
     http.post(`${API_BASE_URL}/quest-sessions/:sessionId/retire`, ({ request, params }) => {

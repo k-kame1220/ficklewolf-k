@@ -137,6 +137,18 @@ export type RewardModel = {
   readonly items: readonly { readonly itemId: string; readonly count: number }[];
 };
 
+/** 敵の 1 ターンの行動（みえーるみえーる・必殺技で見せる） */
+export type TurnActionModel = {
+  readonly turn: number;
+  readonly action: EnemyAction;
+};
+
+/** みえーるみえーる・必殺技を開いた結果。`turns` は見せる敵の行動、`battle` は使ったあとの状態 */
+export type BattleTurnsModel = {
+  readonly turns: readonly TurnActionModel[];
+  readonly battle: BattleModel;
+};
+
 /** コマンドを 1 つ実行した結果 */
 export type BattleStepModel = {
   readonly events: readonly BattleEventModel[];
