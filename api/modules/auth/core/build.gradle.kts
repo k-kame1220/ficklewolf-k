@@ -3,7 +3,6 @@ plugins {
 }
 
 dependencies {
-    api(project(":shared:kernel"))
     api(project(":modules:player:api"))
     api(project(":modules:character:api"))
     api(project(":modules:item:api"))

@@ -11,6 +11,7 @@ K のバックエンド API。設計は `../docs/05_backend-architecture.md`、A
 
 ```
 api/
+├── architecture/            アーキテクチャのテスト（Konsist。core の中の依存の向きなど。docs/05 §4）
 ├── bootstrap/               起動（KApplication）と設定（application.properties）
 ├── build-logic/             Gradle の共通設定（k.kotlin-core・k.spring-adapter・k.spring-boot-app）
 ├── shared/kernel/           全モジュールで共有する小さな型（PlayerId・CharacterId・ItemId・Attribute・Stat・Stats・TransactionRunner など）
