@@ -9,10 +9,19 @@ dependencies {
 }
 
 // ほかのモジュールに依存していないので、Gradle はソースが変わってもこのテストを「最新」とみなして飛ばしてしまう。
-// 読む対象のソースを入力に入れて、変わったら走るようにする
+// 読む対象のソース（modules/<名前>/<api・core・adapter>/src/main/kotlin）を入力に入れて、変わったら走るようにする。
+// 入力の根を api/ 全体にすると、ほかのモジュールの build/ と重なって Gradle 9 が止めるので、ソースのフォルダだけを並べる
+val checkedSourceDirs =
+    rootDir
+        .resolve("modules")
+        .listFiles()
+        .orEmpty()
+        .flatMap { module -> listOf("api", "core", "adapter").map { module.resolve("$it/src/main/kotlin") } }
+        .filter { it.isDirectory }
+
 tasks.test {
     inputs
-        .files(fileTree(rootDir) { include("modules/**/src/main/kotlin/**/*.kt") })
+        .files(checkedSourceDirs)
         .withPropertyName("checkedSources")
         .withPathSensitivity(PathSensitivity.RELATIVE)
 }
