@@ -94,12 +94,14 @@ bootstrap ─→ modules/*/adapter ─→ modules/*/core ─→ modules/*/api �
 - **処理の本体は `<モジュール>Service` に書く。** `Default<モジュール>Api` は**変換だけ**をする（外の型 → domain の型にして Service を呼び、domain の型 → 外の型にして返す）。
 - **core の中で自分のモジュールの api の型を import するのは `Default<モジュール>Api` だけ。** domain と Service は自分の api を知らない（他モジュールの api の窓口を Service から呼ぶのはよい。§3）。api の約束を変えても、直すのは変換役だけで済む。
 - 依存の向きは **core → api**（約束を実装するため）。api は core を知らない。他モジュールは api だけに依存し、core には依存しない（Gradle の依存に入れない）。
-- **core の中の向きはテストで守る。** モジュールの境界は Gradle の依存で守れるが、core の中の `domain` と `application` は同じ Gradle モジュールの中のパッケージなので、Gradle では止められない。そこで `api/architecture`（テストだけのモジュール）で Konsist を使い、次を確かめる（`./gradlew build` で一緒に走る）。
+- **core の中の向きはテストで守る。** モジュールの境界は Gradle の依存で守れるが、core の中の `domain` と `application` は同じ Gradle モジュールの中のパッケージなので、Gradle では止められない。そこで `api/architecture`（テストだけのモジュール）で Konsist を使い、次を確かめる。
   - `domain` は `application` を import しない（`application` → `domain` の一方向）
   - `domain` はどのモジュールの `api` も import しない（ほかのモジュールとのやり取りは `application` がする）
   - 自分のモジュールの `api` を import するのは `Default<モジュール>Api` だけ
   - core は Spring を import しない（§3）
   - 決まりを足すときは、わざと違反させたコードでテストが落ちることを確かめてから入れる
+  - `api/architecture` はほかのモジュールに依存しないので、`modules/**/src/main/kotlin` のソースをテストの入力に入れている（入れないと、ソースが変わっても Gradle がテストを「最新」とみなして飛ばす）
+  - `./gradlew build` に含まれるので、pre-commit（`api/` を変えたとき）と CI の api のジョブで走る
 - `<モジュール>Service` は自分の adapter（別の Gradle モジュール）から使うので public にする。他モジュールは core に依存しないので、外からは見えない。`Default<モジュール>Service`・`Default<モジュール>Api` は `internal`。
 
 ```
