@@ -1,6 +1,6 @@
 # バックエンド設計（モジュラーモノリスとレイヤー構成）
 
-> 版: v1.3（2026-11-01、quest の報酬・クリアの記録・お天気クエストを決める）/ 対象: `api/`。バックエンドはオーナーが書く。この文書はオーナーと AI の相談で決めたことの記録。
+> 版: v1.4（2026-11-19、core の中の依存の向きを Konsist のテストで守る）/ 対象: `api/`。バックエンドはオーナーが書く。この文書はオーナーと AI の相談で決めたことの記録。
 > 前提: [00_project-context.md](00_project-context.md)（Kotlin + Spring Boot は必須）、[02_requirements.md](02_requirements.md) §6（API 一覧）
 
 ---
@@ -94,6 +94,12 @@ bootstrap ─→ modules/*/adapter ─→ modules/*/core ─→ modules/*/api �
 - **処理の本体は `<モジュール>Service` に書く。** `Default<モジュール>Api` は**変換だけ**をする（外の型 → domain の型にして Service を呼び、domain の型 → 外の型にして返す）。
 - **core の中で自分のモジュールの api の型を import するのは `Default<モジュール>Api` だけ。** domain と Service は自分の api を知らない（他モジュールの api の窓口を Service から呼ぶのはよい。§3）。api の約束を変えても、直すのは変換役だけで済む。
 - 依存の向きは **core → api**（約束を実装するため）。api は core を知らない。他モジュールは api だけに依存し、core には依存しない（Gradle の依存に入れない）。
+- **core の中の向きはテストで守る。** モジュールの境界は Gradle の依存で守れるが、core の中の `domain` と `application` は同じ Gradle モジュールの中のパッケージなので、Gradle では止められない。そこで `api/architecture`（テストだけのモジュール）で Konsist を使い、次を確かめる（`./gradlew build` で一緒に走る）。
+  - `domain` は `application` を import しない（`application` → `domain` の一方向）
+  - `domain` はどのモジュールの `api` も import しない（ほかのモジュールとのやり取りは `application` がする）
+  - 自分のモジュールの `api` を import するのは `Default<モジュール>Api` だけ
+  - core は Spring を import しない（§3）
+  - 決まりを足すときは、わざと違反させたコードでテストが落ちることを確かめてから入れる
 - `<モジュール>Service` は自分の adapter（別の Gradle モジュール）から使うので public にする。他モジュールは core に依存しないので、外からは見えない。`Default<モジュール>Service`・`Default<モジュール>Api` は `internal`。
 
 ```
@@ -372,6 +378,7 @@ com.ficklewolf.k.<モジュール>.adapter.web / .adapter.persistence
 | 2026-10-11 | weather: 天気は日本時間の日付ごとに 1 つ。その日の最初の問い合わせで重み付き抽選して保存する（定期実行はしない）。`GET /weather/today` は日付・ID・名前・属性を返し、ログインが要る（§7「weather」） |
 | 2026-10-12 | item と強化: `GET /me/items` は 1 個以上のものだけ。強化は `POST /me/characters/{id}/enhance`（ステータスごとの個数。全部使えるときだけ使い、だめなら何も使わずに断る）で、強化したあとのキャラだけを返す。キャラのステータスは api が内訳（基礎・アイテム・被り・天気・合計）まで計算して `/me/characters` で返す。ゲスト作成で `starterItems`（月の酒を 3 個ずつ）を持たせる |
 | 2026-11-01 | quest: 報酬は quest が持ち、battle は `QuestApi` でクリアを知らせる。クリアの記録は回数と初クリアの日時。天気とお天気クエストのつながりは `quests.json` の `weatherId` に持ち、`weathers.json` の `questId` は消した（weather がクエストを知らないように。quest → weather の一方向）。落ちるアイテムは `rewards.dropItemId`（天気の属性 × ボーナスの付くステータス。スピードの天気は `null`）、個数は 0〜3。Lv1 から何回でも |
+| 2026-11-19 | core の中の依存の向き（`application` → `domain`、自分の `api` は `Default〇〇Api` だけ、Spring に依存しない）を Konsist のテストで守る（`api/architecture`）。前は「Gradle の依存で足りるので、必要になったら入れる」として見送っていたが、core の中のパッケージの向きは Gradle では止められないと指摘を受けて入れた（§4） |
 
 ### 不採用にした案
 - **外側（presentation・infrastructure）を全モジュールで共通にする**: Gradle のモジュールは少なく済むが、外側では境界をコンパイラで守れない（特に DB で他モジュールのテーブルを触れてしまう）。モジュール数はほぼ変わらないので、境界を守れる core + adapter にした。
@@ -384,5 +391,4 @@ com.ficklewolf.k.<モジュール>.adapter.web / .adapter.persistence
 - **`/players/me` にする**: 他のプレイヤーを `/players/{id}` で見る予定がない。URL にモジュールの分け方を出さない。
 - **今日の天気を 0 時の定期実行で抽選する**（2026-10-11）: サーバーが止まっていた日や、複数台で動かすときの扱いが要る。最初の問い合わせで抽選すれば、仕組みがいらない。
 - **今日の天気を日付から計算する（保存しない）**（2026-10-11）: 秘密の値を設定で管理する必要があり、漏れると先の天気が計算できてしまう（リポジトリは公開）。
-- **アーキテクチャのテスト（Konsist など）**: 境界のほとんどは Gradle の依存で守れるので、必要になったら入れる。
 - **`weathers.json` に `questId` を持たせ、`WeatherApi` が今日のお天気クエストを返す**（2026-11-08）: weather が quest の ID を知ることになり、依存が逆向きにもできる。お天気クエストを足し替えるときに weather のマスタも直すことになる。「この天気の日のクエスト」はクエストの性質なので、`quests.json` の `weatherId` に持つ。
