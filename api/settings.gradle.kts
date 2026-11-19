@@ -9,6 +9,7 @@ include(
     ":bootstrap",
     ":platform:web",
     ":platform:persistence",
+    ":architecture",
 )
 
 file("modules").listFiles()?.filter { it.isDirectory }?.sorted()?.forEach { module ->
