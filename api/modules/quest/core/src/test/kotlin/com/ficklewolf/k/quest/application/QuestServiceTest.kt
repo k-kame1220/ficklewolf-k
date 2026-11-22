@@ -4,6 +4,7 @@ import com.ficklewolf.k.player.api.CreatePlayerResult
 import com.ficklewolf.k.player.api.PlayerApi
 import com.ficklewolf.k.player.api.PlayerSummary
 import com.ficklewolf.k.quest.domain.Quest
+import com.ficklewolf.k.quest.domain.QuestClear
 import com.ficklewolf.k.quest.domain.QuestKind
 import com.ficklewolf.k.quest.domain.QuestStage
 import com.ficklewolf.k.shared.kernel.Attribute
@@ -12,9 +13,13 @@ import com.ficklewolf.k.shared.kernel.EnemyAction
 import com.ficklewolf.k.shared.kernel.PlayerId
 import com.ficklewolf.k.shared.kernel.QuestId
 import com.ficklewolf.k.shared.kernel.Stats
+import com.ficklewolf.k.shared.kernel.TransactionRunner
 import com.ficklewolf.k.shared.kernel.WeatherId
 import com.ficklewolf.k.weather.api.TodayWeatherSummary
 import com.ficklewolf.k.weather.api.WeatherApi
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneOffset
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -57,7 +62,41 @@ class QuestServiceTest {
             override fun listAll(): List<Quest> = masters
         }
 
-    private val service = questService(playerApi, weatherApi, questRepository)
+    private val clears = mutableMapOf<Pair<PlayerId, QuestId>, QuestClear>()
+
+    private val questClearRepository =
+        object : QuestClearRepository {
+            override fun listByPlayerId(playerId: PlayerId): List<QuestClear> =
+                clears.values.filter { it.playerId == playerId }
+
+            override fun findByPlayerIdAndQuestId(
+                playerId: PlayerId,
+                questId: QuestId,
+            ): QuestClear? = clears[playerId to questId]
+
+            override fun save(questClear: QuestClear) {
+                clears[questClear.playerId to questClear.questId] = questClear
+            }
+        }
+
+    private val transaction =
+        object : TransactionRunner {
+            override fun <T> run(block: () -> T): T = block()
+        }
+
+    private var now = Instant.parse("2026-11-01T00:00:00Z")
+
+    /** 呼ぶたびに `now` を返す（テストの中で時刻を進められるように） */
+    private val clock =
+        object : Clock() {
+            override fun getZone() = ZoneOffset.UTC
+
+            override fun withZone(zone: java.time.ZoneId?): Clock = this
+
+            override fun instant(): Instant = now
+        }
+
+    private val service = questService(playerApi, weatherApi, questRepository, questClearRepository, transaction, clock)
 
     @Test
     fun `Lv1 ならメインクエストは 1 つめだけで、今日のお天気クエストも出る`() {
@@ -94,10 +133,46 @@ class QuestServiceTest {
     }
 
     @Test
-    fun `クリアの記録はまだ無いので、どれもクリアしていない`() {
+    fun `まだクリアしていなければ、どれもクリアしていない`() {
         val quests = service.listAvailableQuests(player)
 
         assertTrue(quests.none { it.isCleared })
+    }
+
+    @Test
+    fun `クリアしたクエストは、一覧でクリア済みになる`() {
+        service.clearQuest(player, QuestId("main-a"))
+
+        val cleared = service.listAvailableQuests(player).associate { it.quest.id.value to it.isCleared }
+
+        assertEquals(mapOf("main-a" to true, "weather-cloudy" to false), cleared)
+    }
+
+    @Test
+    fun `初めてのクリアは 1 回目で、そのときの時刻を初クリアの日時にする`() {
+        val cleared = service.clearQuest(player, QuestId("main-a"))
+
+        assertEquals(1, cleared.count)
+        assertEquals(Instant.parse("2026-11-01T00:00:00Z"), cleared.firstClearedAt)
+    }
+
+    @Test
+    fun `2 回目のクリアは回数だけが増え、初クリアの日時は変わらない`() {
+        service.clearQuest(player, QuestId("main-a"))
+        now = Instant.parse("2026-11-02T00:00:00Z")
+
+        val cleared = service.clearQuest(player, QuestId("main-a"))
+
+        assertEquals(2, cleared.count)
+        assertEquals(Instant.parse("2026-11-01T00:00:00Z"), cleared.firstClearedAt)
+        assertEquals(listOf(2), questClearRepository.listByPlayerId(player).map { it.count })
+    }
+
+    @Test
+    fun `ほかのプレイヤーのクリアは、自分の一覧に出ない`() {
+        service.clearQuest(PlayerId(UUID.randomUUID()), QuestId("main-a"))
+
+        assertTrue(service.listAvailableQuests(player).none { it.isCleared })
     }
 
     @Test
