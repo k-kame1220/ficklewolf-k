@@ -5,6 +5,7 @@ import com.ficklewolf.k.player.api.PlayerApi
 import com.ficklewolf.k.player.api.PlayerSummary
 import com.ficklewolf.k.quest.domain.Quest
 import com.ficklewolf.k.quest.domain.QuestClear
+import com.ficklewolf.k.quest.domain.QuestConfig
 import com.ficklewolf.k.quest.domain.QuestKind
 import com.ficklewolf.k.quest.domain.QuestStage
 import com.ficklewolf.k.shared.kernel.Attribute
@@ -29,13 +30,28 @@ import kotlin.test.assertTrue
 class QuestServiceTest {
     private val player = PlayerId(UUID.randomUUID())
     private var level = 1
+    private var fuda = 0
 
     private val playerApi =
         object : PlayerApi {
-            override fun find(id: PlayerId): PlayerSummary? =
-                if (id == player) PlayerSummary(player, "ゲスト", level, 0, CharacterId("zero")) else null
+            override fun find(id: PlayerId): PlayerSummary? = if (id == player) summary() else null
 
             override fun create(name: String): CreatePlayerResult = error("使わない")
+
+            override fun levelUp(id: PlayerId): PlayerSummary {
+                level += 1
+                return summary()
+            }
+
+            override fun addFuda(
+                id: PlayerId,
+                amount: Int,
+            ): PlayerSummary {
+                fuda += amount
+                return summary()
+            }
+
+            private fun summary(): PlayerSummary = PlayerSummary(player, "ゲスト", level, fuda, CharacterId("zero"))
         }
 
     private var todayWeatherId = WeatherId("cloudy")
@@ -96,7 +112,22 @@ class QuestServiceTest {
             override fun instant(): Instant = now
         }
 
-    private val service = questService(playerApi, weatherApi, questRepository, questClearRepository, transaction, clock)
+    /** 偶数の Lv になったときのお札は 3 枚（settings.json の値ではなく、ここで決めた値が使われることを確かめる） */
+    private val questConfigRepository =
+        object : QuestConfigRepository {
+            override fun load(): QuestConfig = QuestConfig(1.0, 0.2, 0, 3, fudaPerEvenLevel = 3)
+        }
+
+    private val service =
+        questService(
+            playerApi,
+            weatherApi,
+            questRepository,
+            questClearRepository,
+            questConfigRepository,
+            transaction,
+            clock,
+        )
 
     @Test
     fun `Lv1 ならメインクエストは 1 つめだけで、今日のお天気クエストも出る`() {
@@ -140,12 +171,12 @@ class QuestServiceTest {
     }
 
     @Test
-    fun `クリアしたクエストは、一覧でクリア済みになる`() {
+    fun `クリアしたクエストは、一覧でクリア済みになり、Lv が上がって次のメインクエストが出る`() {
         service.clearQuest(player, QuestId("main-a"))
 
         val cleared = service.listAvailableQuests(player).associate { it.quest.id.value to it.isCleared }
 
-        assertEquals(mapOf("main-a" to true, "weather-cloudy" to false), cleared)
+        assertEquals(mapOf("main-a" to true, "main-b" to false, "weather-cloudy" to false), cleared)
     }
 
     @Test
@@ -178,6 +209,49 @@ class QuestServiceTest {
     @Test
     fun `プレイヤーがいなければ例外（ログインしているのにいないのはバグ）`() {
         assertFailsWith<IllegalStateException> { service.listAvailableQuests(PlayerId(UUID.randomUUID())) }
+    }
+
+    @Test
+    fun `メインクエストを初めてクリアすると Lv が上がり、偶数になったらお札をもらう`() {
+        service.clearQuest(player, QuestId("main-a"))
+
+        assertEquals(2, level)
+        assertEquals(3, fuda)
+    }
+
+    @Test
+    fun `上がった Lv が奇数なら、お札はもらえない`() {
+        level = 2
+
+        service.clearQuest(player, QuestId("main-b"))
+
+        assertEquals(3, level)
+        assertEquals(0, fuda)
+    }
+
+    @Test
+    fun `同じメインクエストを 2 回目にクリアしても、Lv もお札も増えない`() {
+        service.clearQuest(player, QuestId("main-a"))
+
+        service.clearQuest(player, QuestId("main-a"))
+
+        assertEquals(2, level)
+        assertEquals(3, fuda)
+    }
+
+    @Test
+    fun `お天気クエストやイベントクエストを初めてクリアしても、Lv は上がらない`() {
+        service.clearQuest(player, QuestId("weather-cloudy"))
+        service.clearQuest(player, QuestId("event-w"))
+
+        assertEquals(1, level)
+        assertEquals(0, fuda)
+    }
+
+    @Test
+    fun `マスタにないクエストは例外で、何も記録しない（呼ぶ側のバグ）`() {
+        assertFailsWith<IllegalStateException> { service.clearQuest(player, QuestId("nope")) }
+        assertTrue(questClearRepository.listByPlayerId(player).isEmpty())
     }
 
     private fun quest(

@@ -60,4 +60,13 @@ class PlayerApiTest {
         assertEquals(CreatePlayerResult.InvalidName, api.create("abcdefg"))
         assertTrue(players.isEmpty())
     }
+
+    @Test
+    fun `Lv を上げる・お札を足すと、変えたあとの外向けの形で返す`() {
+        val created = assertIs<CreatePlayerResult.Created>(api.create("ゲスト")).player
+
+        assertEquals(2, api.levelUp(created.id).level)
+        assertEquals(1, api.addFuda(created.id, 1).fuda)
+        assertEquals(created.copy(level = 2, fuda = 1), api.find(created.id))
+    }
 }

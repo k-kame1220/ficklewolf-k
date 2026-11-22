@@ -10,6 +10,8 @@ data class QuestClear(
     val count: Int,
     val firstClearedAt: Instant,
 ) {
+    val isFirstClear: Boolean get() = count == 1
+
     fun recordClear(): QuestClear = copy(count = count + 1)
 
     companion object {

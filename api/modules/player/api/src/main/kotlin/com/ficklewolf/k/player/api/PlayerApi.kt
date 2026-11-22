@@ -6,4 +6,11 @@ interface PlayerApi {
     fun find(id: PlayerId): PlayerSummary?
 
     fun create(name: String): CreatePlayerResult
+
+    fun levelUp(id: PlayerId): PlayerSummary
+
+    fun addFuda(
+        id: PlayerId,
+        amount: Int,
+    ): PlayerSummary
 }

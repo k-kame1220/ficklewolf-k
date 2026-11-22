@@ -24,15 +24,26 @@ fun questService(
     weatherApi: WeatherApi,
     questRepository: QuestRepository,
     questClearRepository: QuestClearRepository,
+    questConfigRepository: QuestConfigRepository,
     transaction: TransactionRunner,
     clock: Clock,
-): QuestService = DefaultQuestService(playerApi, weatherApi, questRepository, questClearRepository, transaction, clock)
+): QuestService =
+    DefaultQuestService(
+        playerApi,
+        weatherApi,
+        questRepository,
+        questClearRepository,
+        questConfigRepository,
+        transaction,
+        clock,
+    )
 
 internal class DefaultQuestService(
     private val playerApi: PlayerApi,
     private val weatherApi: WeatherApi,
     private val questRepository: QuestRepository,
     private val questClearRepository: QuestClearRepository,
+    private val questConfigRepository: QuestConfigRepository,
     private val transaction: TransactionRunner,
     private val clock: Clock,
 ) : QuestService {
@@ -55,10 +66,20 @@ internal class DefaultQuestService(
         questId: QuestId,
     ): QuestClear =
         transaction.run {
+            val quest =
+                questRepository.listAll().find { it.id == questId } ?: error(
+                    "quest not found: ${questId.value}",
+                )
             val cleared =
                 questClearRepository.findByPlayerIdAndQuestId(playerId, questId)?.recordClear()
                     ?: QuestClear.first(playerId, questId, clock.instant())
             questClearRepository.save(cleared)
+
+            if (quest.kind == QuestKind.Main && cleared.isFirstClear) {
+                val leveledUp = playerApi.levelUp(playerId)
+                val isEvenLevel = leveledUp.level % 2 == 0
+                if (isEvenLevel) playerApi.addFuda(playerId, questConfigRepository.load().fudaPerEvenLevel)
+            }
             cleared
         }
 }

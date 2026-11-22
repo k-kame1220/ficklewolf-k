@@ -10,6 +10,7 @@ import com.ficklewolf.k.shared.kernel.TransactionRunner
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 
 class PlayerServiceTest {
@@ -91,5 +92,42 @@ class PlayerServiceTest {
 
         assertEquals(UpdatePlayerResult.CharacterNotOwned, result)
         assertEquals(created, service.findPlayer(created.id))
+    }
+
+    @Test
+    fun `Lv を上げると 1 上がり、保存される`() {
+        val created = service.createPlayer(PlayerName.of("ゲスト") ?: error("名前が使えない"))
+
+        val updated = service.levelUpPlayer(created.id)
+
+        assertEquals(2, updated.level)
+        assertEquals(2, service.findPlayer(created.id)?.level)
+    }
+
+    @Test
+    fun `お札を足すと、その枚数だけ増えて保存される`() {
+        val created = service.createPlayer(PlayerName.of("ゲスト") ?: error("名前が使えない"))
+
+        service.addPlayerFuda(created.id, 1)
+        val updated = service.addPlayerFuda(created.id, 2)
+
+        assertEquals(3, updated.fuda)
+        assertEquals(3, service.findPlayer(created.id)?.fuda)
+    }
+
+    @Test
+    fun `0 枚以下のお札は足せない（呼ぶ側のバグ）`() {
+        val created = service.createPlayer(PlayerName.of("ゲスト") ?: error("名前が使えない"))
+
+        assertFailsWith<IllegalArgumentException> { service.addPlayerFuda(created.id, 0) }
+        assertEquals(0, service.findPlayer(created.id)?.fuda)
+    }
+
+    @Test
+    fun `いないプレイヤーの Lv やお札は変えられない（呼ぶ側のバグ）`() {
+        val nobody = PlayerId(UUID.randomUUID())
+
+        assertFailsWith<IllegalStateException> { service.levelUpPlayer(nobody) }
+        assertFailsWith<IllegalStateException> { service.addPlayerFuda(nobody, 1) }
     }
 }

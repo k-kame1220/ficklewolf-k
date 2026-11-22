@@ -9,7 +9,7 @@ dependencies {
 
 tasks.processResources {
     from(rootProject.file("../spec/master")) {
-        include("quests.json")
+        include("quests.json", "settings.json")
         into("quest")
     }
 }

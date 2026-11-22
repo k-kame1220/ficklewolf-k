@@ -10,6 +10,17 @@ data class Player(
     val fuda: Int,
     val selectedCharacterId: CharacterId,
 ) {
+    fun rename(newName: PlayerName): Player = copy(name = newName)
+
+    fun selectCharacter(newCharacterId: CharacterId): Player = copy(selectedCharacterId = newCharacterId)
+
+    fun levelUp(): Player = copy(level = level + 1)
+
+    fun addFuda(amount: Int): Player {
+        require(amount > 0) { "fuda amount must be positive: $amount" }
+        return copy(fuda = fuda + amount)
+    }
+
     companion object {
         const val FIRST_LEVEL = 1
 
@@ -19,8 +30,4 @@ data class Player(
             selectedCharacterId: CharacterId,
         ): Player = Player(id, name, FIRST_LEVEL, 0, selectedCharacterId)
     }
-
-    fun rename(newName: PlayerName): Player = copy(name = newName)
-
-    fun selectCharacter(newCharacterId: CharacterId): Player = copy(selectedCharacterId = newCharacterId)
 }

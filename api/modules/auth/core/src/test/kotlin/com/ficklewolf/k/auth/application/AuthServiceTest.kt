@@ -37,6 +37,13 @@ class AuthServiceTest {
                 if (name == "ゲスト") CreatePlayerResult.Created(guest) else CreatePlayerResult.InvalidName
 
             override fun find(id: PlayerId): PlayerSummary? = null
+
+            override fun levelUp(id: PlayerId): PlayerSummary = error("使わない")
+
+            override fun addFuda(
+                id: PlayerId,
+                amount: Int,
+            ): PlayerSummary = error("使わない")
         }
 
     private val acquiredCharacters = mutableListOf<Pair<PlayerId, CharacterId>>()

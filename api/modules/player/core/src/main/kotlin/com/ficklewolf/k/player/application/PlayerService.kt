@@ -28,6 +28,13 @@ interface PlayerService {
         name: PlayerName?,
         selectedCharacterId: CharacterId?,
     ): UpdatePlayerResult
+
+    fun levelUpPlayer(id: PlayerId): Player
+
+    fun addPlayerFuda(
+        id: PlayerId,
+        amount: Int,
+    ): Player
 }
 
 fun playerService(
@@ -67,5 +74,20 @@ internal class DefaultPlayerService(
                     .let { if (selectedCharacterId != null) it.selectCharacter(selectedCharacterId) else it }
             repository.save(updated)
             UpdatePlayerResult.Updated(updated)
+        }
+
+    override fun levelUpPlayer(id: PlayerId): Player =
+        transaction.run {
+            val player = repository.findById(id) ?: error("player not found: ${id.value}")
+            player.levelUp().also { repository.save(it) }
+        }
+
+    override fun addPlayerFuda(
+        id: PlayerId,
+        amount: Int,
+    ): Player =
+        transaction.run {
+            val player = repository.findById(id) ?: error("player not found: ${id.value}")
+            player.addFuda(amount).also { repository.save(it) }
         }
 }
